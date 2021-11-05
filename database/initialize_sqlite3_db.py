@@ -47,5 +47,83 @@ def initialise_sqlite3_db():
     return
 
 
+def insert_data(
+        testing_dataset,
+        environment,
+        distance,
+        device,
+        training_model,
+        keybyte,
+        epoch,
+        additive_noise_method,
+        additive_noise_parameter_1,
+        additive_noise_parameter_1_value,
+        additive_noise_parameter_2,
+        additive_noise_parameter_2_value,
+        denoising_method,
+        denoising_method_parameter_1,
+        denoising_method_parameter_1_value,
+        denoising_method_parameter_2,
+        denoising_method_parameter_2_value,
+        termination_point,
+        date_added,
+):
+    """
+
+    :param testing_dataset:
+    :param environment:
+    :param distance:
+    :param device:
+    :param training_model:
+    :param keybyte:
+    :param epoch:
+    :param additive_noise_method:
+    :param additive_noise_parameter_1:
+    :param additive_noise_parameter_1_value:
+    :param additive_noise_parameter_2:
+    :param additive_noise_parameter_2_value:
+    :param denoising_method:
+    :param denoising_method_parameter_1:
+    :param denoising_method_parameter_1_value:
+    :param denoising_method_parameter_2:
+    :param denoising_method_parameter_2_value:
+    :param termination_point:
+    :param date_added:
+    """
+    con = lite.connect("TerminationPoints.db")
+    if testing_dataset:
+
+
+    insert_string = f"""
+    INSERT INTO RankTest VALUES(
+    NULL,
+    '{testing_dataset}',
+    '{environment}',
+    {distance},
+    {device},
+    '{training_model}',
+    {keybyte},
+    {epoch},
+    '{additive_noise_method}',
+    '{additive_noise_parameter_1}',
+    {additive_noise_parameter_1_value},
+    '{additive_noise_parameter_2}',
+    {additive_noise_parameter_2_value},
+    '{denoising_method}',
+    '{denoising_method_parameter_1}',
+    {denoising_method_parameter_1_value},
+    '{denoising_method_parameter_2}',
+    {denoising_method_parameter_2_value},
+    {termination_point},
+    '{date_added}'
+    )
+    """
+
+    insert_string.replace("\n", "")
+    con.execute(
+        insert_string
+    )
+
+
 if __name__ == "__main__":
     initialise_sqlite3_db()
