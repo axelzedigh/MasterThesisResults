@@ -70,25 +70,25 @@ def insert_data(
 ):
     """
 
-    :param testing_dataset:
-    :param environment:
-    :param distance:
-    :param device:
-    :param training_model:
-    :param keybyte:
-    :param epoch:
-    :param additive_noise_method:
-    :param additive_noise_parameter_1:
-    :param additive_noise_parameter_1_value:
-    :param additive_noise_parameter_2:
-    :param additive_noise_parameter_2_value:
-    :param denoising_method:
-    :param denoising_method_parameter_1:
-    :param denoising_method_parameter_1_value:
-    :param denoising_method_parameter_2:
-    :param denoising_method_parameter_2_value:
-    :param termination_point:
-    :param date_added:
+    :param testing_dataset: The dataset (either 'Wang2021' or 'Zedigh2021')
+    :param environment: The environment the testing traces were collected. Either office or KTH Kista Hall.
+    :param distance: Distance between device under test and antenna.
+    :param device: Device under test.
+    :param training_model: The deep learning model used. Usually 'CNN 110'.
+    :param keybyte: The keybyte trained and tested. Between 0-15.
+    :param epoch: The epoch of the DL model. Between 1-100.
+    :param additive_noise_method: The additive noise method used during model training. E.g. Gaussian, Collected, Rayleigh etc.
+    :param additive_noise_parameter_1: First parameter of the additive noise method. E.g Mean, Scale, Mode etc.
+    :param additive_noise_parameter_1_value: Value of the first additive noise parameter.
+    :param additive_noise_parameter_2: Second parameter of the additive noise method. E.g. Std, Translation etc.
+    :param additive_noise_parameter_2_value: Value of the second additive noise parameter.
+    :param denoising_method: Denoising method used. E.g. Moving average filter, CDAE, Weiner filter.
+    :param denoising_method_parameter_1: First parameter of the denoising parameter. E.g. N, etc.
+    :param denoising_method_parameter_1_value: Value of the first denoising method.
+    :param denoising_method_parameter_2: Second parameter of the denoising method.
+    :param denoising_method_parameter_2_value: Value of the second denoising parameter.
+    :param termination_point: Termination point from rank test. Dependent variable!
+    :param date_added: The date the value was added to the database. Helps to remove multiple entries of same data.
     """
     con = lite.connect("TerminationPoints.db")
     if testing_dataset:
