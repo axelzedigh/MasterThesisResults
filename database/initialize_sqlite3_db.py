@@ -127,7 +127,7 @@ def insert_data(
     con.close()
 
 
-def fetchall(database="TerminationPoints.db") -> list:
+def fetchall(database="TerminationPoints.db"):
     """
 
     :param database:
@@ -135,7 +135,8 @@ def fetchall(database="TerminationPoints.db") -> list:
     """
     con = lite.connect(database)
     cur = con.cursor()
-    all_data = cur.fetchall()
+    all_data = cur.execute("SELECT * FROM RankTest;").fetchall()
+    con.close()
     return all_data
 
 

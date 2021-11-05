@@ -1,4 +1,4 @@
-from initialize_sqlite3_db import insert_data, fetchall
+from initialize_sqlite3_db import insert_data
 import time
 import sys
 
