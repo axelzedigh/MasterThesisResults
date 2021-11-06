@@ -50,33 +50,59 @@ class AddToDatabaseTestCase(unittest.TestCase):
     def test_fetch_additive_noise_methods(self):
         fetchall = self.cur.execute("SELECT * FROM Additive_Noise_Methods;").fetchall()
         self.assertIsNotNone(fetchall)
-        additive_noise_methods = [
-            (1, "Gaussian", "Std", 0.01, "Mean", 0.0),
-            (2, "Gaussian", "Std", 0.02, "Mean", 0.0),
-            (3, "Gaussian", "Std", 0.03, "Mean", 0.0),
-            (4, "Gaussian", "Std", 0.04, "Mean", 0.0),
-            (5, "Gaussian", "Std", 0.05, "Mean", 0.0),
-            (6, "Collected", "Scale", 25.0, None, None),
-            (7, "Collected", "Scale", 50.0, None, None),
-            (8, "Collected", "Scale", 75.0, None, None),
-            (9, "Collected", "Scale", 105.0, None, None),
-            (10, "Rayleigh", "Mode", 0.0138, None, None),
-            (11, "Rayleigh", "Mode", 0.0276, None, None),
-        ]
+        additive_noise_methods = [(1, "Gaussian", 1, 5)]
         self.assertEqual(fetchall[0], additive_noise_methods[0])
 
     def test_fetch_denoising_methods(self):
         fetchall = self.cur.execute("SELECT * FROM Denoising_Methods;").fetchall()
         self.assertIsNotNone(fetchall)
-        denoising_methods = [(1, "Moving Average Filter", "N", 3.0, None, None)]
+        denoising_methods = [(1, "Moving Average Filter", 12, None)]
         self.assertEqual(fetchall[0], denoising_methods[0])
 
+    def test_fetch_parameters(self):
+        fetchall = self.cur.execute("SELECT * FROM Parameters;").fetchall()
+        self.assertIsNotNone(fetchall)
+        parameters = [
+            (1, "Std", 0.01),
+            (2, "Std", 0.02),
+            (3, "Std", 0.03),
+            (4, "Std", 0.04),
+            (5, "Mean", 0.0),
+            (6, "Scale", 25.0),
+            (7, "Scale", 50.0),
+            (8, "Scale", 75.0),
+            (9, "Scale", 105.0),
+            (10, "Mode", 0.0138),
+            (11, "Mode", 0.0276),
+            (12, "N", 3.0),
+        ]
+        self.assertEqual(fetchall[0], parameters[0])
+
     def test_insert_denoising_method(self):
-        self.cur.execute(
-            "INSERT INTO Denoising_Methods VALUES(NULL,'CDAE',NULL,NULL, NULL, NULL)"
-        )
+        self.cur.execute("INSERT INTO Denoising_Methods VALUES(NULL,'CDAE',NULL,NULL)")
         fetchall = self.cur.execute("SELECT * FROM Denoising_Methods;").fetchall()
-        self.assertEqual("CDAE", fetchall[1][1])
+        self.assertEqual("CDAE", fetchall[2][1])
+
+    def test_fetch_view_full_additive_noise_methods(self):
+        fetchall = self.cur.execute(
+            "SELECT * FROM full_additive_noise_methods;"
+        ).fetchall()
+        self.assertIsNotNone(fetchall)
+        data = [
+            (1, "Gaussian", "Std", 0.01, "Mean", 0.0),
+            (2, "Gaussian", "Std", 0.02, "Mean", 0.0),
+            (3, "Gaussian", "Std", 0.03, "Mean", 0.0),
+            (4, "Gaussian", "Std", 0.04, "Mean", 0.0),
+        ]
+        self.assertEqual(fetchall[0], data[0])
+
+    def test_fetch_view_full_denoising_methods(self):
+        fetchall = self.cur.execute(
+            "SELECT * FROM full_denoising_methods;"
+        ).fetchall()
+        self.assertIsNotNone(fetchall)
+        self.assertNotEqual(fetchall, [])
+        print(fetchall)
 
     def test_insert_rank_test_data(self):
         insert_data_to_db(
@@ -113,6 +139,7 @@ class AddToDatabaseTestCase(unittest.TestCase):
         self.assertIsNotNone(fetchall)
         device = fetchall[0][5]
         self.assertEqual(8, device)
+        self.assertNotEqual(fetchall, [])
 
     def test_view_query(self):
         insert_data_to_db(
@@ -125,7 +152,7 @@ class AddToDatabaseTestCase(unittest.TestCase):
             training_model_id=1,
             keybyte=0,
             epoch=100,
-            additive_noise_method_id=None,
+            additive_noise_method_id=2,
             denoising_method_id=None,
             termination_point=101,
             average_rank=102,
@@ -133,3 +160,5 @@ class AddToDatabaseTestCase(unittest.TestCase):
         query = "SELECT * FROM full_rank_test;"
         data = fetchall_query(self.database, query)
         self.assertIsNotNone(data)
+        self.assertNotEqual(data, [])
+        print(data)

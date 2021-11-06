@@ -3,7 +3,9 @@ import os
 import datetime
 from database.queries import QUERY_CREATE_TABLE_ENVIRONMENTS, QUERY_CREATE_TABLE_TEST_DATASETS, \
     QUERY_CREATE_TABLE_TRAINING_DATASETS, QUERY_CREATE_TABLE_TRAINING_MODELS, QUERY_CREATE_TABLE_ADDITIVE_NOISE_METHODS, \
-    QUERY_CREATE_TABLE_DENOISING_METHODS, QUERY_CREATE_TABLE_RANK_TEST, QUERY_CREATE_VIEW_FULL_RANK_TEST
+    QUERY_CREATE_TABLE_DENOISING_METHODS, QUERY_CREATE_TABLE_RANK_TEST, QUERY_CREATE_VIEW_FULL_RANK_TEST, \
+    QUERY_CREATE_TABLE_PARAMETERS, QUERY_CREATE_VIEW_FULL_ADDITIVE_NOISE_METHODS, \
+    QUERY_CREATE_VIEW_FULL_DENOISING_METHODS
 
 
 def create_db_with_tables(database="TerminationPoints.db") -> None:
@@ -26,11 +28,15 @@ def create_db_with_tables(database="TerminationPoints.db") -> None:
         cur.execute(QUERY_CREATE_TABLE_TEST_DATASETS)
         cur.execute(QUERY_CREATE_TABLE_TRAINING_DATASETS)
         cur.execute(QUERY_CREATE_TABLE_TRAINING_MODELS)
+        cur.execute(QUERY_CREATE_TABLE_PARAMETERS)
         cur.execute(QUERY_CREATE_TABLE_ADDITIVE_NOISE_METHODS)
         cur.execute(QUERY_CREATE_TABLE_DENOISING_METHODS)
+
         cur.execute(QUERY_CREATE_TABLE_RANK_TEST)
 
         # Create views
+        con.execute(QUERY_CREATE_VIEW_FULL_DENOISING_METHODS)
+        con.execute(QUERY_CREATE_VIEW_FULL_ADDITIVE_NOISE_METHODS)
         con.execute(QUERY_CREATE_VIEW_FULL_RANK_TEST)
 
         # Close connections
@@ -59,19 +65,37 @@ def initialize_table_data(database):
 
         cur.execute("INSERT INTO training_models VALUES (1,'CNN110');")
 
-        cur.execute("INSERT INTO additive_noise_methods VALUES (1,'Gaussian', 'Std', 0.01, 'Mean', 0);")
-        cur.execute("INSERT INTO additive_noise_methods VALUES (2,'Gaussian', 'Std', 0.02, 'Mean', 0);")
-        cur.execute("INSERT INTO additive_noise_methods VALUES (3,'Gaussian', 'Std', 0.03, 'Mean', 0);")
-        cur.execute("INSERT INTO additive_noise_methods VALUES (4,'Gaussian', 'Std', 0.04, 'Mean', 0);")
-        cur.execute("INSERT INTO additive_noise_methods VALUES (5,'Gaussian', 'Std', 0.05, 'Mean', 0);")
-        cur.execute("INSERT INTO additive_noise_methods VALUES (6,'Collected', 'Scale', 25, NULL, NULL);")
-        cur.execute("INSERT INTO additive_noise_methods VALUES (7,'Collected', 'Scale', 50, NULL, NULL);")
-        cur.execute("INSERT INTO additive_noise_methods VALUES (8,'Collected', 'Scale', 75, NULL, NULL);")
-        cur.execute("INSERT INTO additive_noise_methods VALUES (9,'Collected', 'Scale', 105, NULL, NULL);")
-        cur.execute("INSERT INTO additive_noise_methods VALUES (10,'Rayleigh', 'Mode', 0.0138, NULL, NULL);")
-        cur.execute("INSERT INTO additive_noise_methods VALUES (11,'Rayleigh', 'Mode', 0.0276, NULL, NULL);")
+        # Additive Noise parameters
+        cur.execute("INSERT INTO parameters VALUES (1, 'Std', 0.01);")
+        cur.execute("INSERT INTO parameters VALUES (2, 'Std', 0.02);")
+        cur.execute("INSERT INTO parameters VALUES (3, 'Std', 0.03);")
+        cur.execute("INSERT INTO parameters VALUES (4, 'Std', 0.04);")
+        cur.execute("INSERT INTO parameters VALUES (5, 'Mean', 0);")
+        cur.execute("INSERT INTO parameters VALUES (6, 'Scale', 25);")
+        cur.execute("INSERT INTO parameters VALUES (7, 'Scale', 50);")
+        cur.execute("INSERT INTO parameters VALUES (8, 'Scale', 75);")
+        cur.execute("INSERT INTO parameters VALUES (9, 'Scale', 105);")
+        cur.execute("INSERT INTO parameters VALUES (10, 'Mode', 0.0138);")
+        cur.execute("INSERT INTO parameters VALUES (11, 'Mode', 0.0276);")
 
-        cur.execute("INSERT INTO denoising_methods VALUES (1,'Moving Average Filter', 'N', 3, NULL, NULL);")
+        # Denoising parameters
+        cur.execute("INSERT INTO parameters VALUES (12, 'N', 3);")
+        cur.execute("INSERT INTO parameters VALUES (13, 'N', 5);")
+        #cur.execute("INSERT INTO parameters VALUES (14, NULL, NULL);")
+
+        cur.execute("INSERT INTO additive_noise_methods VALUES (NULL,'Gaussian',1,5);")
+        cur.execute("INSERT INTO additive_noise_methods VALUES (NULL,'Gaussian',2,5);")
+        cur.execute("INSERT INTO additive_noise_methods VALUES (NULL,'Gaussian',3,5);")
+        cur.execute("INSERT INTO additive_noise_methods VALUES (NULL,'Gaussian',4,5);")
+        cur.execute("INSERT INTO additive_noise_methods VALUES (NULL,'Collected',6,NULL);")
+        cur.execute("INSERT INTO additive_noise_methods VALUES (NULL,'Collected',7,NULL);")
+        cur.execute("INSERT INTO additive_noise_methods VALUES (NULL,'Collected',8,NULL);")
+        cur.execute("INSERT INTO additive_noise_methods VALUES (NULL,'Collected',9,NULL);")
+        cur.execute("INSERT INTO additive_noise_methods VALUES (NULL,'Rayleigh',10,NULL);")
+        cur.execute("INSERT INTO additive_noise_methods VALUES (NULL,'Rayleigh',11,NULL);")
+
+        cur.execute("INSERT INTO denoising_methods VALUES (1,'Moving Average Filter', 12, NULL);")
+        cur.execute("INSERT INTO denoising_methods VALUES (2,'Moving Average Filter', 13, NULL);")
 
         con.commit()
         con.close()
