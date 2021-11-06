@@ -12,7 +12,7 @@ def create_db_with_tables(database="TerminationPoints.db") -> None:
     # e.g. os.listdir(os.path.notbasename(database))
     dirs = os.listdir()
     if database in dirs:
-        print("Database already exists!")
+        #print("Database exists!")
         return
     else:
         con = lite.connect(database)
@@ -156,48 +156,24 @@ def insert_data_to_db(
         training_model: int = 1,
         keybyte: int = 0,
         epoch: int = 100,
-        additive_noise_method: str = None,
-        additive_noise_parameter_1: str = None,
-        additive_noise_parameter_1_value: float = None,
-        additive_noise_parameter_2: str = None,
-        additive_noise_parameter_2_value: float = None,
-        denoising_method: str = None,
-        denoising_method_parameter_1: str = None,
-        denoising_method_parameter_1_value: float = None,
-        denoising_method_parameter_2: str = None,
-        denoising_method_parameter_2_value: float = None,
+        additive_noise_method: int = None,
+        denoising_method: int = None,
         termination_point: int = 9999,
         average_rank: int = 9999,
 ) -> None:
     """
 
     :param database: The database-file to write to. Standard is "TerminationPoints.db".
-    :param testing_dataset: The dataset (either 'Wang2021' or 'Zedigh2021')
+    :param testing_dataset:
     :param training_dataset:
     :param environment:
-    The environment the testing traces were collected. Either office or KTH Kista Hall.
     :param distance: Distance between device under test and antenna.
     :param device: Device under test.
     :param training_model: The deep learning architecture model used, e.g. CNN110.
     :param keybyte: The keybyte trained and tested. Between 0-15.
     :param epoch: The epoch of the DL model. Between 1-100.
     :param additive_noise_method:
-    The additive noise method used during model training. E.g. Gaussian, Collected, Rayleigh etc.
-    :param additive_noise_parameter_1:
-    First parameter of the additive noise method. E.g Mean, Scale, Mode etc.
-    :param additive_noise_parameter_1_value:
-    Value of the first additive noise parameter.
-    :param additive_noise_parameter_2:
-    Second parameter of the additive noise method. E.g. Std, Translation etc.
-    :param additive_noise_parameter_2_value:
-    Value of the second additive noise parameter.
     :param denoising_method:
-    Denoising method used. E.g. Moving average filter, CDAE, Weiner filter.
-    :param denoising_method_parameter_1:
-    First parameter of the denoising parameter. E.g. N, etc.
-    :param denoising_method_parameter_1_value: Value of the first denoising method.
-    :param denoising_method_parameter_2: Second parameter of the denoising method.
-    :param denoising_method_parameter_2_value: Value of the second denoising parameter.
     :param termination_point: Termination point from rank test. Dependent variable!
     :param average_rank: Average rank of the
     """
@@ -206,8 +182,9 @@ def insert_data_to_db(
     cur = con.cursor()
     date_added = str(datetime.datetime.today())
 
-    cur.execute("INSERT INTO RankTest VALUES(NULL,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+    cur.execute("INSERT INTO Rank_Test VALUES(NULL,?,?,?,?,?,?,?,?,?,?,?,?,?)",
                 (testing_dataset,
+                 training_dataset,
                  environment,
                  distance,
                  device,
@@ -232,7 +209,7 @@ def fetchall_rank_test(database="TerminationPoints.db") -> list:
     """
     con = lite.connect(database)
     cur = con.cursor()
-    all_data = cur.execute("SELECT * FROM RankTest;").fetchall()
+    all_data = cur.execute("SELECT * FROM Rank_Test;").fetchall()
     con.close()
     return all_data
 

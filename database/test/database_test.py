@@ -2,7 +2,7 @@ import unittest
 import sqlite3 as lite
 import os
 
-from database.db_utils import create_db_with_tables, initialize_table_data
+from database.db_utils import create_db_with_tables, initialize_table_data, insert_data_to_db
 
 
 class AddToDatabaseTestCase(unittest.TestCase):
@@ -71,4 +71,38 @@ class AddToDatabaseTestCase(unittest.TestCase):
         fetchall = self.cur.execute("SELECT * FROM Denoising_Methods;").fetchall()
         self.assertEqual('CDAE', fetchall[1][1])
 
-
+    def test_insert_rank_test_data(self):
+        insert_data_to_db(
+            database=self.database,
+            testing_dataset=1,
+            training_dataset=2,
+            environment=1,
+            distance=15,
+            device=8,
+            training_model=1,
+            keybyte=0,
+            epoch=100,
+            additive_noise_method=None,
+            denoising_method=None,
+            termination_point=9999,
+            average_rank=9999,
+        )
+        insert_data_to_db(
+            database=self.database,
+            testing_dataset=1,
+            training_dataset=1,
+            environment=1,
+            distance=15,
+            device=7,
+            training_model=1,
+            keybyte=0,
+            epoch=100,
+            additive_noise_method=None,
+            denoising_method=None,
+            termination_point=101,
+            average_rank=102,
+        )
+        fetchall = self.cur.execute("SELECT * FROM Rank_Test;").fetchall()
+        self.assertIsNotNone(fetchall)
+        device = fetchall[0][5]
+        self.assertEqual(8, device)
