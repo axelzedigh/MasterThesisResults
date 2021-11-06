@@ -1,4 +1,4 @@
-from initialize_sqlite3_db import insert_data
+from db_utils import insert_data_to_db
 import time
 import sys
 
@@ -27,26 +27,18 @@ def main(dev):
     denoising_method_parameter_2 = None
     denoising_method_parameter_2_value = None
     termination_point = 200
-    insert_data(database,
-                testing_dataset,
-                environment,
-                distance,
-                device,
-                training_model,
-                keybyte,
-                epoch,
-                additive_noise_method,
-                additive_noise_parameter_1,
-                additive_noise_parameter_1_value,
-                additive_noise_parameter_2,
-                additive_noise_parameter_2_value,
-                denoising_method,
-                denoising_method_parameter_1,
-                denoising_method_parameter_1_value,
-                denoising_method_parameter_2,
-                denoising_method_parameter_2_value,
-                termination_point,
-                )
+    insert_data_to_db(database, testing_dataset, environment=environment, distance=distance, device=device,
+                      training_model=training_model, keybyte=keybyte, epoch=epoch,
+                      additive_noise_method=additive_noise_method,
+                      additive_noise_parameter_1=additive_noise_parameter_1,
+                      additive_noise_parameter_1_value=additive_noise_parameter_1_value,
+                      additive_noise_parameter_2=additive_noise_parameter_2,
+                      additive_noise_parameter_2_value=additive_noise_parameter_2_value,
+                      denoising_method=denoising_method, denoising_method_parameter_1=denoising_method_parameter_1,
+                      denoising_method_parameter_1_value=denoising_method_parameter_1_value,
+                      denoising_method_parameter_2=denoising_method_parameter_2,
+                      denoising_method_parameter_2_value=denoising_method_parameter_2_value,
+                      termination_point=termination_point)
     print(f"Added one entry of device {dev}!")
     time.sleep(5)
     main(sys.argv[1])
