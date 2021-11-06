@@ -1,6 +1,9 @@
 import sqlite3 as lite
 import os
 import datetime
+from database.queries import QUERY_CREATE_TABLE_ENVIRONMENTS, QUERY_CREATE_TABLE_TEST_DATASETS, \
+    QUERY_CREATE_TABLE_TRAINING_DATASETS, QUERY_CREATE_TABLE_TRAINING_MODELS, QUERY_CREATE_TABLE_ADDITIVE_NOISE_METHODS, \
+    QUERY_CREATE_TABLE_DENOISING_METHODS, QUERY_CREATE_TABLE_RANK_TEST, QUERY_CREATE_VIEW_FULL_RANK_TEST
 
 
 def create_db_with_tables(database="TerminationPoints.db") -> None:
@@ -17,137 +20,31 @@ def create_db_with_tables(database="TerminationPoints.db") -> None:
     else:
         con = lite.connect(database)
         cur = con.cursor()
-        cur.execute(
-            """
-            CREATE TABLE Environments(
-            id INTEGER PRIMARY KEY,
-            environment TEXT NOT NULL
-            );
-            """
-        )
 
-        cur.execute(
-            """
-            CREATE TABLE Test_Datasets(
-            id INTEGER PRIMARY KEY,
-            test_dataset TEXT
-            );
-            """
-        )
+        # Create tables
+        cur.execute(QUERY_CREATE_TABLE_ENVIRONMENTS)
+        cur.execute(QUERY_CREATE_TABLE_TEST_DATASETS)
+        cur.execute(QUERY_CREATE_TABLE_TRAINING_DATASETS)
+        cur.execute(QUERY_CREATE_TABLE_TRAINING_MODELS)
+        cur.execute(QUERY_CREATE_TABLE_ADDITIVE_NOISE_METHODS)
+        cur.execute(QUERY_CREATE_TABLE_DENOISING_METHODS)
+        cur.execute(QUERY_CREATE_TABLE_RANK_TEST)
 
-        cur.execute(
-            """
-            CREATE TABLE Training_Datasets(
-            id INTEGER PRIMARY KEY,
-            training_dataset TEXT
-            );
-            """
-        )
+        # Create views
+        con.execute(QUERY_CREATE_VIEW_FULL_RANK_TEST)
 
-        cur.execute(
-            """
-            CREATE TABLE Training_Models(
-            id INTEGER PRIMARY KEY,
-            training_model TEXT
-            );
-            """
-        )
-
-        cur.execute(
-            """
-            CREATE TABLE Additive_Noise_Methods(
-            id INTEGER PRIMARY KEY,
-            additive_noise_method TEXT,
-            additive_noise_parameter_1 TEXT,
-            additive_noise_parameter_1_value FLOAT,
-            additive_noise_parameter_2 TEXT,
-            additive_noise_parameter_2_value FLOAT
-            );
-            """
-        )
-
-        cur.execute(
-            """
-            CREATE TABLE Denoising_Methods(
-            id INTEGER PRIMARY KEY,
-            denoising_method TEXT,
-            denoising_parameter_1 TEXT,
-            denoising_parameter_1_value FLOAT,
-            denoising_parameter_2 TEXT,
-            denoising_parameter_2_value FLOAT
-            );
-            """
-        )
-
-        cur.execute(
-            """
-            CREATE TABLE Rank_Test(
-            id INTEGER PRIMARY KEY,
-            test_dataset_id INTEGER,
-            training_dataset_id INTEGER,
-            environment_id INTEGER,
-            distance FLOAT NOT NULL,
-            device INT NOT NULL, 
-            training_model_id INTEGER,
-            keybyte INT NOT NULL,
-            epoch INT NOT NULL,
-            additive_noise_method_id INTEGER,
-            denoising_method_id INTEGER,
-            termination_point INT NOT NULL,
-            average_rank INT NOT NULL,
-            date_added TEXT NOT NULL,
-            
-            FOREIGN KEY(test_dataset_id) REFERENCES Test_Datasets(test_dataset_id),
-            FOREIGN KEY(training_dataset_id) REFERENCES Training_Datasets(training_dataset_id),
-            FOREIGN KEY(environment_id) REFERENCES Environments(environments_id),
-            FOREIGN KEY(training_model_id) REFERENCES Training_Model(training_model_id),
-            FOREIGN KEY(additive_noise_method_id) REFERENCES Additive_Noise_Methods(additive_noise_method_id),
-            FOREIGN KEY(denoising_method_id) REFERENCES Denoising_Method(denoising_method_id)
-            )
-            """
-        )
-
-        con.execute(
-        """
-        CREATE VIEW full_rank_test
-        AS
-        SELECT
-            Rank_Test.id,
-            Test_Datasets.test_dataset AS test_dataset,
-            Training_Datasets.training_dataset AS training_dataset,
-            Environments.environment AS environment,
-            Rank_Test.distance,
-            Rank_Test.device,
-            Training_Models.training_model AS training_model,
-            Rank_Test.keybyte,
-            Rank_Test.epoch,
-            Additive_Noise_Methods.additive_noise_method AS additive_noise_method,
-            Additive_Noise_Methods.additive_noise_parameter_1 AS additive_noise_method_parameter_1,
-            Additive_Noise_Methods.additive_noise_parameter_1_value AS additive_noise_method_parameter_1_value,
-            Additive_Noise_Methods.additive_noise_parameter_2 AS additive_noise_method_parameter_2,
-            Additive_Noise_Methods.additive_noise_parameter_2_value AS additive_noise_method_parameter_2_value,
-            Denoising_Methods.denoising_method AS denoising_method,
-            Denoising_Methods.denoising_parameter_1 AS denoising_method_parameter_1,
-            Denoising_Methods.denoising_parameter_1_value AS denoising_method_parameter_1_value,
-            Denoising_Methods.denoising_parameter_2 AS denoising_method_parameter_2,
-            Denoising_Methods.denoising_parameter_2_value AS denoising_method_parameter_2_value,
-            Rank_Test.termination_point,
-            Rank_Test.average_rank,
-            Rank_Test.date_added
-        FROM
-            Rank_Test
-        INNER JOIN Test_Datasets ON Test_Datasets.id = Rank_Test.id
-        INNER JOIN Training_Datasets ON Training_Datasets.id = Rank_Test.id
-        INNER JOIN Environments ON Environments.id = Rank_TEst.id
-        INNER JOIN Training_Models on Training_Models.id = Rank_Test.id
-        INNER JOIN Additive_Noise_Methods ON Additive_Noise_Methods.id = Rank_test.id
-        INNER JOIN Denoising_Methods ON Denoising_Methods.id = Rank_Test.id;
-        """
-        )
+        # Close connections
+        cur.close()
+        con.close()
     return
 
 
 def initialize_table_data(database):
+    """
+
+    :param database:
+    :return:
+    """
     dirs = os.listdir()
     if database in dirs:
         con = lite.connect(database)

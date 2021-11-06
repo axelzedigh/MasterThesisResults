@@ -132,5 +132,4 @@ class AddToDatabaseTestCase(unittest.TestCase):
         )
         query = "SELECT * FROM full_rank_test;"
         data = fetchall_query(self.database, query)
-        print(data)
         self.assertIsNotNone(data)
