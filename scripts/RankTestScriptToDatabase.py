@@ -267,17 +267,9 @@ def main():
     denoising_method_parameter_2_value
     for i in tqdm(range(0, runs)):
         termination_point, average_ranks = test(file_path, keybyte, device)
-        insert_data_to_db(database, testing_dataset, environment=environment, distance=distance, device=device,
-                          training_model=training_model, keybyte=keybyte, epoch=epoch,
-                          additive_noise_method=additive_noise_method,
-                          additive_noise_parameter_1=additive_noise_parameter_1,
-                          additive_noise_parameter_1_value=additive_noise_parameter_1_value,
-                          additive_noise_parameter_2=additive_noise_parameter_2,
-                          additive_noise_parameter_2_value=additive_noise_parameter_2_value,
-                          denoising_method=denoising_method, denoising_method_parameter_1=denoising_method_parameter_1,
-                          denoising_method_parameter_1_value=denoising_method_parameter_1_value,
-                          denoising_method_parameter_2=denoising_method_parameter_2,
-                          denoising_method_parameter_2_value=denoising_method_parameter_2_value,
+        insert_data_to_db(database, testing_dataset, environment_id=environment, distance=distance, device=device,
+                          training_model_id=training_model, keybyte=keybyte, epoch=epoch,
+                          additive_noise_method_id=additive_noise_method, denoising_method_id=denoising_method,
                           termination_point=termination_point, average_rank=average_ranks)
         # np.save(
         # f"Results/{DATE}-d{DEVICE}/rank_test-{DISTANCE}m-device-{DEVICE}-epoch-{EPOCH}-keybyte-{KEY_BYTE}-runs-{RUNS}-{MODEL}-date-{DATE}.npy",

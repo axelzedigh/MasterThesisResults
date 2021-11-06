@@ -12,7 +12,7 @@ def create_db_with_tables(database="TerminationPoints.db") -> None:
     # e.g. os.listdir(os.path.notbasename(database))
     dirs = os.listdir()
     if database in dirs:
-        #print("Database exists!")
+        # print("Database exists!")
         return
     else:
         con = lite.connect(database)
@@ -20,7 +20,7 @@ def create_db_with_tables(database="TerminationPoints.db") -> None:
         cur.execute(
             """
             CREATE TABLE Environments(
-            environment_id INTEGER PRIMARY KEY,
+            id INTEGER PRIMARY KEY,
             environment TEXT NOT NULL
             );
             """
@@ -29,7 +29,7 @@ def create_db_with_tables(database="TerminationPoints.db") -> None:
         cur.execute(
             """
             CREATE TABLE Test_Datasets(
-            test_dataset_id INTEGER PRIMARY KEY,
+            id INTEGER PRIMARY KEY,
             test_dataset TEXT
             );
             """
@@ -38,7 +38,7 @@ def create_db_with_tables(database="TerminationPoints.db") -> None:
         cur.execute(
             """
             CREATE TABLE Training_Datasets(
-            training_dataset_id INTEGER PRIMARY KEY,
+            id INTEGER PRIMARY KEY,
             training_dataset TEXT
             );
             """
@@ -47,7 +47,7 @@ def create_db_with_tables(database="TerminationPoints.db") -> None:
         cur.execute(
             """
             CREATE TABLE Training_Models(
-            training_model_id INTEGER PRIMARY KEY,
+            id INTEGER PRIMARY KEY,
             training_model TEXT
             );
             """
@@ -56,7 +56,7 @@ def create_db_with_tables(database="TerminationPoints.db") -> None:
         cur.execute(
             """
             CREATE TABLE Additive_Noise_Methods(
-            additive_noise_method_id INTEGER PRIMARY KEY,
+            id INTEGER PRIMARY KEY,
             additive_noise_method TEXT,
             additive_noise_parameter_1 TEXT,
             additive_noise_parameter_1_value FLOAT,
@@ -69,12 +69,12 @@ def create_db_with_tables(database="TerminationPoints.db") -> None:
         cur.execute(
             """
             CREATE TABLE Denoising_Methods(
-            denoising_method_id INTEGER PRIMARY KEY,
+            id INTEGER PRIMARY KEY,
             denoising_method TEXT,
-            denoising_method_parameter_1 TEXT,
-            denoising_method_parameter_1_value FLOAT,
-            denoising_method_parameter_2 TEXT,
-            denoising_method_parameter_2_value FLOAT
+            denoising_parameter_1 TEXT,
+            denoising_parameter_1_value FLOAT,
+            denoising_parameter_2 TEXT,
+            denoising_parameter_2_value FLOAT
             );
             """
         )
@@ -83,28 +83,66 @@ def create_db_with_tables(database="TerminationPoints.db") -> None:
             """
             CREATE TABLE Rank_Test(
             id INTEGER PRIMARY KEY,
-            testing_dataset INTEGER,
-            training_dataset INTEGER,
-            environment INTEGER,
+            test_dataset_id INTEGER,
+            training_dataset_id INTEGER,
+            environment_id INTEGER,
             distance FLOAT NOT NULL,
             device INT NOT NULL, 
-            training_model INTEGER,
+            training_model_id INTEGER,
             keybyte INT NOT NULL,
             epoch INT NOT NULL,
-            additive_noise_method INTEGER,
-            denoising_method INTEGER,
+            additive_noise_method_id INTEGER,
+            denoising_method_id INTEGER,
             termination_point INT NOT NULL,
             average_rank INT NOT NULL,
             date_added TEXT NOT NULL,
             
-            FOREIGN KEY(testing_dataset) REFERENCES Testing_Datasets(testing_dataset_id),
-            FOREIGN KEY(training_dataset) REFERENCES Training_Datasets(training_dataset_id),
-            FOREIGN KEY(environment) REFERENCES Environments(environments_id),
-            FOREIGN KEY(training_model) REFERENCES Training_Model(training_model_id),
-            FOREIGN KEY(additive_noise_method) REFERENCES Additive_Noise_Methods(additive_noise_method_id),
-            FOREIGN KEY(denoising_method) REFERENCES Denoising_Method(denoising_method_id)
+            FOREIGN KEY(test_dataset_id) REFERENCES Test_Datasets(test_dataset_id),
+            FOREIGN KEY(training_dataset_id) REFERENCES Training_Datasets(training_dataset_id),
+            FOREIGN KEY(environment_id) REFERENCES Environments(environments_id),
+            FOREIGN KEY(training_model_id) REFERENCES Training_Model(training_model_id),
+            FOREIGN KEY(additive_noise_method_id) REFERENCES Additive_Noise_Methods(additive_noise_method_id),
+            FOREIGN KEY(denoising_method_id) REFERENCES Denoising_Method(denoising_method_id)
             )
             """
+        )
+
+        con.execute(
+        """
+        CREATE VIEW full_rank_test
+        AS
+        SELECT
+            Rank_Test.id,
+            Test_Datasets.test_dataset AS test_dataset,
+            Training_Datasets.training_dataset AS training_dataset,
+            Environments.environment AS environment,
+            Rank_Test.distance,
+            Rank_Test.device,
+            Training_Models.training_model AS training_model,
+            Rank_Test.keybyte,
+            Rank_Test.epoch,
+            Additive_Noise_Methods.additive_noise_method AS additive_noise_method,
+            Additive_Noise_Methods.additive_noise_parameter_1 AS additive_noise_method_parameter_1,
+            Additive_Noise_Methods.additive_noise_parameter_1_value AS additive_noise_method_parameter_1_value,
+            Additive_Noise_Methods.additive_noise_parameter_2 AS additive_noise_method_parameter_2,
+            Additive_Noise_Methods.additive_noise_parameter_2_value AS additive_noise_method_parameter_2_value,
+            Denoising_Methods.denoising_method AS denoising_method,
+            Denoising_Methods.denoising_parameter_1 AS denoising_method_parameter_1,
+            Denoising_Methods.denoising_parameter_1_value AS denoising_method_parameter_1_value,
+            Denoising_Methods.denoising_parameter_2 AS denoising_method_parameter_2,
+            Denoising_Methods.denoising_parameter_2_value AS denoising_method_parameter_2_value,
+            Rank_Test.termination_point,
+            Rank_Test.average_rank,
+            Rank_Test.date_added
+        FROM
+            Rank_Test
+        INNER JOIN Test_Datasets ON Test_Datasets.id = Rank_Test.id
+        INNER JOIN Training_Datasets ON Training_Datasets.id = Rank_Test.id
+        INNER JOIN Environments ON Environments.id = Rank_TEst.id
+        INNER JOIN Training_Models on Training_Models.id = Rank_Test.id
+        INNER JOIN Additive_Noise_Methods ON Additive_Noise_Methods.id = Rank_test.id
+        INNER JOIN Denoising_Methods ON Denoising_Methods.id = Rank_Test.id;
+        """
         )
     return
 
@@ -148,32 +186,32 @@ def initialize_table_data(database):
 
 def insert_data_to_db(
         database="TerminationPoints.db",
-        testing_dataset: int = 1,
-        training_dataset: int = 1,
-        environment: int = 1,
+        test_dataset_id: int = 1,
+        training_dataset_id: int = 1,
+        environment_id: int = 1,
         distance: float = 15,
         device: int = 8,
-        training_model: int = 1,
+        training_model_id: int = 1,
         keybyte: int = 0,
         epoch: int = 100,
-        additive_noise_method: int = None,
-        denoising_method: int = None,
+        additive_noise_method_id: int = None,
+        denoising_method_id: int = None,
         termination_point: int = 9999,
         average_rank: int = 9999,
 ) -> None:
     """
 
     :param database: The database-file to write to. Standard is "TerminationPoints.db".
-    :param testing_dataset:
-    :param training_dataset:
-    :param environment:
+    :param test_dataset_id:
+    :param training_dataset_id:
+    :param environment_id:
     :param distance: Distance between device under test and antenna.
     :param device: Device under test.
-    :param training_model: The deep learning architecture model used, e.g. CNN110.
+    :param training_model_id: The deep learning architecture model used, e.g. CNN110.
     :param keybyte: The keybyte trained and tested. Between 0-15.
     :param epoch: The epoch of the DL model. Between 1-100.
-    :param additive_noise_method:
-    :param denoising_method:
+    :param additive_noise_method_id:
+    :param denoising_method_id:
     :param termination_point: Termination point from rank test. Dependent variable!
     :param average_rank: Average rank of the
     """
@@ -183,16 +221,16 @@ def insert_data_to_db(
     date_added = str(datetime.datetime.today())
 
     cur.execute("INSERT INTO Rank_Test VALUES(NULL,?,?,?,?,?,?,?,?,?,?,?,?,?)",
-                (testing_dataset,
-                 training_dataset,
-                 environment,
+                (test_dataset_id,
+                 training_dataset_id,
+                 environment_id,
                  distance,
                  device,
-                 training_model,
+                 training_model_id,
                  keybyte,
                  epoch,
-                 additive_noise_method,
-                 denoising_method,
+                 additive_noise_method_id,
+                 denoising_method_id,
                  termination_point,
                  average_rank,
                  date_added)
@@ -201,18 +239,23 @@ def insert_data_to_db(
     con.close()
 
 
-def fetchall_rank_test(database="TerminationPoints.db") -> list:
+def fetch_all_from_db(database="TerminationPoints.db", query="SELECT * from full_rank_test;") -> list:
     """
 
     :param database:
-    :return: a list containing all database entries
+    :return: a list containing all database entries from Rank_Test table
     """
     con = lite.connect(database)
     cur = con.cursor()
-    all_data = cur.execute("SELECT * FROM Rank_Test;").fetchall()
+    all_data = cur.execute(query).fetchall()
     con.close()
     return all_data
 
 
-if __name__ == "__main__":
-    create_db_with_tables()
+def fetchall_query(database="TerminationPoints.db", query="SELECT * FROM Rank_Test;"):
+    con = lite.connect(database)
+    cur = con.cursor()
+    query_data = cur.execute(query).fetchall()
+    con.close()
+    return query_data
+

@@ -2,7 +2,12 @@ import unittest
 import sqlite3 as lite
 import os
 
-from database.db_utils import create_db_with_tables, initialize_table_data, insert_data_to_db
+from database.db_utils import (
+    create_db_with_tables,
+    initialize_table_data,
+    insert_data_to_db,
+    fetchall_query,
+)
 
 
 class AddToDatabaseTestCase(unittest.TestCase):
@@ -63,42 +68,44 @@ class AddToDatabaseTestCase(unittest.TestCase):
     def test_fetch_denoising_methods(self):
         fetchall = self.cur.execute("SELECT * FROM Denoising_Methods;").fetchall()
         self.assertIsNotNone(fetchall)
-        denoising_methods = [(1, 'Moving Average Filter', 'N', 3.0, None, None)]
+        denoising_methods = [(1, "Moving Average Filter", "N", 3.0, None, None)]
         self.assertEqual(fetchall[0], denoising_methods[0])
 
     def test_insert_denoising_method(self):
-        self.cur.execute("INSERT INTO Denoising_Methods VALUES(NULL,'CDAE',NULL,NULL, NULL, NULL)")
+        self.cur.execute(
+            "INSERT INTO Denoising_Methods VALUES(NULL,'CDAE',NULL,NULL, NULL, NULL)"
+        )
         fetchall = self.cur.execute("SELECT * FROM Denoising_Methods;").fetchall()
-        self.assertEqual('CDAE', fetchall[1][1])
+        self.assertEqual("CDAE", fetchall[1][1])
 
     def test_insert_rank_test_data(self):
         insert_data_to_db(
             database=self.database,
-            testing_dataset=1,
-            training_dataset=2,
-            environment=1,
+            test_dataset_id=1,
+            training_dataset_id=2,
+            environment_id=1,
             distance=15,
             device=8,
-            training_model=1,
+            training_model_id=1,
             keybyte=0,
             epoch=100,
-            additive_noise_method=None,
-            denoising_method=None,
+            additive_noise_method_id=None,
+            denoising_method_id=None,
             termination_point=9999,
             average_rank=9999,
         )
         insert_data_to_db(
             database=self.database,
-            testing_dataset=1,
-            training_dataset=1,
-            environment=1,
+            test_dataset_id=1,
+            training_dataset_id=1,
+            environment_id=1,
             distance=15,
             device=7,
-            training_model=1,
+            training_model_id=1,
             keybyte=0,
             epoch=100,
-            additive_noise_method=None,
-            denoising_method=None,
+            additive_noise_method_id=None,
+            denoising_method_id=None,
             termination_point=101,
             average_rank=102,
         )
@@ -106,3 +113,24 @@ class AddToDatabaseTestCase(unittest.TestCase):
         self.assertIsNotNone(fetchall)
         device = fetchall[0][5]
         self.assertEqual(8, device)
+
+    def test_view_query(self):
+        insert_data_to_db(
+            database=self.database,
+            test_dataset_id=1,
+            training_dataset_id=1,
+            environment_id=1,
+            distance=15,
+            device=7,
+            training_model_id=1,
+            keybyte=0,
+            epoch=100,
+            additive_noise_method_id=None,
+            denoising_method_id=None,
+            termination_point=101,
+            average_rank=102,
+        )
+        query = "SELECT * FROM full_rank_test;"
+        data = fetchall_query(self.database, query)
+        print(data)
+        self.assertIsNotNone(data)

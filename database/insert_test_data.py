@@ -27,17 +27,9 @@ def main(dev):
     denoising_method_parameter_2 = None
     denoising_method_parameter_2_value = None
     termination_point = 200
-    insert_data_to_db(database, testing_dataset, environment=environment, distance=distance, device=device,
-                      training_model=training_model, keybyte=keybyte, epoch=epoch,
-                      additive_noise_method=additive_noise_method,
-                      additive_noise_parameter_1=additive_noise_parameter_1,
-                      additive_noise_parameter_1_value=additive_noise_parameter_1_value,
-                      additive_noise_parameter_2=additive_noise_parameter_2,
-                      additive_noise_parameter_2_value=additive_noise_parameter_2_value,
-                      denoising_method=denoising_method, denoising_method_parameter_1=denoising_method_parameter_1,
-                      denoising_method_parameter_1_value=denoising_method_parameter_1_value,
-                      denoising_method_parameter_2=denoising_method_parameter_2,
-                      denoising_method_parameter_2_value=denoising_method_parameter_2_value,
+    insert_data_to_db(database, testing_dataset, environment_id=environment, distance=distance, device=device,
+                      training_model_id=training_model, keybyte=keybyte, epoch=epoch,
+                      additive_noise_method_id=additive_noise_method, denoising_method_id=denoising_method,
                       termination_point=termination_point)
     print(f"Added one entry of device {dev}!")
     time.sleep(5)
