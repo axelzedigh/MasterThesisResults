@@ -39,10 +39,10 @@ QUERY_CREATE_TABLE_DENOISING_METHODS = """
             CREATE TABLE Denoising_Methods(
             id INTEGER PRIMARY KEY,
             denoising_method TEXT,
-            denoising_parameter_1 TEXT,
-            denoising_parameter_1_value FLOAT,
-            denoising_parameter_2 TEXT,
-            denoising_parameter_2_value FLOAT
+            denoising_method_parameter_1 TEXT,
+            denoising_method_parameter_1_value FLOAT,
+            denoising_method_parameter_2 TEXT,
+            denoising_method_parameter_2_value FLOAT
             );
             """
 
@@ -91,10 +91,10 @@ QUERY_CREATE_VIEW_FULL_RANK_TEST = """
             Additive_Noise_Methods.additive_noise_method_parameter_2 AS additive_noise_method_parameter_2,
             Additive_Noise_Methods.additive_noise_method_parameter_2_value AS additive_noise_method_parameter_2_value,
             Denoising_Methods.denoising_method AS denoising_method,
-            Denoising_Methods.denoising_parameter_1 AS denoising_method_parameter_1,
-            Denoising_Methods.denoising_parameter_1_value AS denoising_method_parameter_1_value,
-            Denoising_Methods.denoising_parameter_2 AS denoising_method_parameter_2,
-            Denoising_Methods.denoising_parameter_2_value AS denoising_method_parameter_2_value,
+            Denoising_Methods.denoising_method_parameter_1 AS denoising_method_parameter_1,
+            Denoising_Methods.denoising_method_parameter_1_value AS denoising_method_parameter_1_value,
+            Denoising_Methods.denoising_method_parameter_2 AS denoising_method_parameter_2,
+            Denoising_Methods.denoising_method_parameter_2_value AS denoising_method_parameter_2_value,
             Rank_Test.termination_point,
             Rank_Test.average_rank,
             Rank_Test.date_added
@@ -114,8 +114,20 @@ QUERY_SELECT_ADDITIVE_NOISE_METHOD_ID = """
         FROM Additive_Noise_Methods
         WHERE 
             additive_noise_method = ? AND
-            additive_noise_method_parameter_1 = ? AND
-            additive_noise_method_parameter_1_value = ? AND
-            additive_noise_method_parameter_2 = ? AND
-            additive_noise_method_parameter_2_value = ?;
+            (additive_noise_method_parameter_1 = ? OR additive_noise_method_parameter_1 IS NULL) AND
+            (additive_noise_method_parameter_1_value = ? OR additive_noise_method_parameter_1_value IS NULL) AND
+            (additive_noise_method_parameter_2 = ? OR additive_noise_method_parameter_2 IS NULL) AND
+            (additive_noise_method_parameter_2_value = ? OR additive_noise_method_parameter_2_value IS NULL);
+        """
+
+QUERY_SELECT_DENOISING_METHOD_ID = """
+        SELECT
+            Denoising_Methods.id
+        FROM Denoising_Methods
+        WHERE 
+            (denoising_method = ? OR denoising_method IS NULL) AND
+            (denoising_method_parameter_1 = ? OR denoising_method_parameter_1 IS NULL) AND
+            (denoising_method_parameter_1_value = ? OR denoising_method_parameter_1_value IS NULL) AND
+            (denoising_method_parameter_2 = ? OR denoising_method_parameter_2 IS NULL) AND
+            (denoising_method_parameter_2_value = ? OR denoising_method_parameter_2_value IS NULL);
         """

@@ -10,7 +10,7 @@ from database.queries import (
     QUERY_CREATE_TABLE_DENOISING_METHODS,
     QUERY_CREATE_TABLE_RANK_TEST,
     QUERY_CREATE_VIEW_FULL_RANK_TEST,
-    QUERY_SELECT_ADDITIVE_NOISE_METHOD_ID,
+    QUERY_SELECT_ADDITIVE_NOISE_METHOD_ID, QUERY_SELECT_DENOISING_METHOD_ID,
 )
 
 
@@ -207,4 +207,30 @@ def get_additive_noise_method_id(
     if len(additive_noise_method_id) == 1:
         return additive_noise_method_id[0][0]
     else:
-        raise "Something is wrong!"
+        print("Something is wrong!")
+
+
+def get_denoising_method_id(
+        database: str,
+        denoising_method: str,
+        parameter_1: str,
+        parameter_1_value: float,
+        parameter_2: str,
+        parameter_2_value: float,
+):
+    query_arguments = (
+        denoising_method,
+        parameter_1,
+        parameter_1_value,
+        parameter_2,
+        parameter_2_value,
+    )
+    con = lite.connect(database)
+    cur = con.cursor()
+    denoising_method_id = cur.execute(
+        QUERY_SELECT_DENOISING_METHOD_ID, query_arguments
+    ).fetchall()
+    if len(denoising_method_id) == 1:
+        return denoising_method_id[0][0]
+    else:
+        print("Something is wrong!")

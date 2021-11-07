@@ -8,6 +8,7 @@ from database.db_utils import (
     insert_data_to_db,
     fetchall_query,
     get_additive_noise_method_id,
+    get_denoising_method_id,
 )
 
 view_rank_test_index = {
@@ -206,10 +207,44 @@ class AddToDatabaseTestCase(unittest.TestCase):
         method = "Gaussian"
         param_1 = "Std"
         param_1_value = 0.03
-        param_2 = 'Mean'
+        param_2 = "Mean"
         param_2_value = 0
         additive_id = get_additive_noise_method_id(
             self.database, method, param_1, param_1_value, param_2, param_2_value
         )
         self.assertIsNotNone(additive_id)
         self.assertEqual(additive_id, 3)
+
+        method = "Rayleigh"
+        param_1 = "Mode"
+        param_1_value = 0.0138
+        param_2 = None
+        param_2_value = None
+        additive_id = get_additive_noise_method_id(
+            self.database, method, param_1, param_1_value, param_2, param_2_value
+        )
+        self.assertIsNotNone(additive_id)
+        self.assertEqual(additive_id, 10)
+
+    def test_get_denoising_method_id(self):
+        method = "Moving Average Filter"
+        param_1 = "N"
+        param_1_value = 3
+        param_2 = None
+        param_2_value = None
+        denoising_id = get_denoising_method_id(
+            self.database, method, param_1, param_1_value, param_2, param_2_value
+        )
+        self.assertIsNotNone(denoising_id)
+        self.assertEqual(denoising_id, 1)
+
+        method = "Moving Average Filter"
+        param_1 = "N"
+        param_1_value = 5
+        param_2 = None
+        param_2_value = None
+        denoising_id = get_denoising_method_id(
+            self.database, method, param_1, param_1_value, param_2, param_2_value
+        )
+        self.assertIsNotNone(denoising_id)
+        self.assertEqual(denoising_id, 2)
