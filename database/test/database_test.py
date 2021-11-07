@@ -9,6 +9,31 @@ from database.db_utils import (
     fetchall_query,
 )
 
+view_rank_test_index = {
+    "id": 1,
+    "test_dataset": 1,
+    "training_dataset": 2,
+    "environment": 3,
+    "distance": 4,
+    "device": 5,
+    "training_model": 6,
+    "keybyte": 7,
+    "epoch": 8,
+    "additive_noise_method": 9,
+    "additive_param_1": 10,
+    "additive_param_1_value": 11,
+    "additive_param_2": 12,
+    "additive_param_2_value": 13,
+    "denoising_method": 14,
+    "denoising_param_1": 15,
+    "denoising_param_1_value": 16,
+    "denoising_param_2": 17,
+    "denoising_param_2_value": 18,
+    "termination_point": 19,
+    "average_rank": 20,
+    "date_added": 21,
+}
+
 
 class AddToDatabaseTestCase(unittest.TestCase):
     def setUp(self) -> None:
@@ -36,7 +61,8 @@ class AddToDatabaseTestCase(unittest.TestCase):
         self.assertEqual(fetchall[1], test_datasets[1])
 
     def test_fetch_training_datasets(self):
-        fetchall = self.cur.execute("SELECT * FROM Training_Datasets;").fetchall()
+        fetchall = self.cur.execute(
+            "SELECT * FROM Training_Datasets;").fetchall()
         self.assertIsNotNone(fetchall)
         training_datasets = [(1, "Wang2021 - Cable")]
         self.assertEqual(fetchall[0], training_datasets[0])
@@ -48,61 +74,38 @@ class AddToDatabaseTestCase(unittest.TestCase):
         self.assertEqual(fetchall[0], training_models[0])
 
     def test_fetch_additive_noise_methods(self):
-        fetchall = self.cur.execute("SELECT * FROM Additive_Noise_Methods;").fetchall()
-        self.assertIsNotNone(fetchall)
-        additive_noise_methods = [(1, "Gaussian", 1, 5)]
-        self.assertEqual(fetchall[0], additive_noise_methods[0])
-
-    def test_fetch_denoising_methods(self):
-        fetchall = self.cur.execute("SELECT * FROM Denoising_Methods;").fetchall()
-        self.assertIsNotNone(fetchall)
-        denoising_methods = [(1, "Moving Average Filter", 12, None)]
-        self.assertEqual(fetchall[0], denoising_methods[0])
-
-    def test_fetch_parameters(self):
-        fetchall = self.cur.execute("SELECT * FROM Parameters;").fetchall()
-        self.assertIsNotNone(fetchall)
-        parameters = [
-            (1, "Std", 0.01),
-            (2, "Std", 0.02),
-            (3, "Std", 0.03),
-            (4, "Std", 0.04),
-            (5, "Mean", 0.0),
-            (6, "Scale", 25.0),
-            (7, "Scale", 50.0),
-            (8, "Scale", 75.0),
-            (9, "Scale", 105.0),
-            (10, "Mode", 0.0138),
-            (11, "Mode", 0.0276),
-            (12, "N", 3.0),
-        ]
-        self.assertEqual(fetchall[0], parameters[0])
-
-    def test_insert_denoising_method(self):
-        self.cur.execute("INSERT INTO Denoising_Methods VALUES(NULL,'CDAE',NULL,NULL)")
-        fetchall = self.cur.execute("SELECT * FROM Denoising_Methods;").fetchall()
-        self.assertEqual("CDAE", fetchall[2][1])
-
-    def test_fetch_view_full_additive_noise_methods(self):
         fetchall = self.cur.execute(
-            "SELECT * FROM full_additive_noise_methods;"
-        ).fetchall()
+            "SELECT * FROM Additive_Noise_Methods;").fetchall()
         self.assertIsNotNone(fetchall)
-        data = [
+        additive_noise_methods = [
             (1, "Gaussian", "Std", 0.01, "Mean", 0.0),
             (2, "Gaussian", "Std", 0.02, "Mean", 0.0),
             (3, "Gaussian", "Std", 0.03, "Mean", 0.0),
             (4, "Gaussian", "Std", 0.04, "Mean", 0.0),
+            (5, "Gaussian", "Std", 0.05, "Mean", 0.0),
+            (6, "Collected", "Scale", 25.0, None, None),
+            (7, "Collected", "Scale", 50.0, None, None),
+            (8, "Collected", "Scale", 75.0, None, None),
+            (9, "Collected", "Scale", 105.0, None, None),
+            (10, "Rayleigh", "Mode", 0.0138, None, None),
+            (11, "Rayleigh", "Mode", 0.0276, None, None),
         ]
-        self.assertEqual(fetchall[0], data[0])
+        self.assertEqual(fetchall[0], additive_noise_methods[0])
 
-    def test_fetch_view_full_denoising_methods(self):
+    def test_fetch_denoising_methods(self):
         fetchall = self.cur.execute(
-            "SELECT * FROM full_denoising_methods;"
-        ).fetchall()
+            "SELECT * FROM Denoising_Methods;").fetchall()
         self.assertIsNotNone(fetchall)
-        self.assertNotEqual(fetchall, [])
-        print(fetchall)
+        denoising_methods = [(1, "Moving Average Filter", "N", 3.0, None, None)]
+        self.assertEqual(fetchall[0], denoising_methods[0])
+
+    def test_insert_denoising_method(self):
+        self.cur.execute(
+            "INSERT INTO Denoising_Methods VALUES(NULL,'CDAE',NULL,NULL, NULL, NULL)"
+        )
+        fetchall = self.cur.execute(
+            "SELECT * FROM Denoising_Methods;").fetchall()
+        self.assertEqual("CDAE", fetchall[-1][1])
 
     def test_insert_rank_test_data(self):
         insert_data_to_db(
@@ -139,7 +142,6 @@ class AddToDatabaseTestCase(unittest.TestCase):
         self.assertIsNotNone(fetchall)
         device = fetchall[0][5]
         self.assertEqual(8, device)
-        self.assertNotEqual(fetchall, [])
 
     def test_view_query(self):
         insert_data_to_db(
@@ -152,13 +154,58 @@ class AddToDatabaseTestCase(unittest.TestCase):
             training_model_id=1,
             keybyte=0,
             epoch=100,
-            additive_noise_method_id=2,
+            additive_noise_method_id=None,
             denoising_method_id=None,
+            termination_point=101,
+            average_rank=102,
+        )
+        insert_data_to_db(
+            database=self.database,
+            test_dataset_id=1,
+            training_dataset_id=1,
+            environment_id=1,
+            distance=15,
+            device=8,
+            training_model_id=1,
+            keybyte=0,
+            epoch=100,
+            additive_noise_method_id=1,
+            denoising_method_id=None,
+            termination_point=101,
+            average_rank=102,
+        )
+        insert_data_to_db(
+            database=self.database,
+            test_dataset_id=1,
+            training_dataset_id=1,
+            environment_id=1,
+            distance=15,
+            device=9,
+            training_model_id=1,
+            keybyte=0,
+            epoch=100,
+            additive_noise_method_id=None,
+            denoising_method_id=1,
             termination_point=101,
             average_rank=102,
         )
         query = "SELECT * FROM full_rank_test;"
         data = fetchall_query(self.database, query)
-        self.assertIsNotNone(data)
         self.assertNotEqual(data, [])
-        print(data)
+        self.assertEqual(3, len(data))
+        self.assertEqual(data[0][view_rank_test_index["device"]], 7)
+        self.assertEqual(data[1][view_rank_test_index["device"]], 8)
+        self.assertEqual(data[2][view_rank_test_index["device"]], 9)
+        self.assertIsNone(
+            data[0][view_rank_test_index["additive_noise_method"]]
+        )
+        self.assertEqual(
+            data[1][view_rank_test_index["additive_noise_method"]], 'Gaussian'
+        )
+        self.assertEqual(
+            data[2][view_rank_test_index["denoising_method"]],
+            'Moving Average Filter'
+        )
+        self.assertEqual(
+            data[2][view_rank_test_index["denoising_param_1"]], 'N'
+        )
