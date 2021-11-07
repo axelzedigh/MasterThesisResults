@@ -2,7 +2,7 @@ import unittest
 import sqlite3 as lite
 import os
 
-from database.db_utils import (
+from utils.db_utils import (
     create_db_with_tables,
     initialize_table_data,
     insert_data_to_db,

@@ -1,4 +1,4 @@
-from db_utils import insert_data_to_db
+from utils.db_utils import insert_data_to_db
 import time
 import sys
 

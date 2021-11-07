@@ -138,14 +138,14 @@ def insert_data_to_db(
     :param test_dataset_id:
     :param training_dataset_id:
     :param environment_id:
-    :param distance: Distance between device under test and antenna.
-    :param device: Device under test.
+    :param distance: Distance between device under tests and antenna.
+    :param device: Device under tests.
     :param training_model_id: The deep learning architecture model used, e.g. CNN110.
     :param keybyte: The keybyte trained and tested. Between 0-15.
     :param epoch: The epoch of the DL model. Between 1-100.
     :param additive_noise_method_id:
     :param denoising_method_id:
-    :param termination_point: Termination point from rank test. Dependent variable!
+    :param termination_point: Termination point from rank tests. Dependent variable!
     :param average_rank: Average rank of the
     """
     create_db_with_tables(database)
