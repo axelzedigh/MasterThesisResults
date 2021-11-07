@@ -10,6 +10,7 @@ from database.queries import (
     QUERY_CREATE_TABLE_DENOISING_METHODS,
     QUERY_CREATE_TABLE_RANK_TEST,
     QUERY_CREATE_VIEW_FULL_RANK_TEST,
+    QUERY_SELECT_ADDITIVE_NOISE_METHOD_ID,
 )
 
 
@@ -62,7 +63,8 @@ def initialize_table_data(database):
         cur.execute("INSERT INTO test_datasets VALUES (1,'Wang2021');")
         cur.execute("INSERT INTO test_datasets VALUES (2,'Zedigh2021');")
 
-        cur.execute("INSERT INTO training_datasets VALUES (1,'Wang2021 - Cable');")
+        cur.execute(
+            "INSERT INTO training_datasets VALUES (1,'Wang2021 - Cable');")
 
         cur.execute("INSERT INTO training_models VALUES (1,'CNN110');")
 
@@ -116,19 +118,19 @@ def initialize_table_data(database):
 
 
 def insert_data_to_db(
-    database: str = "TerminationPoints.db",
-    test_dataset_id: int = 1,
-    training_dataset_id: int = 1,
-    environment_id: int = 1,
-    distance: float = 15,
-    device: int = 8,
-    training_model_id: int = 1,
-    keybyte: int = 0,
-    epoch: int = 100,
-    additive_noise_method_id: int = None,
-    denoising_method_id: int = None,
-    termination_point: int = 9999,
-    average_rank: int = 9999,
+        database: str = "TerminationPoints.db",
+        test_dataset_id: int = 1,
+        training_dataset_id: int = 1,
+        environment_id: int = 1,
+        distance: float = 15,
+        device: int = 8,
+        training_model_id: int = 1,
+        keybyte: int = 0,
+        epoch: int = 100,
+        additive_noise_method_id: int = None,
+        denoising_method_id: int = None,
+        termination_point: int = 9999,
+        average_rank: int = 9999,
 ) -> None:
     """
 
@@ -173,9 +175,36 @@ def insert_data_to_db(
     con.close()
 
 
-def fetchall_query(database="TerminationPoints.db", query="SELECT * FROM Rank_Test;"):
+def fetchall_query(database="TerminationPoints.db",
+                   query="SELECT * FROM Rank_Test;"):
     con = lite.connect(database)
     cur = con.cursor()
     query_data = cur.execute(query).fetchall()
     con.close()
     return query_data
+
+
+def get_additive_noise_method_id(
+        database: str,
+        additive_noise_method: str,
+        parameter_1: float,
+        parameter_1_value: str,
+        parameter_2: str,
+        parameter_2_value: str,
+):
+    query_arguments = (
+        additive_noise_method,
+        parameter_1,
+        parameter_1_value,
+        parameter_2,
+        parameter_2_value,
+    )
+    con = lite.connect(database)
+    cur = con.cursor()
+    additive_noise_method_id = cur.execute(
+        QUERY_SELECT_ADDITIVE_NOISE_METHOD_ID, query_arguments
+    ).fetchall()
+    if len(additive_noise_method_id) == 1:
+        return additive_noise_method_id[0][0]
+    else:
+        raise "Something is wrong!"

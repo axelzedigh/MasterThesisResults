@@ -7,6 +7,7 @@ from database.db_utils import (
     initialize_table_data,
     insert_data_to_db,
     fetchall_query,
+    get_additive_noise_method_id,
 )
 
 view_rank_test_index = {
@@ -200,3 +201,15 @@ class AddToDatabaseTestCase(unittest.TestCase):
             data[2][view_rank_test_index["denoising_method"]], "Moving Average Filter"
         )
         self.assertEqual(data[2][view_rank_test_index["denoising_param_1"]], "N")
+
+    def test_get_additive_noise_method_id(self):
+        method = "Gaussian"
+        param_1 = "Std"
+        param_1_value = 0.03
+        param_2 = 'Mean'
+        param_2_value = 0
+        additive_id = get_additive_noise_method_id(
+            self.database, method, param_1, param_1_value, param_2, param_2_value
+        )
+        self.assertIsNotNone(additive_id)
+        self.assertEqual(additive_id, 3)
