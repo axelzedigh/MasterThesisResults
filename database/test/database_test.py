@@ -61,8 +61,7 @@ class AddToDatabaseTestCase(unittest.TestCase):
         self.assertEqual(fetchall[1], test_datasets[1])
 
     def test_fetch_training_datasets(self):
-        fetchall = self.cur.execute(
-            "SELECT * FROM Training_Datasets;").fetchall()
+        fetchall = self.cur.execute("SELECT * FROM Training_Datasets;").fetchall()
         self.assertIsNotNone(fetchall)
         training_datasets = [(1, "Wang2021 - Cable")]
         self.assertEqual(fetchall[0], training_datasets[0])
@@ -74,8 +73,7 @@ class AddToDatabaseTestCase(unittest.TestCase):
         self.assertEqual(fetchall[0], training_models[0])
 
     def test_fetch_additive_noise_methods(self):
-        fetchall = self.cur.execute(
-            "SELECT * FROM Additive_Noise_Methods;").fetchall()
+        fetchall = self.cur.execute("SELECT * FROM Additive_Noise_Methods;").fetchall()
         self.assertIsNotNone(fetchall)
         additive_noise_methods = [
             (1, "Gaussian", "Std", 0.01, "Mean", 0.0),
@@ -90,11 +88,10 @@ class AddToDatabaseTestCase(unittest.TestCase):
             (10, "Rayleigh", "Mode", 0.0138, None, None),
             (11, "Rayleigh", "Mode", 0.0276, None, None),
         ]
-        self.assertEqual(fetchall[0], additive_noise_methods[0])
+        self.assertEqual(fetchall[10], additive_noise_methods[10])
 
     def test_fetch_denoising_methods(self):
-        fetchall = self.cur.execute(
-            "SELECT * FROM Denoising_Methods;").fetchall()
+        fetchall = self.cur.execute("SELECT * FROM Denoising_Methods;").fetchall()
         self.assertIsNotNone(fetchall)
         denoising_methods = [(1, "Moving Average Filter", "N", 3.0, None, None)]
         self.assertEqual(fetchall[0], denoising_methods[0])
@@ -103,8 +100,7 @@ class AddToDatabaseTestCase(unittest.TestCase):
         self.cur.execute(
             "INSERT INTO Denoising_Methods VALUES(NULL,'CDAE',NULL,NULL, NULL, NULL)"
         )
-        fetchall = self.cur.execute(
-            "SELECT * FROM Denoising_Methods;").fetchall()
+        fetchall = self.cur.execute("SELECT * FROM Denoising_Methods;").fetchall()
         self.assertEqual("CDAE", fetchall[-1][1])
 
     def test_insert_rank_test_data(self):
@@ -196,16 +192,11 @@ class AddToDatabaseTestCase(unittest.TestCase):
         self.assertEqual(data[0][view_rank_test_index["device"]], 7)
         self.assertEqual(data[1][view_rank_test_index["device"]], 8)
         self.assertEqual(data[2][view_rank_test_index["device"]], 9)
-        self.assertIsNone(
-            data[0][view_rank_test_index["additive_noise_method"]]
+        self.assertIsNone(data[0][view_rank_test_index["additive_noise_method"]])
+        self.assertEqual(
+            data[1][view_rank_test_index["additive_noise_method"]], "Gaussian"
         )
         self.assertEqual(
-            data[1][view_rank_test_index["additive_noise_method"]], 'Gaussian'
+            data[2][view_rank_test_index["denoising_method"]], "Moving Average Filter"
         )
-        self.assertEqual(
-            data[2][view_rank_test_index["denoising_method"]],
-            'Moving Average Filter'
-        )
-        self.assertEqual(
-            data[2][view_rank_test_index["denoising_param_1"]], 'N'
-        )
+        self.assertEqual(data[2][view_rank_test_index["denoising_param_1"]], "N")
