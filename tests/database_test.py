@@ -2,39 +2,18 @@ import unittest
 import sqlite3 as lite
 import os
 
+import numpy as np
+from pprint import pprint
+
+from database.variables import VIEW_RANK_TEST_INDEX
 from utils.db_utils import (
     create_db_with_tables,
     initialize_table_data,
     insert_data_to_db,
     fetchall_query,
     get_additive_noise_method_id,
-    get_denoising_method_id,
+    get_denoising_method_id, insert_legacy_rank_test_numpy_file_to_db,
 )
-
-view_rank_test_index = {
-    "id": 1,
-    "test_dataset": 1,
-    "training_dataset": 2,
-    "environment": 3,
-    "distance": 4,
-    "device": 5,
-    "training_model": 6,
-    "keybyte": 7,
-    "epoch": 8,
-    "additive_noise_method": 9,
-    "additive_param_1": 10,
-    "additive_param_1_value": 11,
-    "additive_param_2": 12,
-    "additive_param_2_value": 13,
-    "denoising_method": 14,
-    "denoising_param_1": 15,
-    "denoising_param_1_value": 16,
-    "denoising_param_2": 17,
-    "denoising_param_2_value": 18,
-    "termination_point": 19,
-    "average_rank": 20,
-    "date_added": 21,
-}
 
 
 class AddToDatabaseTestCase(unittest.TestCase):
@@ -63,7 +42,8 @@ class AddToDatabaseTestCase(unittest.TestCase):
         self.assertEqual(fetchall[1], test_datasets[1])
 
     def test_fetch_training_datasets(self):
-        fetchall = self.cur.execute("SELECT * FROM Training_Datasets;").fetchall()
+        fetchall = self.cur.execute(
+            "SELECT * FROM Training_Datasets;").fetchall()
         self.assertIsNotNone(fetchall)
         training_datasets = [(1, "Wang2021 - Cable")]
         self.assertEqual(fetchall[0], training_datasets[0])
@@ -75,7 +55,8 @@ class AddToDatabaseTestCase(unittest.TestCase):
         self.assertEqual(fetchall[0], training_models[0])
 
     def test_fetch_additive_noise_methods(self):
-        fetchall = self.cur.execute("SELECT * FROM Additive_Noise_Methods;").fetchall()
+        fetchall = self.cur.execute(
+            "SELECT * FROM Additive_Noise_Methods;").fetchall()
         self.assertIsNotNone(fetchall)
         additive_noise_methods = [
             (1, "Gaussian", "Std", 0.01, "Mean", 0.0),
@@ -93,7 +74,8 @@ class AddToDatabaseTestCase(unittest.TestCase):
         self.assertEqual(fetchall[10], additive_noise_methods[10])
 
     def test_fetch_denoising_methods(self):
-        fetchall = self.cur.execute("SELECT * FROM Denoising_Methods;").fetchall()
+        fetchall = self.cur.execute(
+            "SELECT * FROM Denoising_Methods;").fetchall()
         self.assertIsNotNone(fetchall)
         denoising_methods = [(1, "Moving Average Filter", "N", 3.0, None, None)]
         self.assertEqual(fetchall[0], denoising_methods[0])
@@ -102,7 +84,8 @@ class AddToDatabaseTestCase(unittest.TestCase):
         self.cur.execute(
             "INSERT INTO Denoising_Methods VALUES(NULL,'CDAE',NULL,NULL, NULL, NULL)"
         )
-        fetchall = self.cur.execute("SELECT * FROM Denoising_Methods;").fetchall()
+        fetchall = self.cur.execute(
+            "SELECT * FROM Denoising_Methods;").fetchall()
         self.assertEqual("CDAE", fetchall[-1][1])
 
     def test_insert_rank_test_data(self):
@@ -192,17 +175,20 @@ class AddToDatabaseTestCase(unittest.TestCase):
         data = fetchall_query(self.database, query)
         self.assertNotEqual(data, [])
         self.assertEqual(3, len(data))
-        self.assertEqual(data[0][view_rank_test_index["device"]], 7)
-        self.assertEqual(data[1][view_rank_test_index["device"]], 8)
-        self.assertEqual(data[2][view_rank_test_index["device"]], 9)
-        self.assertIsNone(data[0][view_rank_test_index["additive_noise_method"]])
+        self.assertEqual(data[0][VIEW_RANK_TEST_INDEX["device"]], 7)
+        self.assertEqual(data[1][VIEW_RANK_TEST_INDEX["device"]], 8)
+        self.assertEqual(data[2][VIEW_RANK_TEST_INDEX["device"]], 9)
+        self.assertIsNone(
+            data[0][VIEW_RANK_TEST_INDEX["additive_noise_method"]])
         self.assertEqual(
-            data[1][view_rank_test_index["additive_noise_method"]], "Gaussian"
+            data[1][VIEW_RANK_TEST_INDEX["additive_noise_method"]], "Gaussian"
         )
         self.assertEqual(
-            data[2][view_rank_test_index["denoising_method"]], "Moving Average Filter"
+            data[2][VIEW_RANK_TEST_INDEX["denoising_method"]],
+            "Moving Average Filter"
         )
-        self.assertEqual(data[2][view_rank_test_index["denoising_param_1"]], "N")
+        self.assertEqual(data[2][VIEW_RANK_TEST_INDEX["denoising_param_1"]],
+                         "N")
 
     def test_get_additive_noise_method_id(self):
         method = "Gaussian"
@@ -211,7 +197,8 @@ class AddToDatabaseTestCase(unittest.TestCase):
         param_2 = "Mean"
         param_2_value = 0
         additive_id = get_additive_noise_method_id(
-            self.database, method, param_1, param_1_value, param_2, param_2_value
+            self.database, method, param_1, param_1_value, param_2,
+            param_2_value
         )
         self.assertIsNotNone(additive_id)
         self.assertEqual(additive_id, 3)
@@ -222,7 +209,8 @@ class AddToDatabaseTestCase(unittest.TestCase):
         param_2 = None
         param_2_value = None
         additive_id = get_additive_noise_method_id(
-            self.database, method, param_1, param_1_value, param_2, param_2_value
+            self.database, method, param_1, param_1_value, param_2,
+            param_2_value
         )
         self.assertIsNotNone(additive_id)
         self.assertEqual(additive_id, 10)
@@ -234,7 +222,8 @@ class AddToDatabaseTestCase(unittest.TestCase):
         param_2 = None
         param_2_value = None
         denoising_id = get_denoising_method_id(
-            self.database, method, param_1, param_1_value, param_2, param_2_value
+            self.database, method, param_1, param_1_value, param_2,
+            param_2_value
         )
         self.assertIsNotNone(denoising_id)
         self.assertEqual(denoising_id, 1)
@@ -245,7 +234,58 @@ class AddToDatabaseTestCase(unittest.TestCase):
         param_2 = None
         param_2_value = None
         denoising_id = get_denoising_method_id(
-            self.database, method, param_1, param_1_value, param_2, param_2_value
+            self.database, method, param_1, param_1_value, param_2,
+            param_2_value
         )
         self.assertIsNotNone(denoising_id)
         self.assertEqual(denoising_id, 2)
+
+    def test_insert_rank_test_data_to_db_from_numpy(self):
+        # Setup variables
+        test_dataset_id = 1
+        training_dataset_id = 1
+        environment_id = 1
+        distance = 15
+        training_model_id = 1
+        additive_noise_method_id = 7  # Collected scale 50
+        denoising_method_id = None
+
+        device = 4
+        epoch = 33
+        keybyte = 8
+
+        # Setup numpy file
+        termination_points = [50, 60, 70]
+        termination_point_numpy_list = np.array(termination_points)
+
+        # Save list as file
+        filename = f"rank_test-device-{device}-epoch-{epoch}-keybyte-{keybyte}-runs-100-cnn_110-some_noise_processing"
+        np.save(filename, termination_point_numpy_list)
+
+        # reference to the temp numpy file
+        real_file_path = os.path.join("../tests/", filename + ".npy")
+
+        # Insert numpy-file data to db
+        insert_legacy_rank_test_numpy_file_to_db(
+            self.database,
+            real_file_path,
+            test_dataset_id,
+            training_dataset_id,
+            environment_id,
+            distance,
+            training_model_id,
+            additive_noise_method_id,
+            denoising_method_id)
+
+        # Get rank test data from db
+        data = fetchall_query(self.database)
+        self.assertIsNotNone(data)
+        self.assertNotEqual(data, [])
+        self.assertEqual(data[0][VIEW_RANK_TEST_INDEX["device"]], 4)
+        self.assertEqual(data[1][VIEW_RANK_TEST_INDEX["epoch"]], 33)
+        self.assertEqual(data[2][VIEW_RANK_TEST_INDEX["keybyte"]], 8)
+        self.assertEqual(data[0][VIEW_RANK_TEST_INDEX["termination_point"]], 50)
+        self.assertEqual(data[1][VIEW_RANK_TEST_INDEX["termination_point"]], 60)
+
+        # Remove numpy-file
+        os.remove(filename + ".npy")

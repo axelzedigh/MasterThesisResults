@@ -51,9 +51,9 @@ QUERY_CREATE_TABLE_DENOISING_METHODS = """
 QUERY_CREATE_TABLE_RANK_TEST = """
         CREATE TABLE Rank_Test(
         id INTEGER PRIMARY KEY,
-        test_dataset_id INTEGER,
-        training_dataset_id INTEGER,
-        environment_id INTEGER,
+        test_dataset_id INTEGER NOT NULL,
+        training_dataset_id INTEGER NOT NULL,
+        environment_id INTEGER NOT NULL,
         distance FLOAT NOT NULL,
         device INT NOT NULL, 
         training_model_id INTEGER,
@@ -62,7 +62,7 @@ QUERY_CREATE_TABLE_RANK_TEST = """
         additive_noise_method_id INTEGER,
         denoising_method_id INTEGER,
         termination_point INT NOT NULL,
-        average_rank INT NOT NULL,
+        average_rank INT,
         date_added REAL NOT NULL,
 
         FOREIGN KEY(test_dataset_id) 

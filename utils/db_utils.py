@@ -1,6 +1,8 @@
 import sqlite3 as lite
 import os
-import datetime
+import numpy as np
+import re
+from typing import Optional
 from database.queries import (
     QUERY_CREATE_TABLE_ENVIRONMENTS,
     QUERY_CREATE_TABLE_TEST_DATASETS,
@@ -57,56 +59,69 @@ def initialize_table_data(database):
     if database in dirs:
         con = lite.connect(database)
         cur = con.cursor()
-        cur.execute("INSERT INTO environments VALUES (1,'office corridor');")
-        cur.execute("INSERT INTO environments VALUES (2,'big hall');")
+        cur.execute("INSERT INTO environments VALUES (NULL,'office corridor');")
+        cur.execute("INSERT INTO environments VALUES (NULL,'big hall');")
 
-        cur.execute("INSERT INTO test_datasets VALUES (1,'Wang2021');")
-        cur.execute("INSERT INTO test_datasets VALUES (2,'Zedigh2021');")
-
-        cur.execute(
-            "INSERT INTO training_datasets VALUES (1,'Wang2021 - Cable');")
-
-        cur.execute("INSERT INTO training_models VALUES (1,'CNN110');")
+        cur.execute("INSERT INTO test_datasets VALUES (NULL,'Wang2021');")
+        cur.execute("INSERT INTO test_datasets VALUES (NULL,'Zedigh2021');")
 
         cur.execute(
-            "INSERT INTO additive_noise_methods VALUES (1,'Gaussian', 'Std', 0.01, 'Mean', 0);"
+            "INSERT INTO training_datasets VALUES (NULL,'Wang2021 - Cable');")
+
+        cur.execute("INSERT INTO training_models VALUES (NULL,'CNN110');")
+
+        cur.execute(
+            "INSERT INTO additive_noise_methods VALUES (NULL,'Gaussian', "
+            "'Std', 0.01, 'Mean', 0); "
         )
         cur.execute(
-            "INSERT INTO additive_noise_methods VALUES (2,'Gaussian', 'Std', 0.02, 'Mean', 0);"
+            "INSERT INTO additive_noise_methods VALUES (NULL,'Gaussian', "
+            "'Std', 0.02, 'Mean', 0); "
         )
         cur.execute(
-            "INSERT INTO additive_noise_methods VALUES (3,'Gaussian', 'Std', 0.03, 'Mean', 0);"
+            "INSERT INTO additive_noise_methods VALUES (NULL,'Gaussian', "
+            "'Std', 0.03, 'Mean', 0); "
         )
         cur.execute(
-            "INSERT INTO additive_noise_methods VALUES (4,'Gaussian', 'Std', 0.04, 'Mean', 0);"
+            "INSERT INTO additive_noise_methods VALUES (NULL,'Gaussian', "
+            "'Std', 0.04, 'Mean', 0); "
         )
         cur.execute(
-            "INSERT INTO additive_noise_methods VALUES (5,'Gaussian', 'Std', 0.05, 'Mean', 0);"
+            "INSERT INTO additive_noise_methods VALUES (NULL,'Gaussian', "
+            "'Std', 0.05, 'Mean', 0); "
         )
         cur.execute(
-            "INSERT INTO additive_noise_methods VALUES (6,'Collected', 'Scale', 25, NULL, NULL);"
+            "INSERT INTO additive_noise_methods VALUES (NULL,'Collected', "
+            "'Scale', 25, NULL, NULL); "
         )
         cur.execute(
-            "INSERT INTO additive_noise_methods VALUES (7,'Collected', 'Scale', 50, NULL, NULL);"
+            "INSERT INTO additive_noise_methods VALUES (NULL,'Collected', "
+            "'Scale', 50, NULL, NULL); "
         )
         cur.execute(
-            "INSERT INTO additive_noise_methods VALUES (8,'Collected', 'Scale', 75, NULL, NULL);"
+            "INSERT INTO additive_noise_methods VALUES (NULL,'Collected', "
+            "'Scale', 75, NULL, NULL); "
         )
         cur.execute(
-            "INSERT INTO additive_noise_methods VALUES (9,'Collected', 'Scale', 105, NULL, NULL);"
+            "INSERT INTO additive_noise_methods VALUES (NULL,'Collected', "
+            "'Scale', 105, NULL, NULL); "
         )
         cur.execute(
-            "INSERT INTO additive_noise_methods VALUES (10,'Rayleigh', 'Mode', 0.0138, NULL, NULL);"
+            "INSERT INTO additive_noise_methods VALUES (NULL,'Rayleigh', "
+            "'Mode', 0.0138, NULL, NULL); "
         )
         cur.execute(
-            "INSERT INTO additive_noise_methods VALUES (11,'Rayleigh', 'Mode', 0.0276, NULL, NULL);"
+            "INSERT INTO additive_noise_methods VALUES (NULL,'Rayleigh', "
+            "'Mode', 0.0276, NULL, NULL); "
         )
 
         cur.execute(
-            "INSERT INTO denoising_methods VALUES (1,'Moving Average Filter', 'N', 3, NULL, NULL);"
+            "INSERT INTO denoising_methods VALUES (NULL,'Moving Average "
+            "Filter', 'N', 3, NULL, NULL); "
         )
         cur.execute(
-            "INSERT INTO denoising_methods VALUES (2,'Moving Average Filter', 'N', 5, NULL, NULL);"
+            "INSERT INTO denoising_methods VALUES (NULL,'Moving Average "
+            "Filter', 'N', 5, NULL, NULL); "
         )
 
         con.commit()
@@ -130,28 +145,27 @@ def insert_data_to_db(
         additive_noise_method_id: int = None,
         denoising_method_id: int = None,
         termination_point: int = 9999,
-        average_rank: int = 9999,
+        average_rank: Optional[int] = 9999,
 ) -> None:
     """
 
-    :param database: The database-file to write to. Standard is "TerminationPoints.db".
+    :param database: The database-file to write to.
     :param test_dataset_id:
     :param training_dataset_id:
     :param environment_id:
     :param distance: Distance between device under tests and antenna.
     :param device: Device under tests.
-    :param training_model_id: The deep learning architecture model used, e.g. CNN110.
-    :param keybyte: The keybyte trained and tested. Between 0-15.
+    :param training_model_id: The deep learning architecture model used.
+    :param keybyte: The keybyte trained and tested [0-15].
     :param epoch: The epoch of the DL model. Between 1-100.
-    :param additive_noise_method_id:
-    :param denoising_method_id:
-    :param termination_point: Termination point from rank tests. Dependent variable!
-    :param average_rank: Average rank of the
+    :param additive_noise_method_id: Foreign key id.
+    :param denoising_method_id: Foreign key id.
+    :param termination_point: Termination point from rank tests.
+    :param average_rank:
     """
     create_db_with_tables(database)
     con = lite.connect(database)
     cur = con.cursor()
-    # date_added = str(datetime.datetime.today())
 
     cur.execute(
         "INSERT INTO Rank_Test VALUES(NULL,?,?,?,?,?,?,?,?,?,?,?,?,julianday("
@@ -175,8 +189,8 @@ def insert_data_to_db(
     con.close()
 
 
-def fetchall_query(database="TerminationPoints.db",
-                   query="SELECT * FROM Rank_Test;"):
+def fetchall_query(database: str = "TerminationPoints.db",
+                   query: str = "SELECT * FROM full_rank_test;"):
     con = lite.connect(database)
     cur = con.cursor()
     query_data = cur.execute(query).fetchall()
@@ -215,8 +229,8 @@ def get_denoising_method_id(
         denoising_method: str,
         parameter_1: str,
         parameter_1_value: float,
-        parameter_2: str,
-        parameter_2_value: float,
+        parameter_2: Optional[str],
+        parameter_2_value: Optional[float],
 ):
     query_arguments = (
         denoising_method,
@@ -234,3 +248,65 @@ def get_denoising_method_id(
         return denoising_method_id[0][0]
     else:
         print("Something is wrong!")
+
+
+def insert_legacy_rank_test_numpy_file_to_db(
+        database: str,
+        filename: str,
+        test_dataset_id: int,
+        training_dataset_id: int,
+        environment_id: int,
+        distance: float,
+        training_model_id: int,
+        additive_noise_method_id: Optional[int],
+        denoising_method_id: Optional[int],
+):
+    """
+    Numpy filename-format:
+    rank_test-device-{i}-epoch-{i}-keybyte-{i}-runs-{i}-{training_model}-{
+    noise processing name}.npy
+
+    :param database: Path to database to write to.
+    :param filename: Path to numpy file.
+    :param test_dataset_id:
+    :param training_dataset_id:
+    :param environment_id:
+    :param distance:
+    :param training_model_id:
+    :param additive_noise_method_id:
+    :param denoising_method_id:
+    """
+    file = np.load(filename)
+
+    device_start = re.search("device-", filename).end()
+    device_end = re.search("-epoch", filename).start()
+    device = int(filename[device_start:device_end])
+
+    epoch_start = re.search("epoch-", filename).end()
+    epoch_end = re.search("-keybyte", filename).start()
+    epoch = int(filename[epoch_start:epoch_end])
+
+    keybyte_start = re.search("keybyte-", filename).end()
+    keybyte_end = re.search("-runs", filename).start()
+    keybyte = int(filename[keybyte_start:keybyte_end])
+
+    # model_start = re.search("cnn_110_", filename).end()
+    # model_end = re.search(".npy", filename).start()
+    # model = file[model_start:model_end]
+
+    for termination_point in file:
+        insert_data_to_db(
+            database=database,
+            test_dataset_id=test_dataset_id,
+            training_dataset_id=training_dataset_id,
+            environment_id=environment_id,
+            distance=distance,
+            device=device,
+            training_model_id=training_model_id,
+            keybyte=keybyte,
+            epoch=epoch,
+            additive_noise_method_id=additive_noise_method_id,
+            denoising_method_id=denoising_method_id,
+            termination_point=int(termination_point),
+            average_rank=None,
+        )
