@@ -140,10 +140,10 @@ def fetchall_query(database: str = "TerminationPoints.db",
 def get_additive_noise_method_id(
         database: str,
         additive_noise_method: str,
-        parameter_1: str,
-        parameter_1_value: float,
-        parameter_2: str,
-        parameter_2_value: float,
+        parameter_1: Optional[str],
+        parameter_1_value: Optional[float],
+        parameter_2: Optional[str],
+        parameter_2_value: Optional[float],
 ):
     query_arguments = (
         additive_noise_method,
@@ -166,8 +166,8 @@ def get_additive_noise_method_id(
 def get_denoising_method_id(
         database: str,
         denoising_method: str,
-        parameter_1: str,
-        parameter_1_value: float,
+        parameter_1: Optional[str],
+        parameter_1_value: Optional[float],
         parameter_2: Optional[str],
         parameter_2_value: Optional[float],
 ):

@@ -165,13 +165,13 @@ QUERY_SELECT_DENOISING_METHOD_ID = """
         """
 
 QUERY_LIST_INITIALIZE_DB = [
-    "INSERT INTO environments VALUES (NULL,'office corridor');",
-    "INSERT INTO environments VALUES (NULL,'big hall');",
+    "INSERT INTO environments VALUES (NULL,'office_corridor');",
+    "INSERT INTO environments VALUES (NULL,'big_hall');",
 
-    "INSERT INTO test_datasets VALUES (NULL,'Wang2021');",
-    "INSERT INTO test_datasets VALUES (NULL,'Zedigh2021');",
+    "INSERT INTO test_datasets VALUES (NULL,'Wang_2021');",
+    "INSERT INTO test_datasets VALUES (NULL,'Zedigh_2021');",
 
-    "INSERT INTO training_datasets VALUES (NULL,'Wang2021 - Cable');",
+    "INSERT INTO training_datasets VALUES (NULL,'Wang_2021 - Cable');",
 
     "INSERT INTO training_models VALUES (NULL,'CNN110');",
 

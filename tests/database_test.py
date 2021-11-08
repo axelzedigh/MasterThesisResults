@@ -30,13 +30,13 @@ class AddToDatabaseTestCase(unittest.TestCase):
 
     def test_fetch_environments(self):
         fetchall = self.cur.execute("SELECT * FROM Environments;").fetchall()
-        environments = [(1, "office corridor"), (2, "big hall")]
+        environments = [(1, "office_corridor"), (2, "big_hall")]
         self.assertEqual(fetchall[0], environments[0])
         self.assertEqual(fetchall[1], environments[1])
 
     def test_fetch_test_datasets(self):
         fetchall = self.cur.execute("SELECT * FROM Test_Datasets;").fetchall()
-        test_datasets = [(1, "Wang2021"), (2, "Zedigh2021")]
+        test_datasets = [(1, "Wang_2021"), (2, "Zedigh_2021")]
         self.assertIsNotNone(fetchall)
         self.assertEqual(fetchall[0], test_datasets[0])
         self.assertEqual(fetchall[1], test_datasets[1])
@@ -45,7 +45,7 @@ class AddToDatabaseTestCase(unittest.TestCase):
         fetchall = self.cur.execute(
             "SELECT * FROM Training_Datasets;").fetchall()
         self.assertIsNotNone(fetchall)
-        training_datasets = [(1, "Wang2021 - Cable")]
+        training_datasets = [(1, "Wang_2021 - Cable")]
         self.assertEqual(fetchall[0], training_datasets[0])
 
     def test_fetch_training_models(self):
@@ -82,7 +82,8 @@ class AddToDatabaseTestCase(unittest.TestCase):
 
     def test_insert_denoising_method(self):
         self.cur.execute(
-            "INSERT INTO Denoising_Methods VALUES(NULL,'CDAE',NULL,NULL, NULL, NULL)"
+            "INSERT INTO Denoising_Methods VALUES(NULL,'CDAE',NULL,NULL, "
+            "NULL, NULL) "
         )
         fetchall = self.cur.execute(
             "SELECT * FROM Denoising_Methods;").fetchall()
@@ -259,7 +260,10 @@ class AddToDatabaseTestCase(unittest.TestCase):
         termination_point_numpy_list = np.array(termination_points)
 
         # Save list as file
-        filename = f"rank_test-device-{device}-epoch-{epoch}-keybyte-{keybyte}-runs-100-cnn_110-some_noise_processing"
+        filename = (
+            f"rank_test-device-{device}-epoch-{epoch}-keybyte-{keybyte}-runs"
+            f"-100-cnn_110-some_noise_processing "
+        )
         np.save(filename, termination_point_numpy_list)
 
         # reference to the temp numpy file
