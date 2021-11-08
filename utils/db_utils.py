@@ -251,7 +251,7 @@ def insert_legacy_rank_test_numpy_file_to_db(
         )
 
 
-def create_pre_processing_table_info_file(database="main.db", path="docs"):
+def create_pre_processing_table_info_md(database="main.db", path="docs"):
     project_dir = os.getenv("MASTER_THESIS_RESULTS")
     file_path = os.path.join(project_dir, path, "pre_processing_tables.md")
     additive_data = fetchall_query(
@@ -287,5 +287,22 @@ def create_pre_processing_table_info_file(database="main.db", path="docs"):
             f"{denoising_method[4]} | {denoising_method[5]} |\n"
         )
 
+    file.write("\n")
+    file.close()
+
+
+def create_rank_test_table_info_md(database="main.db", path="docs"):
+    project_dir = os.getenv("MASTER_THESIS_RESULTS")
+    file_path = os.path.join(project_dir, path, "rank_test_table_info.md")
+    rank_test_rows = fetchall_query(
+        database, "SELECT Count(*) from Rank_Test;"
+    )
+
+    file = open(file_path, "w")
+    file.write("# Rank Test Table Info\n")
+    file.close()
+
+    file = open(file_path, "a")
+    file.write(f"Rows: {rank_test_rows[0][0]}")
     file.write("\n")
     file.close()

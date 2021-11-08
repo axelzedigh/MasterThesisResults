@@ -13,7 +13,7 @@ from utils.db_utils import (
     fetchall_query,
     get_additive_noise_method_id,
     get_denoising_method_id, insert_legacy_rank_test_numpy_file_to_db,
-    create_pre_processing_table_info_file,
+    create_pre_processing_table_info_md,
 )
 
 
@@ -301,7 +301,7 @@ class AddToDatabaseTestCase(unittest.TestCase):
         file_path = os.path.join(project_dir, path, "pre_processing_tables.md")
 
         # Update file
-        create_pre_processing_table_info_file(self.database, path)
+        create_pre_processing_table_info_md(self.database, path)
 
         file = open(file_path, "r")
         first_line = file.readline()
