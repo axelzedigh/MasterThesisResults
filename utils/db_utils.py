@@ -2,6 +2,7 @@ import sqlite3 as lite
 import os
 import numpy as np
 import re
+from datetime import datetime
 from typing import Optional
 from database.queries import (
     QUERY_CREATE_TABLE_ENVIRONMENTS,
@@ -92,14 +93,14 @@ def insert_data_to_db(
     :param test_dataset_id:
     :param training_dataset_id:
     :param environment_id:
-    :param distance: Distance between device under tests and antenna.
-    :param device: Device under tests.
+    :param distance: Distance between device under unittests and antenna.
+    :param device: Device under unittests.
     :param training_model_id: The deep learning architecture model used.
     :param keybyte: The keybyte trained and tested [0-15].
     :param epoch: The epoch of the DL model. Between 1-100.
     :param additive_noise_method_id: Foreign key id.
     :param denoising_method_id: Foreign key id.
-    :param termination_point: Termination point from rank tests.
+    :param termination_point: Termination point from rank unittests.
     :param average_rank:
     """
     create_db_with_tables(database)
@@ -262,6 +263,7 @@ def create_pre_processing_table_info_md(database="main.db", path="docs"):
     )
     file = open(file_path, "w")
     file.write("# Pre-processing tables\n")
+    file.write(f"Last updated: {datetime.today()}\n\n")
     file.write("## Additive noise methods\n")
     file.close()
     file = open(file_path, "a")
@@ -300,6 +302,7 @@ def create_rank_test_table_info_md(database="main.db", path="docs"):
 
     file = open(file_path, "w")
     file.write("# Rank Test Table Info\n")
+    file.write(f"Last updated: {datetime.today()}\n\n")
     file.close()
 
     file = open(file_path, "a")

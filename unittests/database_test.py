@@ -267,7 +267,7 @@ class AddToDatabaseTestCase(unittest.TestCase):
         np.save(filename, termination_point_numpy_list)
 
         # reference to the temp numpy file
-        real_file_path = os.path.join("../tests/", filename + ".npy")
+        real_file_path = os.path.join("../unittests/", filename + ".npy")
 
         # Insert numpy-file data to db
         insert_legacy_rank_test_numpy_file_to_db(
@@ -297,7 +297,7 @@ class AddToDatabaseTestCase(unittest.TestCase):
     def test_create_pre_processing_table_info_file(self):
         # Get file path
         project_dir = os.getenv("MASTER_THESIS_RESULTS")
-        path = "tests"
+        path = "unittests"
         file_path = os.path.join(project_dir, path, "pre_processing_tables.md")
 
         # Update file
