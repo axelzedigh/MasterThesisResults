@@ -203,10 +203,3 @@ QUERY_LIST_INITIALIZE_DB = [
     "INSERT INTO denoising_methods VALUES (2,'Moving Average Filter', 'N', "
     "5, NULL, NULL); ",
 ]
-
-QUERY_CREATE_VIEW_ALL_PRE_PROCESSING_METHODS = """
-        CREATE VIEW all_pre_processing_methods
-        AS
-        SELECT
-            
-"""

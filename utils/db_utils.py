@@ -17,7 +17,7 @@ from database.queries import (
 )
 
 
-def create_db_with_tables(database="TerminationPoints.db") -> None:
+def create_db_with_tables(database="main.db") -> None:
     """
 
     :return:
@@ -72,7 +72,7 @@ def initialize_table_data(database):
 
 
 def insert_data_to_db(
-        database: str = "TerminationPoints.db",
+        database: str = "main.db",
         test_dataset_id: int = 1,
         training_dataset_id: int = 1,
         environment_id: int = 1,
@@ -128,7 +128,7 @@ def insert_data_to_db(
     con.close()
 
 
-def fetchall_query(database: str = "TerminationPoints.db",
+def fetchall_query(database: str = "main.db",
                    query: str = "SELECT * FROM full_rank_test;"):
     con = lite.connect(database)
     cur = con.cursor()
@@ -249,3 +249,43 @@ def insert_legacy_rank_test_numpy_file_to_db(
             termination_point=int(termination_point),
             average_rank=None,
         )
+
+
+def create_pre_processing_table_info_file(database, path):
+    project_dir = os.getenv("MASTER_THESIS_RESULTS")
+    file_path = os.path.join(project_dir, path, "pre_processing_tables.md")
+    additive_data = fetchall_query(
+        database, "SELECT * from additive_noise_methods;"
+    )
+    denoising_data = fetchall_query(
+        database, "SELECT * from denoising_methods;"
+    )
+    file = open(file_path, "w")
+    file.write("# Pre-processing tables\n")
+    file.write("## Additive noise methods\n")
+    file.close()
+    file = open(file_path, "a")
+    file.write("| id | additive noise method | parameter 1 | value | "
+               "parameter 2 | value |\n")
+    file.write("|---|---|---|---|---|---|\n")
+    for additive_method in additive_data:
+        file.write(
+            f"| {additive_method[0]} | {additive_method[1]} |"
+            f"{additive_method[2]} | {additive_method[3]} | "
+            f"{additive_method[4]} | {additive_method[5]} |\n"
+        )
+
+    file.write("\n")
+    file.write("## Denoising methods\n")
+    file.write("| id | denoising method | parameter 1 | value | parameter 2 | "
+               "value |\n")
+    file.write("|---|---|---|---|---|---|\n")
+    for denoising_method in denoising_data:
+        file.write(
+            f"| {denoising_method[0]} | {denoising_method[1]} |"
+            f"{denoising_method[2]} | {denoising_method[3]} | "
+            f"{denoising_method[4]} | {denoising_method[5]} |\n"
+        )
+
+    file.write("\n")
+    file.close()

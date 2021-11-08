@@ -13,6 +13,7 @@ from utils.db_utils import (
     fetchall_query,
     get_additive_noise_method_id,
     get_denoising_method_id, insert_legacy_rank_test_numpy_file_to_db,
+    create_pre_processing_table_info_file,
 )
 
 
@@ -121,7 +122,6 @@ class AddToDatabaseTestCase(unittest.TestCase):
             average_rank=102,
         )
         fetchall = self.cur.execute("SELECT * FROM Rank_Test;").fetchall()
-        print(fetchall)
         self.assertIsNotNone(fetchall)
         device = fetchall[0][5]
         self.assertEqual(8, device)
@@ -293,3 +293,23 @@ class AddToDatabaseTestCase(unittest.TestCase):
 
         # Remove numpy-file
         os.remove(filename + ".npy")
+
+    def test_create_pre_processing_table_info_file(self):
+        # Get file path
+        project_dir = os.getenv("MASTER_THESIS_RESULTS")
+        path = "tests"
+        file_path = os.path.join(project_dir, path, "pre_processing_tables.md")
+
+        # Update file
+        create_pre_processing_table_info_file(self.database, path)
+
+        file = open(file_path, "r")
+        first_line = file.readline()
+        file.close()
+
+        first_line_stub = "# Pre-processing tables\n"
+        self.assertIsNotNone(file)
+        self.assertEqual(first_line, first_line_stub)
+
+        # Delete file
+        os.remove(file_path)
