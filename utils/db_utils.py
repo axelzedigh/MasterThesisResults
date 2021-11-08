@@ -50,7 +50,7 @@ def create_db_with_tables(database="main.db") -> None:
     return
 
 
-def initialize_table_data(database):
+def initialize_table_data(database="main.db"):
     """
 
     :param database:
@@ -251,14 +251,14 @@ def insert_legacy_rank_test_numpy_file_to_db(
         )
 
 
-def create_pre_processing_table_info_file(database, path):
+def create_pre_processing_table_info_file(database="main.db", path="docs"):
     project_dir = os.getenv("MASTER_THESIS_RESULTS")
     file_path = os.path.join(project_dir, path, "pre_processing_tables.md")
     additive_data = fetchall_query(
-        database, "SELECT * from additive_noise_methods;"
+        database, "SELECT * from Additive_Noise_Methods;"
     )
     denoising_data = fetchall_query(
-        database, "SELECT * from denoising_methods;"
+        database, "SELECT * from Denoising_Methods;"
     )
     file = open(file_path, "w")
     file.write("# Pre-processing tables\n")
