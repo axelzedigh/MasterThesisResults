@@ -151,10 +151,11 @@ def insert_data_to_db(
     create_db_with_tables(database)
     con = lite.connect(database)
     cur = con.cursor()
-    date_added = str(datetime.datetime.today())
+    # date_added = str(datetime.datetime.today())
 
     cur.execute(
-        "INSERT INTO Rank_Test VALUES(NULL,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+        "INSERT INTO Rank_Test VALUES(NULL,?,?,?,?,?,?,?,?,?,?,?,?,julianday("
+        "'now'))",
         (
             test_dataset_id,
             training_dataset_id,
@@ -168,7 +169,6 @@ def insert_data_to_db(
             denoising_method_id,
             termination_point,
             average_rank,
-            date_added,
         ),
     )
     con.commit()

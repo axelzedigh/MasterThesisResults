@@ -137,6 +137,7 @@ class AddToDatabaseTestCase(unittest.TestCase):
             average_rank=102,
         )
         fetchall = self.cur.execute("SELECT * FROM Rank_Test;").fetchall()
+        print(fetchall)
         self.assertIsNotNone(fetchall)
         device = fetchall[0][5]
         self.assertEqual(8, device)

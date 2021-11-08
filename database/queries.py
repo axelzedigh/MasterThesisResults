@@ -63,7 +63,7 @@ QUERY_CREATE_TABLE_RANK_TEST = """
         denoising_method_id INTEGER,
         termination_point INT NOT NULL,
         average_rank INT NOT NULL,
-        date_added TEXT NOT NULL,
+        date_added REAL NOT NULL,
 
         FOREIGN KEY(test_dataset_id) 
             REFERENCES Test_Datasets(test_dataset_id),
