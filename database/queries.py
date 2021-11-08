@@ -165,15 +165,15 @@ QUERY_SELECT_DENOISING_METHOD_ID = """
         """
 
 QUERY_LIST_INITIALIZE_DB = [
-    "INSERT INTO environments VALUES (NULL,'office_corridor');",
-    "INSERT INTO environments VALUES (NULL,'big_hall');",
+    "INSERT INTO environments VALUES (1,'office_corridor');",
+    "INSERT INTO environments VALUES (2,'big_hall');",
 
-    "INSERT INTO test_datasets VALUES (NULL,'Wang_2021');",
-    "INSERT INTO test_datasets VALUES (NULL,'Zedigh_2021');",
+    "INSERT INTO test_datasets VALUES (1,'Wang_2021');",
+    "INSERT INTO test_datasets VALUES (2,'Zedigh_2021');",
 
-    "INSERT INTO training_datasets VALUES (NULL,'Wang_2021 - Cable');",
+    "INSERT INTO training_datasets VALUES (1,'Wang_2021 - Cable');",
 
-    "INSERT INTO training_models VALUES (NULL,'CNN110');",
+    "INSERT INTO training_models VALUES (1,'CNN110');",
 
     "INSERT INTO additive_noise_methods VALUES (1,'Gaussian', 'Std', 0.01, "
     "'Mean', 0); ",

@@ -1,4 +1,5 @@
-# Run to update help docs from the current db.
+# Run to update help docs based on current status of db.
+
 import os
 from utils.db_utils import create_pre_processing_table_info_file
 

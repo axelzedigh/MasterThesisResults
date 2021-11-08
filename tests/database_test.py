@@ -313,3 +313,38 @@ class AddToDatabaseTestCase(unittest.TestCase):
 
         # Delete file
         os.remove(file_path)
+
+    def test_get_number_of_rows_in_rank_test_table(self):
+        insert_data_to_db(
+            database=self.database,
+            test_dataset_id=1,
+            training_dataset_id=1,
+            environment_id=1,
+            distance=15,
+            device=9,
+            training_model_id=1,
+            keybyte=0,
+            epoch=100,
+            additive_noise_method_id=None,
+            denoising_method_id=1,
+            termination_point=101,
+            average_rank=102,
+        )
+        insert_data_to_db(
+            database=self.database,
+            test_dataset_id=1,
+            training_dataset_id=1,
+            environment_id=1,
+            distance=15,
+            device=8,
+            training_model_id=1,
+            keybyte=0,
+            epoch=100,
+            additive_noise_method_id=1,
+            denoising_method_id=None,
+            termination_point=101,
+            average_rank=102,
+        )
+        data = fetchall_query(self.database, "SELECT Count(*) FROM Rank_Test;")
+        self.assertNotEqual(data, [])
+        self.assertEqual(data[0][0], 2)
