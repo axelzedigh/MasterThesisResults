@@ -2,13 +2,12 @@
 
 import os
 from utils.db_utils import create_pre_processing_table_info_md, \
-    create_rank_test_table_info_md
+    create_rank_test_table_info_md, get_db_absolute_path
 
 
 def update_helper_docs():
-    project_dir = os.getenv("MASTER_THESIS_RESULTS")
     path = "docs"
-    database = os.path.join(project_dir, "database", "main.db")
+    database = get_db_absolute_path()
     create_pre_processing_table_info_md(database, path)
     create_rank_test_table_info_md(database, path)
 

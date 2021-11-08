@@ -203,3 +203,79 @@ QUERY_LIST_INITIALIZE_DB = [
     "INSERT INTO denoising_methods VALUES (2,'Moving Average Filter', 'N', "
     "5, NULL, NULL); ",
 ]
+
+QUERY_RANK_TEST_GROUPED_A = """
+SELECT 
+    *, 
+    Count(*), 
+    avg(termination_point) 
+FROM 
+    Rank_Test 
+GROUP BY
+    test_dataset_id,
+    training_dataset_id,
+    environment_id,
+    distance,
+    device,
+    training_model_id,
+    keybyte,
+    epoch,
+    additive_noise_method_id,  
+    denoising_method_id;
+"""
+
+QUERY_FULL_RANK_TEST_GROUPED_A = """
+SELECT
+    test_dataset,
+    training_dataset,
+    environment,
+    distance,
+    device,
+    training_model,
+    keybyte,
+    epoch,
+    additive_noise_method
+        AS additive_method,
+    additive_noise_method_parameter_1
+        AS additive_param_1,
+    additive_noise_method_parameter_1_value
+        AS additive_param_1_value,
+    additive_noise_method_parameter_2
+        AS additive_param_2,
+    additive_noise_method_parameter_2_value
+        AS additive_param_2_value,
+    denoising_method,
+    denoising_method_parameter_1
+        AS denoising_param_1,
+    denoising_method_parameter_1_value
+        AS denoising_param_1_value,
+    denoising_method_parameter_2
+        AS denoising_param_2,
+    denoising_method_parameter_2_value 
+        AS denoising_param_2_value,
+    Count(termination_point) 
+        AS count_term_p,
+    avg(termination_point)
+        AS avg_term_p
+FROM
+    full_rank_test
+GROUP BY
+    test_dataset,
+    training_dataset,
+    environment,
+    distance,
+    device,
+    training_model,
+    keybyte,
+    epoch,
+    additive_method,
+    additive_param_1,
+    additive_param_1_value,
+    additive_param_2,
+    additive_param_2_value,
+    denoising_method,
+    denoising_param_1,
+    denoising_param_1_value,
+    denoising_param_2,
+    denoising_param_2_value 
+"""
