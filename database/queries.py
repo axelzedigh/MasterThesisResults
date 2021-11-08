@@ -163,3 +163,43 @@ QUERY_SELECT_DENOISING_METHOD_ID = """
             (denoising_method_parameter_2_value = ? 
                 OR denoising_method_parameter_2_value IS NULL);
         """
+
+QUERY_LIST_INITIALIZE_DB = [
+    "INSERT INTO environments VALUES (NULL,'office corridor');",
+    "INSERT INTO environments VALUES (NULL,'big hall');",
+
+    "INSERT INTO test_datasets VALUES (NULL,'Wang2021');",
+    "INSERT INTO test_datasets VALUES (NULL,'Zedigh2021');",
+
+    "INSERT INTO training_datasets VALUES (NULL,'Wang2021 - Cable');",
+
+    "INSERT INTO training_models VALUES (NULL,'CNN110');",
+
+    "INSERT INTO additive_noise_methods VALUES (NULL,'Gaussian', 'Std', 0.01, "
+    "'Mean', 0); ",
+    "INSERT INTO additive_noise_methods VALUES (NULL,'Gaussian', 'Std', 0.02, "
+    "'Mean', 0); ",
+    "INSERT INTO additive_noise_methods VALUES (NULL,'Gaussian', 'Std', 0.03, "
+    "'Mean', 0); ",
+    "INSERT INTO additive_noise_methods VALUES (NULL,'Gaussian', 'Std', 0.04, "
+    "'Mean', 0); ",
+    "INSERT INTO additive_noise_methods VALUES (NULL,'Gaussian', 'Std', 0.05, "
+    "'Mean', 0); ",
+    "INSERT INTO additive_noise_methods VALUES (NULL,'Collected', 'Scale', "
+    "25, NULL, NULL); ",
+    "INSERT INTO additive_noise_methods VALUES (NULL,'Collected', 'Scale', "
+    "49, NULL, NULL); ",
+    "INSERT INTO additive_noise_methods VALUES (NULL,'Collected', 'Scale', "
+    "75, NULL, NULL); ",
+    "INSERT INTO additive_noise_methods VALUES (NULL,'Collected', 'Scale', "
+    "105, NULL, NULL); ",
+    "INSERT INTO additive_noise_methods VALUES (NULL,'Rayleigh', 'Mode', "
+    "0.0138, NULL, NULL); ",
+    "INSERT INTO additive_noise_methods VALUES (NULL,'Rayleigh', 'Mode', "
+    "0.0276, NULL, NULL); ",
+
+    "INSERT INTO denoising_methods VALUES (NULL,'Moving Average Filter', 'N', "
+    "3, NULL, NULL); ",
+    "INSERT INTO denoising_methods VALUES (NULL,'Moving Average Filter', 'N', "
+    "5, NULL, NULL); ",
+]

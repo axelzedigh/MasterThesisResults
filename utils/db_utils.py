@@ -13,6 +13,7 @@ from database.queries import (
     QUERY_CREATE_TABLE_RANK_TEST,
     QUERY_CREATE_VIEW_FULL_RANK_TEST,
     QUERY_SELECT_ADDITIVE_NOISE_METHOD_ID, QUERY_SELECT_DENOISING_METHOD_ID,
+    QUERY_LIST_INITIALIZE_DB,
 )
 
 
@@ -59,70 +60,8 @@ def initialize_table_data(database):
     if database in dirs:
         con = lite.connect(database)
         cur = con.cursor()
-        cur.execute("INSERT INTO environments VALUES (NULL,'office corridor');")
-        cur.execute("INSERT INTO environments VALUES (NULL,'big hall');")
-
-        cur.execute("INSERT INTO test_datasets VALUES (NULL,'Wang2021');")
-        cur.execute("INSERT INTO test_datasets VALUES (NULL,'Zedigh2021');")
-
-        cur.execute(
-            "INSERT INTO training_datasets VALUES (NULL,'Wang2021 - Cable');")
-
-        cur.execute("INSERT INTO training_models VALUES (NULL,'CNN110');")
-
-        cur.execute(
-            "INSERT INTO additive_noise_methods VALUES (NULL,'Gaussian', "
-            "'Std', 0.01, 'Mean', 0); "
-        )
-        cur.execute(
-            "INSERT INTO additive_noise_methods VALUES (NULL,'Gaussian', "
-            "'Std', 0.02, 'Mean', 0); "
-        )
-        cur.execute(
-            "INSERT INTO additive_noise_methods VALUES (NULL,'Gaussian', "
-            "'Std', 0.03, 'Mean', 0); "
-        )
-        cur.execute(
-            "INSERT INTO additive_noise_methods VALUES (NULL,'Gaussian', "
-            "'Std', 0.04, 'Mean', 0); "
-        )
-        cur.execute(
-            "INSERT INTO additive_noise_methods VALUES (NULL,'Gaussian', "
-            "'Std', 0.05, 'Mean', 0); "
-        )
-        cur.execute(
-            "INSERT INTO additive_noise_methods VALUES (NULL,'Collected', "
-            "'Scale', 25, NULL, NULL); "
-        )
-        cur.execute(
-            "INSERT INTO additive_noise_methods VALUES (NULL,'Collected', "
-            "'Scale', 50, NULL, NULL); "
-        )
-        cur.execute(
-            "INSERT INTO additive_noise_methods VALUES (NULL,'Collected', "
-            "'Scale', 75, NULL, NULL); "
-        )
-        cur.execute(
-            "INSERT INTO additive_noise_methods VALUES (NULL,'Collected', "
-            "'Scale', 105, NULL, NULL); "
-        )
-        cur.execute(
-            "INSERT INTO additive_noise_methods VALUES (NULL,'Rayleigh', "
-            "'Mode', 0.0138, NULL, NULL); "
-        )
-        cur.execute(
-            "INSERT INTO additive_noise_methods VALUES (NULL,'Rayleigh', "
-            "'Mode', 0.0276, NULL, NULL); "
-        )
-
-        cur.execute(
-            "INSERT INTO denoising_methods VALUES (NULL,'Moving Average "
-            "Filter', 'N', 3, NULL, NULL); "
-        )
-        cur.execute(
-            "INSERT INTO denoising_methods VALUES (NULL,'Moving Average "
-            "Filter', 'N', 5, NULL, NULL); "
-        )
+        for QUERY in QUERY_LIST_INITIALIZE_DB:
+            cur.execute(QUERY)
 
         con.commit()
         con.close()
