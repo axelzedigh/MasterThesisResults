@@ -13,7 +13,7 @@ from utils.db_utils import (
     fetchall_query,
     get_additive_noise_method_id,
     get_denoising_method_id, insert_legacy_rank_test_numpy_file_to_db,
-    create_pre_processing_table_info_md,
+    create_pre_processing_table_info_md, get_db_absolute_path,
 )
 
 
@@ -91,87 +91,40 @@ class AddToDatabaseTestCase(unittest.TestCase):
         self.assertEqual("CDAE", fetchall[-1][1])
 
     def test_insert_rank_test_data(self):
-        insert_data_to_db(
-            database=self.database,
-            test_dataset_id=1,
-            training_dataset_id=2,
-            environment_id=1,
-            distance=15,
-            device=8,
-            training_model_id=1,
-            keybyte=0,
-            epoch=100,
-            additive_noise_method_id=None,
-            denoising_method_id=None,
-            termination_point=9999,
-            average_rank=9999,
-        )
-        insert_data_to_db(
-            database=self.database,
-            test_dataset_id=1,
-            training_dataset_id=1,
-            environment_id=1,
-            distance=15,
-            device=7,
-            training_model_id=1,
-            keybyte=0,
-            epoch=100,
-            additive_noise_method_id=None,
-            denoising_method_id=None,
-            termination_point=101,
-            average_rank=102,
-        )
+        insert_data_to_db(database=self.database, test_dataset_id=1,
+                          training_dataset_id=2, environment_id=1, distance=15,
+                          device=8, training_model_id=1, keybyte=0, epoch=100,
+                          additive_noise_method_id=None,
+                          denoising_method_id=None, termination_point=9999,
+                          average_rank=9999)
+        insert_data_to_db(database=self.database, test_dataset_id=1,
+                          training_dataset_id=1, environment_id=1, distance=15,
+                          device=7, training_model_id=1, keybyte=0, epoch=100,
+                          additive_noise_method_id=None,
+                          denoising_method_id=None, termination_point=101,
+                          average_rank=102)
         fetchall = self.cur.execute("SELECT * FROM Rank_Test;").fetchall()
         self.assertIsNotNone(fetchall)
         device = fetchall[0][5]
         self.assertEqual(8, device)
 
     def test_view_query(self):
-        insert_data_to_db(
-            database=self.database,
-            test_dataset_id=1,
-            training_dataset_id=1,
-            environment_id=1,
-            distance=15,
-            device=7,
-            training_model_id=1,
-            keybyte=0,
-            epoch=100,
-            additive_noise_method_id=None,
-            denoising_method_id=None,
-            termination_point=101,
-            average_rank=102,
-        )
-        insert_data_to_db(
-            database=self.database,
-            test_dataset_id=1,
-            training_dataset_id=1,
-            environment_id=1,
-            distance=15,
-            device=8,
-            training_model_id=1,
-            keybyte=0,
-            epoch=100,
-            additive_noise_method_id=1,
-            denoising_method_id=None,
-            termination_point=101,
-            average_rank=102,
-        )
-        insert_data_to_db(
-            database=self.database,
-            test_dataset_id=1,
-            training_dataset_id=1,
-            environment_id=1,
-            distance=15,
-            device=9,
-            training_model_id=1,
-            keybyte=0,
-            epoch=100,
-            additive_noise_method_id=None,
-            denoising_method_id=1,
-            termination_point=101,
-            average_rank=102,
-        )
+        insert_data_to_db(database=self.database, test_dataset_id=1,
+                          training_dataset_id=1, environment_id=1, distance=15,
+                          device=7, training_model_id=1, keybyte=0, epoch=100,
+                          additive_noise_method_id=None,
+                          denoising_method_id=None, termination_point=101,
+                          average_rank=102)
+        insert_data_to_db(database=self.database, test_dataset_id=1,
+                          training_dataset_id=1, environment_id=1, distance=15,
+                          device=8, training_model_id=1, keybyte=0, epoch=100,
+                          additive_noise_method_id=1, denoising_method_id=None,
+                          termination_point=101, average_rank=102)
+        insert_data_to_db(database=self.database, test_dataset_id=1,
+                          training_dataset_id=1, environment_id=1, distance=15,
+                          device=9, training_model_id=1, keybyte=0, epoch=100,
+                          additive_noise_method_id=None, denoising_method_id=1,
+                          termination_point=101, average_rank=102)
         query = "SELECT * FROM full_rank_test;"
         data = fetchall_query(self.database, query)
         self.assertNotEqual(data, [])
@@ -315,36 +268,20 @@ class AddToDatabaseTestCase(unittest.TestCase):
         os.remove(file_path)
 
     def test_get_number_of_rows_in_rank_test_table(self):
-        insert_data_to_db(
-            database=self.database,
-            test_dataset_id=1,
-            training_dataset_id=1,
-            environment_id=1,
-            distance=15,
-            device=9,
-            training_model_id=1,
-            keybyte=0,
-            epoch=100,
-            additive_noise_method_id=None,
-            denoising_method_id=1,
-            termination_point=101,
-            average_rank=102,
-        )
-        insert_data_to_db(
-            database=self.database,
-            test_dataset_id=1,
-            training_dataset_id=1,
-            environment_id=1,
-            distance=15,
-            device=8,
-            training_model_id=1,
-            keybyte=0,
-            epoch=100,
-            additive_noise_method_id=1,
-            denoising_method_id=None,
-            termination_point=101,
-            average_rank=102,
-        )
+        insert_data_to_db(database=self.database, test_dataset_id=1,
+                          training_dataset_id=1, environment_id=1, distance=15,
+                          device=9, training_model_id=1, keybyte=0, epoch=100,
+                          additive_noise_method_id=None, denoising_method_id=1,
+                          termination_point=101, average_rank=102)
+        insert_data_to_db(database=self.database, test_dataset_id=1,
+                          training_dataset_id=1, environment_id=1, distance=15,
+                          device=8, training_model_id=1, keybyte=0, epoch=100,
+                          additive_noise_method_id=1, denoising_method_id=None,
+                          termination_point=101, average_rank=102)
         data = fetchall_query(self.database, "SELECT Count(*) FROM Rank_Test;")
         self.assertNotEqual(data, [])
         self.assertEqual(data[0][0], 2)
+
+    def test_get_db_absolute_path(self):
+        db_path = get_db_absolute_path(self.database, "unittest")
+        self.assertIsNotNone(db_path)

@@ -73,19 +73,19 @@ def initialize_table_data(database="main.db"):
 
 
 def insert_data_to_db(
-        database: str = "main.db",
-        test_dataset_id: int = 1,
-        training_dataset_id: int = 1,
-        environment_id: int = 1,
-        distance: float = 15,
-        device: int = 8,
-        training_model_id: int = 1,
-        keybyte: int = 0,
-        epoch: int = 100,
-        additive_noise_method_id: int = None,
-        denoising_method_id: int = None,
-        termination_point: int = 9999,
-        average_rank: Optional[int] = 9999,
+        database: str,
+        test_dataset_id: int,
+        training_dataset_id: int,
+        environment_id: int,
+        distance: float,
+        device: int,
+        training_model_id: int,
+        keybyte: int,
+        epoch: int,
+        additive_noise_method_id: int,
+        denoising_method_id: int,
+        termination_point: int,
+        average_rank: Optional[int],
 ) -> None:
     """
 
@@ -103,7 +103,7 @@ def insert_data_to_db(
     :param termination_point: Termination point from rank unittests.
     :param average_rank:
     """
-    create_db_with_tables(database)
+    # create_db_with_tables(database)
     con = lite.connect(database)
     cur = con.cursor()
 
@@ -192,7 +192,7 @@ def get_denoising_method_id(
 
 def insert_legacy_rank_test_numpy_file_to_db(
         database: str,
-        filename: str,
+        file_path: str,
         test_dataset_id: int,
         training_dataset_id: int,
         environment_id: int,
@@ -207,7 +207,7 @@ def insert_legacy_rank_test_numpy_file_to_db(
     noise processing name}.npy
 
     :param database: Path to database to write to.
-    :param filename: Path to numpy file.
+    :param file_path: Path to numpy file.
     :param test_dataset_id:
     :param training_dataset_id:
     :param environment_id:
@@ -216,40 +216,34 @@ def insert_legacy_rank_test_numpy_file_to_db(
     :param additive_noise_method_id:
     :param denoising_method_id:
     """
-    file = np.load(filename)
+    file = np.load(file_path)
 
-    device_start = re.search("device-", filename).end()
-    device_end = re.search("-epoch", filename).start()
-    device = int(filename[device_start:device_end])
+    device_start = re.search("device-", file_path).end()
+    device_end = re.search("-epoch", file_path).start()
+    device = int(file_path[device_start:device_end])
 
-    epoch_start = re.search("epoch-", filename).end()
-    epoch_end = re.search("-keybyte", filename).start()
-    epoch = int(filename[epoch_start:epoch_end])
+    epoch_start = re.search("epoch-", file_path).end()
+    epoch_end = re.search("-keybyte", file_path).start()
+    epoch = int(file_path[epoch_start:epoch_end])
 
-    keybyte_start = re.search("keybyte-", filename).end()
-    keybyte_end = re.search("-runs", filename).start()
-    keybyte = int(filename[keybyte_start:keybyte_end])
+    keybyte_start = re.search("keybyte-", file_path).end()
+    keybyte_end = re.search("-runs", file_path).start()
+    keybyte = int(file_path[keybyte_start:keybyte_end])
 
     # model_start = re.search("cnn_110_", filename).end()
     # model_end = re.search(".npy", filename).start()
     # model = file[model_start:model_end]
 
     for termination_point in file:
-        insert_data_to_db(
-            database=database,
-            test_dataset_id=test_dataset_id,
-            training_dataset_id=training_dataset_id,
-            environment_id=environment_id,
-            distance=distance,
-            device=device,
-            training_model_id=training_model_id,
-            keybyte=keybyte,
-            epoch=epoch,
-            additive_noise_method_id=additive_noise_method_id,
-            denoising_method_id=denoising_method_id,
-            termination_point=int(termination_point),
-            average_rank=None,
-        )
+        insert_data_to_db(database=database, test_dataset_id=test_dataset_id,
+                          training_dataset_id=training_dataset_id,
+                          environment_id=environment_id, distance=distance,
+                          device=device, training_model_id=training_model_id,
+                          keybyte=keybyte, epoch=epoch,
+                          additive_noise_method_id=additive_noise_method_id,
+                          denoising_method_id=denoising_method_id,
+                          termination_point=int(termination_point),
+                          average_rank=None)
 
 
 def create_pre_processing_table_info_md(database="main.db", path="docs"):
@@ -309,3 +303,10 @@ def create_rank_test_table_info_md(database="main.db", path="docs"):
     file.write(f"Rows: {rank_test_rows[0][0]}")
     file.write("\n")
     file.close()
+
+
+def get_db_absolute_path(database="main.db", path="database"):
+    project_dir = os.getenv("MASTER_THESIS_RESULTS")
+    database = os.path.join(project_dir, path, database)
+    return database
+
