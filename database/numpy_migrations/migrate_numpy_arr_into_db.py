@@ -2,7 +2,7 @@
 import os
 
 # from docs.update_db_docs import update_preprocessing_docs
-from docs.update_db_docs import update_preprocessing_docs
+from docs.update_db_docs import update_helper_docs
 from utils.db_utils import insert_legacy_rank_test_numpy_file_to_db, \
     get_db_absolute_path
 
@@ -16,7 +16,7 @@ def main():
     training_model_id = 1
 
     # Look after these
-    additive_noise_method_id = 4
+    additive_noise_method_id = 11
     denoising_method_id = None
 
     files = os.listdir("to_migrate")
@@ -34,7 +34,7 @@ def main():
             additive_noise_method_id=additive_noise_method_id,
             denoising_method_id=denoising_method_id,
         )
-    update_preprocessing_docs()
+    update_helper_docs()
 
 
 if __name__ == "__main__":

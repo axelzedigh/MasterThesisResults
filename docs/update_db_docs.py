@@ -5,7 +5,7 @@ from utils.db_utils import create_pre_processing_table_info_md, \
     create_rank_test_table_info_md
 
 
-def update_preprocessing_docs():
+def update_helper_docs():
     project_dir = os.getenv("MASTER_THESIS_RESULTS")
     path = "docs"
     database = os.path.join(project_dir, "database", "main.db")
@@ -14,4 +14,4 @@ def update_preprocessing_docs():
 
 
 if __name__ == "__main__":
-    update_preprocessing_docs()
+    update_helper_docs()
