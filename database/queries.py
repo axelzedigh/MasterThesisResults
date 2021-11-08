@@ -175,31 +175,38 @@ QUERY_LIST_INITIALIZE_DB = [
 
     "INSERT INTO training_models VALUES (NULL,'CNN110');",
 
-    "INSERT INTO additive_noise_methods VALUES (NULL,'Gaussian', 'Std', 0.01, "
+    "INSERT INTO additive_noise_methods VALUES (1,'Gaussian', 'Std', 0.01, "
     "'Mean', 0); ",
-    "INSERT INTO additive_noise_methods VALUES (NULL,'Gaussian', 'Std', 0.02, "
+    "INSERT INTO additive_noise_methods VALUES (2,'Gaussian', 'Std', 0.02, "
     "'Mean', 0); ",
-    "INSERT INTO additive_noise_methods VALUES (NULL,'Gaussian', 'Std', 0.03, "
+    "INSERT INTO additive_noise_methods VALUES (3,'Gaussian', 'Std', 0.03, "
     "'Mean', 0); ",
-    "INSERT INTO additive_noise_methods VALUES (NULL,'Gaussian', 'Std', 0.04, "
+    "INSERT INTO additive_noise_methods VALUES (4,'Gaussian', 'Std', 0.04, "
     "'Mean', 0); ",
-    "INSERT INTO additive_noise_methods VALUES (NULL,'Gaussian', 'Std', 0.05, "
+    "INSERT INTO additive_noise_methods VALUES (5,'Gaussian', 'Std', 0.05, "
     "'Mean', 0); ",
-    "INSERT INTO additive_noise_methods VALUES (NULL,'Collected', 'Scale', "
+    "INSERT INTO additive_noise_methods VALUES (6,'Collected', 'Scale', "
     "25, NULL, NULL); ",
-    "INSERT INTO additive_noise_methods VALUES (NULL,'Collected', 'Scale', "
-    "49, NULL, NULL); ",
-    "INSERT INTO additive_noise_methods VALUES (NULL,'Collected', 'Scale', "
+    "INSERT INTO additive_noise_methods VALUES (7,'Collected', 'Scale', "
+    "50, NULL, NULL); ",
+    "INSERT INTO additive_noise_methods VALUES (8,'Collected', 'Scale', "
     "75, NULL, NULL); ",
-    "INSERT INTO additive_noise_methods VALUES (NULL,'Collected', 'Scale', "
+    "INSERT INTO additive_noise_methods VALUES (9,'Collected', 'Scale', "
     "105, NULL, NULL); ",
-    "INSERT INTO additive_noise_methods VALUES (NULL,'Rayleigh', 'Mode', "
+    "INSERT INTO additive_noise_methods VALUES (10,'Rayleigh', 'Mode', "
     "0.0138, NULL, NULL); ",
-    "INSERT INTO additive_noise_methods VALUES (NULL,'Rayleigh', 'Mode', "
+    "INSERT INTO additive_noise_methods VALUES (11,'Rayleigh', 'Mode', "
     "0.0276, NULL, NULL); ",
 
-    "INSERT INTO denoising_methods VALUES (NULL,'Moving Average Filter', 'N', "
+    "INSERT INTO denoising_methods VALUES (1,'Moving Average Filter', 'N', "
     "3, NULL, NULL); ",
-    "INSERT INTO denoising_methods VALUES (NULL,'Moving Average Filter', 'N', "
+    "INSERT INTO denoising_methods VALUES (2,'Moving Average Filter', 'N', "
     "5, NULL, NULL); ",
 ]
+
+QUERY_CREATE_VIEW_ALL_PRE_PROCESSING_METHODS = """
+        CREATE VIEW all_pre_processing_methods
+        AS
+        SELECT
+            
+"""
