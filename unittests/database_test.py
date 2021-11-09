@@ -5,7 +5,8 @@ import os
 import numpy as np
 from pprint import pprint
 
-from database.queries import QUERY_FULL_RANK_TEST_GROUPED_A, QUERY_RANK_TEST_GROUPED_A
+from database.queries import QUERY_FULL_RANK_TEST_GROUPED_A, \
+    QUERY_RANK_TEST_GROUPED_A
 from database.variables import VIEW_RANK_TEST_INDEX
 from utils.db_utils import (
     create_db_with_tables,
@@ -15,6 +16,7 @@ from utils.db_utils import (
     get_additive_noise_method_id,
     get_denoising_method_id, insert_legacy_rank_test_numpy_file_to_db,
     create_pre_processing_table_info_md, get_db_absolute_path,
+    get_test_trace_path, get_training_model_file_path,
 )
 
 
@@ -47,13 +49,13 @@ class AddToDatabaseTestCase(unittest.TestCase):
         fetchall = self.cur.execute(
             "SELECT * FROM Training_Datasets;").fetchall()
         self.assertIsNotNone(fetchall)
-        training_datasets = [(1, "Wang_2021 - Cable")]
+        training_datasets = [(1, "Wang_2021-Cable")]
         self.assertEqual(fetchall[0], training_datasets[0])
 
     def test_fetch_training_models(self):
         fetchall = self.cur.execute("SELECT * FROM Training_Models;").fetchall()
         self.assertIsNotNone(fetchall)
-        training_models = [(1, "CNN110")]
+        training_models = [(1, "cnn_110")]
         self.assertEqual(fetchall[0], training_models[0])
 
     def test_fetch_additive_noise_methods(self):
@@ -336,3 +338,36 @@ class AddToDatabaseTestCase(unittest.TestCase):
         data = fetchall_query(self.database, QUERY_FULL_RANK_TEST_GROUPED_A)
         self.assertIsNotNone(data)
         self.assertNotEqual(data, [])
+
+    def test_get_test_trace_path(self):
+        test_dataset_id = 1
+        environment_id = 1
+        distance = 15
+        device = 6
+
+        test_path = get_test_trace_path(
+            database=self.database,
+            test_dataset_id=test_dataset_id,
+            environment_id=environment_id,
+            distance=distance,
+            device=device
+        )
+        self.assertIsNotNone(test_path)
+
+    def test_get_training_model_file_path(self):
+        training_model_id = 1
+        additive_noise_method_id = None
+        denoising_method_id = 1
+        epoch = 50
+        keybyte = 0
+
+        training_model_file_path = get_training_model_file_path(
+            database=self.database,
+            training_model_id=training_model_id,
+            additive_noise_method_id=additive_noise_method_id,
+            denoising_method_id=denoising_method_id,
+            epoch=epoch,
+            keybyte=keybyte
+        )
+
+        self.assertIsNotNone(training_model_file_path)

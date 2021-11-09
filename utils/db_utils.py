@@ -310,3 +310,68 @@ def get_db_absolute_path(database="main.db", path="database"):
     database = os.path.join(project_dir, path, database)
     return database
 
+
+def get_test_trace_path(
+        database,
+        test_dataset_id,
+        environment_id,
+        distance,
+        device
+) -> str:
+    project_dir = os.getenv("MASTER_THESIS_RESULTS")
+    path = "datasets/test_traces"
+    test_dataset_query = f"""
+    select test_dataset from test_datasets
+    where id = {test_dataset_id};"""
+    test_dataset = fetchall_query(database, test_dataset_query)[0][0]
+
+    environment_query = f"""
+    select environment from environments
+    where id = {environment_id};"""
+    environment = fetchall_query(database, environment_query)[0][0]
+
+    test_traces_path = os.path.join(
+        project_dir,
+        path,
+        test_dataset,
+        environment,
+        f"{distance}m",
+        f"device_{device}",
+        "data"
+    )
+
+    return test_traces_path
+
+
+def get_training_model_file_path(
+        database,
+        training_model_id,
+        additive_noise_method_id,
+        denoising_method_id,
+        epoch,
+        keybyte
+) -> str:
+    project_dir = os.getenv("MASTER_THESIS_RESULTS")
+    path = "models"
+
+    training_model_query = f"""
+    select training_model from training_models
+    where id = {training_model_id};"""
+    training_model = fetchall_query(
+        database, training_model_query)[0][0]
+
+    if additive_noise_method_id is None:
+        additive_noise_method_id = "None"
+
+    if denoising_method_id is None:
+        denoising_method_id = "None"
+
+    training_model_file_path = os.path.join(
+        project_dir,
+        path,
+        f"keybyte_{keybyte}",
+        f"{additive_noise_method_id}_{denoising_method_id}",
+        f"{training_model}-{epoch}.h5"
+    )
+
+    return training_model_file_path
