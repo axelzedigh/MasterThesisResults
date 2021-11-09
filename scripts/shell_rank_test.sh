@@ -1,48 +1,43 @@
 #!/bin/bash
-# This script will run rank tests using python script
+# This script will run rank tests and insert into db using python.
 # Following variables should be fed to the python-script:
-#
-# RUNS=100
-# TEST_TRACE_PATH="master-thesis/path/to/trace/"
-# DISTANCE=[5,10,15]
-# DEVICES=[6,7,8,9,10]
-# EPOCH=[20,...,100]
-# MODEL=[
-  #"no_noise",
-  #"gaussian_noise_04", "gaussian_noise_03",
-  #"rayleigh_noise_0138","rayleigh_noise_0276"
-  #"collected_noise_25", "collected_noise_50", "collected_noise_75",
-  #]
 
-#E.g.
-#RUN=10;TEST_TRACE="/master-thesis/previous_testing_traces";
-#DISTANCE=15;DEVICES=6;EPOCH=65;MODEL="GWN_04";
-# python3 RankTestScript.py $RUN $TEST_TRACE $DISTANCE $DEVICES $EPOCH $MODEL
+DATABASE_1="main.db"
+DATABASE_2="main_2.db"
+DATABASE_3="main_3.db"
+DATABASE_4="main_4.db"
+RUNS=20
+TEST_DATASET_ID=1
+TRAINING_DATASET_ID=1
+ENVIRONMENT_ID=1
+DISTANCE=15
+DEVICE={8..10}
+TRAINING_MODEL_ID=1
+KEYBYTE=0
+EPOCH=50
+ADDITIVE_NOISE_METHOD_ID={1..11}
+DENOISING_METHOD_ID={1..2}
 
 case_1(){
-  RUN=30;TEST_TRACE="master-thesis/previous_testing_traces";
-  DISTANCE=15;DEVICES=10;EPOCH=65;MODEL="no_noise";
-  python3 RankTestScript.py $RUN $TEST_TRACE $DISTANCE $DEVICES $EPOCH $MODEL
-  python3 RankTestScript.py $RUN $TEST_TRACE $DISTANCE $DEVICES $EPOCH $MODEL
-  python3 RankTestScript.py $RUN $TEST_TRACE $DISTANCE $DEVICES $EPOCH $MODEL
-  python3 RankTestScript.py $RUN $TEST_TRACE $DISTANCE $DEVICES $EPOCH $MODEL
+
+  python3 test_models__termination_point_to_db.py $DATABASE_2 $RUNS $TEST_DATASET_ID $TRAINING_DATASET_ID $ENVIRONMENT_ID $DISTANCE $DEVICE $TRAINING_MODEL_ID $KEYBYTE $EPOCH $ADDITIVE_NOISE_METHOD_ID $DENOISING_METHOD_ID
 
 }
 
 case_2(){
-  RUN=20;TEST_TRACE="master-thesis/previous_testing_traces";
-  DISTANCE=15;DEVICES=6;EPOCH=65;MODEL="rayleigh_noise_0138";
-  python3 RankTestScript.py $RUN $TEST_TRACE $DISTANCE $DEVICES $EPOCH $MODEL
-  python3 RankTestScript.py $RUN $TEST_TRACE $DISTANCE $DEVICES $EPOCH $MODEL
-  python3 RankTestScript.py $RUN $TEST_TRACE $DISTANCE $DEVICES $EPOCH $MODEL
-  python3 RankTestScript.py $RUN $TEST_TRACE $DISTANCE $DEVICES $EPOCH $MODEL
-
+  python3 test_models__termination_point_to_db.py $DATABASE_3 $RUNS $TEST_DATASET_ID $TRAINING_DATASET_ID $ENVIRONMENT_ID $DISTANCE $DEVICE $TRAINING_MODEL_ID $KEYBYTE $EPOCH $ADDITIVE_NOISE_METHOD_ID $DENOISING_METHOD_ID
 }
 
 case_3(){
-  RUN=30;TEST_TRACE="master-thesis/previous_testing_traces";
-  DISTANCE=15;DEVICES=6;EPOCH=65;MODEL="rayleigh_noise_0138";
-  python3 RankTestScript.py $RUN $TEST_TRACE $DISTANCE $DEVICES $EPOCH $MODEL
+for element in Hydrogen Helium Lithium Beryllium
+do
+#  echo "Element: $element"
+  for yeah in yo ya ye
+  do
+    echo "$yeah $element"
+  done
+done
+
 }
 
 
