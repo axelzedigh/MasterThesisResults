@@ -475,7 +475,6 @@ class TerminationPointTest(unittest.TestCase):
             additive_noise_method_id=additive_noise_method_id,
             denoising_method_id=denoising_method_id,
         )
-        data = fetchall_query(self.database, "select * from rank_test;")
 
         data = fetchall_query(self.database, "select Count(*) from rank_test;")
         self.assertNotEqual(data, [])
