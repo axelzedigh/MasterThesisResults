@@ -8,7 +8,7 @@ import numpy as np
 from database.queries import QUERY_FULL_RANK_TEST_GROUPED_A, \
     QUERY_RANK_TEST_GROUPED_A
 from database.variables import VIEW_RANK_TEST_INDEX
-from scripts.capture_rank_to_db import termination_point_test_and_insert_to_db
+from scripts.test_models__termination_point_to_db import termination_point_test_and_insert_to_db
 from utils.db_utils import (
     create_db_with_tables,
     initialize_table_data,
