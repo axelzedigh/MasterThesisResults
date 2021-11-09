@@ -82,8 +82,8 @@ def insert_data_to_db(
         training_model_id: int,
         keybyte: int,
         epoch: int,
-        additive_noise_method_id: int,
-        denoising_method_id: int,
+        additive_noise_method_id: Optional[int],
+        denoising_method_id: Optional[int],
         termination_point: int,
         average_rank: Optional[int],
 ) -> None:

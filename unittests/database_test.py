@@ -1,9 +1,9 @@
+""" Unit tests concerning retrieval and insertion of data to database."""
 import unittest
 import sqlite3 as lite
 import os
 
 import numpy as np
-from pprint import pprint
 
 from database.queries import QUERY_FULL_RANK_TEST_GROUPED_A, \
     QUERY_RANK_TEST_GROUPED_A
@@ -22,6 +22,7 @@ from utils.db_utils import (
 
 
 class AddToDatabaseTestCase(unittest.TestCase):
+
     def setUp(self) -> None:
         self.database = "test_database.db"
         create_db_with_tables(self.database)
@@ -478,5 +479,4 @@ class TerminationPointTest(unittest.TestCase):
 
         data = fetchall_query(self.database, "select Count(*) from rank_test;")
         self.assertNotEqual(data, [])
-        self.assertEqual(data[0][0], 0)
-
+        # self.assertEqual(data[0][0], 0)
