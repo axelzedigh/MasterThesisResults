@@ -8,6 +8,7 @@ from pprint import pprint
 from database.queries import QUERY_FULL_RANK_TEST_GROUPED_A, \
     QUERY_RANK_TEST_GROUPED_A
 from database.variables import VIEW_RANK_TEST_INDEX
+from scripts.capture_rank_to_db import termination_point_test_and_insert_to_db
 from utils.db_utils import (
     create_db_with_tables,
     initialize_table_data,
@@ -371,3 +372,112 @@ class AddToDatabaseTestCase(unittest.TestCase):
         )
 
         self.assertIsNotNone(training_model_file_path)
+
+
+class TerminationPointTest(unittest.TestCase):
+
+    def setUp(self) -> None:
+        self.database = "test_database.db"
+        create_db_with_tables(self.database)
+        initialize_table_data(self.database)
+        self.con = lite.connect(self.database)
+        self.cur = self.con.cursor()
+
+    def tearDown(self) -> None:
+        self.con.close()
+        os.remove(self.database)
+
+    def test_termination_point_test_and_insert_to_db__additive_None(self):
+        runs = 1
+        test_dataset_id = 1
+        training_dataset_id = 1
+        environment_id = 1
+        training_model_id = 1
+        distance = 15
+        device = 6
+        keybyte = 0
+        epoch = 65
+        additive_noise_method_id = None
+        denoising_method_id = None
+        termination_point_test_and_insert_to_db(
+            database=self.database,
+            runs=runs,
+            test_dataset_id=test_dataset_id,
+            training_dataset_id=training_dataset_id,
+            training_model_id=training_model_id,
+            environment_id=environment_id,
+            distance=distance,
+            device=device,
+            keybyte=keybyte,
+            epoch=epoch,
+            additive_noise_method_id=additive_noise_method_id,
+            denoising_method_id=denoising_method_id,
+        )
+
+        data = fetchall_query(self.database, "select Count(*) from rank_test;")
+        self.assertNotEqual(data, [])
+        self.assertEqual(data[0][0], 1)
+
+    def test_termination_point_test_and_insert_to_db__additive_1(self):
+        runs = 1
+        test_dataset_id = 1
+        training_dataset_id = 1
+        environment_id = 1
+        training_model_id = 1
+        distance = 15
+        device = 6
+        keybyte = 0
+        epoch = 65
+        additive_noise_method_id = 1
+        denoising_method_id = None
+        termination_point_test_and_insert_to_db(
+            database=self.database,
+            runs=runs,
+            test_dataset_id=test_dataset_id,
+            training_dataset_id=training_dataset_id,
+            training_model_id=training_model_id,
+            environment_id=environment_id,
+            distance=distance,
+            device=device,
+            keybyte=keybyte,
+            epoch=epoch,
+            additive_noise_method_id=additive_noise_method_id,
+            denoising_method_id=denoising_method_id,
+        )
+
+        data = fetchall_query(self.database, "select Count(*) from rank_test;")
+        self.assertNotEqual(data, [])
+        self.assertEqual(data[0][0], 1)
+
+    def test_termination_point_test_and_insert_to_db__denoising_1(self):
+        runs = 1
+        test_dataset_id = 1
+        training_dataset_id = 1
+        environment_id = 1
+        training_model_id = 1
+        distance = 15
+        device = 6
+        keybyte = 0
+        epoch = 65
+        additive_noise_method_id = None
+        denoising_method_id = 1
+        termination_point_test_and_insert_to_db(
+            database=self.database,
+            runs=runs,
+            test_dataset_id=test_dataset_id,
+            training_dataset_id=training_dataset_id,
+            training_model_id=training_model_id,
+            environment_id=environment_id,
+            distance=distance,
+            device=device,
+            keybyte=keybyte,
+            epoch=epoch,
+            additive_noise_method_id=additive_noise_method_id,
+            denoising_method_id=denoising_method_id,
+        )
+        data = fetchall_query(self.database, "select * from rank_test;")
+
+        data = fetchall_query(self.database, "select Count(*) from rank_test;")
+        self.assertNotEqual(data, [])
+        self.assertEqual(data[0][0], 0)
+

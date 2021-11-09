@@ -1,11 +1,12 @@
 import os.path
+import random
 import sys
+from typing import Tuple, Optional, Callable
+
 import numpy as np
 import tensorflow as tf
-import random
-from tqdm import tqdm
-from datetime import datetime
-from database.db_utils import insert_data_to_db
+
+from utils.db_utils import get_test_trace_path, get_training_model_file_path
 
 AES_Sbox = np.array([
     0x63, 0x7C, 0x77, 0x7B, 0xF2, 0x6B, 0x6F, 0xC5, 0x30, 0x01, 0x67, 0x2B, 0xFE, 0xD7, 0xAB, 0x76,
@@ -79,8 +80,10 @@ def get_prediction(model, traces):
 
     # Sanity check
     if input_layer_shape[1] != len(traces[0]):
-        print("Error: model input shape %d instead of %d is not expected ..." % (
-            input_layer_shape[1], len(traces[0])))
+        print(
+            "Error: model input shape %d instead of %d is not expected ..."
+            % (input_layer_shape[1], len(traces[0]))
+        )
         sys.exit(-1)
     # Adapt the data shape according our model input
     elif len(input_layer_shape) == 3:
@@ -88,7 +91,10 @@ def get_prediction(model, traces):
         input_data = traces
         input_data = input_data.reshape((input_data.shape[0], input_data.shape[1], 1))
     else:
-        print("Error: model input shape length %d is not expected ..." % len(input_layer_shape))
+        print(
+            "Error: model input shape length %d is not expected ..."
+            % len(input_layer_shape)
+        )
         sys.exit(-1)
 
     # Predict our probabilities
@@ -155,7 +161,9 @@ def rank_cal(selected_probabilities, key_interest, number):
         total_pro = total_pro + np.log(selected_probabilities[i])
 
         # Find the rank of real key in the total probabilities
-        sorted_probability = np.array(list(map(lambda a: total_pro[a], total_pro.argsort()[::-1])))
+        sorted_probability = np.array(
+            list(map(lambda a: total_pro[a], total_pro.argsort()[::-1]))
+        )
         real_key_rank = np.where(sorted_probability == total_pro[key_interest])[0][0]
         rank.append(real_key_rank)
 
@@ -164,28 +172,65 @@ def rank_cal(selected_probabilities, key_interest, number):
     return rank
 
 
-def test(model_path, interest_byte, device_nr):
-    home = os.getenv("HOME")
-    distance = str(sys.argv[3])
-    test_trace_path = str(sys.argv[2])
-    path = os.path.join(test_trace_path, f"{distance}m/")
-    averages = 1
-    device_path = f"d{device_nr}_{averages}avg/data/"
-    full_path = os.path.join(home, path, device_path)
+def termination_point_test(
+        database: str,
+        filter_function: Optional[Callable],
+        test_dataset_id: int,
+        environment_id: int,
+        distance: float,
+        device: int,
+        training_model_id: int,
+        keybyte: int,
+        epoch: int,
+        additive_noise_method_id: int,
+        denoising_method_id: int
+) -> Tuple[Optional[int], Optional[float]]:
+    """
+
+    :param database:
+    :param filter_function:
+    :param test_dataset_id:
+    :param environment_id:
+    :param distance:
+    :param device:
+    :param training_model_id:
+    :param keybyte:
+    :param epoch:
+    :param additive_noise_method_id:
+    :param denoising_method_id:
+    :return:
+    """
+
+    # load test traces
+    test_path = get_test_trace_path(
+        database=database,
+        test_dataset_id=test_dataset_id,
+        environment_id=environment_id,
+        distance=distance,
+        device=device
+    )
 
     nor_traces_maxmin = "nor_traces_maxmin.npy"
     tenth_roundkey = "10th_roundkey.npy"
     ct = "ct.npy"
+    testing_traces_path = os.path.join(test_path, nor_traces_maxmin)
+    keys_path = os.path.join(test_path, tenth_roundkey)
+    ciphertexts_path = os.path.join(test_path, ct)
 
-    testing_traces_path = os.path.join(full_path, nor_traces_maxmin)
-    keys_path = os.path.join(full_path, tenth_roundkey)
-    ciphertexts_path = os.path.join(full_path, ct)
-
-    # load traces
     number_total_trace = 5000
     testing_traces = np.load(testing_traces_path)
     testing_traces = testing_traces[:number_total_trace]
-    testing_traces = testing_traces[:, [i for i in range(204, 314)]]
+
+    # Range in traces to test.
+    range_start = 204
+    range_end = 314
+
+    # Filter traces
+    if filter_function is not None:
+        testing_traces, range_start, range_end = filter_function(testing_traces)
+
+    # Select range in traces to test.
+    testing_traces = testing_traces[:, [i for i in range(range_start, range_end)]]
 
     # load key
     key = np.load(keys_path)
@@ -196,13 +241,22 @@ def test(model_path, interest_byte, device_nr):
 
     # choose interest key byte and pt byte
     # interest_byte = 0
-    key_interest = key[interest_byte]
-    cts_interest = cts[:, interest_byte]
+    key_interest = key[keybyte]
+    cts_interest = cts[:, keybyte]
 
-    model = load_sca_model(model_path)
+    # Load training model
+    training_model_path = get_training_model_file_path(
+        database=database,
+        training_model_id=training_model_id,
+        additive_noise_method_id=additive_noise_method_id,
+        denoising_method_id=denoising_method_id,
+        epoch=epoch,
+        keybyte=keybyte
+    )
+    training_model = load_sca_model(training_model_path)
 
     # get predictions for all traces
-    predictions = get_prediction(model, testing_traces)
+    predictions = get_prediction(training_model, testing_traces)
 
     # randomly select trace for testing
     number = 1500
@@ -215,7 +269,9 @@ def test(model_path, interest_byte, device_nr):
         selected_predictions = predictions[select]
 
         # Calculate subkey probability for selected traces
-        probabilities = prediction_to_probability(selected_cts_interest, selected_predictions, number)
+        probabilities = prediction_to_probability(
+            selected_cts_interest, selected_predictions, number
+        )
         ranks = rank_cal(probabilities, key_interest, number)
         ranks_array.append(ranks)
 
@@ -225,57 +281,9 @@ def test(model_path, interest_byte, device_nr):
     for i in range(ranks_array.shape[1]):
         if np.count_nonzero(ranks_array[:, i]) < int(average / 2):
             term_point = i
-            # print(i)
             break
 
     average_ranks = np.sum(ranks_array, axis=0) / average
     # plt.plot(average_ranks)
     # plt.show()
-    return term_point, average_ranks
-
-
-def main():
-    database = "TerminationPoint.db"
-    testing_datasets = ["Wang2021", "Zedigh2021"]
-    testing_dataset = testing_datasets[0]
-    environments = ["office corridor", "big hall"]
-    environment = environments[0]
-    distance = float(sys.argv[3])
-    device = int(sys.argv[4])
-    home = os.getenv("HOME")
-    path = "master-thesis/models"
-    model = str(sys.argv[6])
-    date = str(datetime.today())
-    date = date.replace(' ', '_')
-    # os.mkdir(f"Results/{date}-d{device}")
-    model_folder = os.path.join(home, path, model)
-    epoch = sys.argv[5]
-    file = f"cnn_model-{epoch}.h5"
-    file_path = os.path.join(model_folder, file)
-    runs = int(sys.argv[1])
-    keybyte = 0
-    training_model
-    additive_noise_method
-    additive_noise_parameter_1
-    additive_noise_parameter_1_value
-    additive_noise_parameter_2
-    additive_noise_parameter_2_value
-    denoising_method
-    denoising_method_parameter_1
-    denoising_method_parameter_1_value
-    denoising_method_parameter_2
-    denoising_method_parameter_2_value
-    for i in tqdm(range(0, runs)):
-        termination_point, average_ranks = test(file_path, keybyte, device)
-        insert_data_to_db(database, testing_dataset, environment_id=environment, distance=distance, device=device,
-                          training_model_id=training_model, keybyte=keybyte, epoch=epoch,
-                          additive_noise_method_id=additive_noise_method, denoising_method_id=denoising_method,
-                          termination_point=termination_point, average_rank=average_ranks)
-        # np.save(
-        # f"Results/{DATE}-d{DEVICE}/rank_test-{DISTANCE}m-device-{DEVICE}-epoch-{EPOCH}-keybyte-{KEY_BYTE}-runs-{RUNS}-{MODEL}-date-{DATE}.npy",
-        # termination_point_array
-        # )
-
-
-if __name__ == "__main__":
-    main()
+    return term_point, int(average_ranks.mean())

@@ -1,0 +1,76 @@
+import sys
+
+from tqdm import tqdm
+from scripts.RankTestScriptToDatabase import termination_point_test
+from utils.db_utils import insert_data_to_db
+from utils.denoising_utils import moving_average_filter_n3, \
+    moving_average_filter_n5
+
+
+def termination_point_test_and_insert_to_db(
+        database,
+        runs,
+        test_dataset_id,
+        training_dataset_id,
+        environment_id,
+        distance,
+        device,
+        training_model_id,
+        keybyte,
+        epoch,
+        additive_noise_method_id,
+        denoising_method_id,
+):
+    filter_function = None
+    if denoising_method_id == 1:
+        filter_function = moving_average_filter_n3
+    if denoising_method_id == 2:
+        filter_function = moving_average_filter_n5
+
+    for _ in tqdm(range(0, runs)):
+        termination_point, average_ranks = termination_point_test(
+            database,
+            filter_function,
+            test_dataset_id,
+            environment_id,
+            distance,
+            device,
+            training_model_id,
+            keybyte,
+            epoch,
+            additive_noise_method_id,
+            denoising_method_id,
+        )
+        if termination_point is not None:
+            insert_data_to_db(
+                database,
+                test_dataset_id,
+                training_dataset_id=training_dataset_id,
+                environment_id=environment_id,
+                distance=distance,
+                device=device,
+                training_model_id=training_model_id,
+                keybyte=keybyte,
+                epoch=epoch,
+                additive_noise_method_id=additive_noise_method_id,
+                denoising_method_id=denoising_method_id,
+                termination_point=termination_point,
+                average_rank=average_ranks,
+            )
+
+
+if __name__ == "__main__":
+    termination_point_test_and_insert_to_db(
+        database=str(sys.argv[1]),
+        runs=int(sys.argv[2]),
+        test_dataset_id=int(sys.argv[3]),
+        training_dataset_id=int(sys.argv[4]),
+        environment_id=int(sys.argv[5]),
+        distance=float(sys.argv[6]),
+        device=int(sys.argv[7]),
+        training_model_id=int(sys.argv[8]),
+        keybyte=int(sys.argv[9]),
+        epoch=int(sys.argv[10]),
+        additive_noise_method_id=int(sys.argv[11]),
+        denoising_method_id=int(sys.argv[12]),
+    )
