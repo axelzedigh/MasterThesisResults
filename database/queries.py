@@ -264,10 +264,6 @@ GROUP BY
     training_dataset,
     environment,
     distance,
-    device,
-    training_model,
-    keybyte,
-    epoch,
     additive_method,
     additive_param_1,
     additive_param_1_value,
@@ -277,5 +273,9 @@ GROUP BY
     denoising_param_1,
     denoising_param_1_value,
     denoising_param_2,
-    denoising_param_2_value 
+    denoising_param_2_value,
+    epoch,
+    device,
+    training_model,
+    keybyte
 """

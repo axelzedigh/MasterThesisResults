@@ -14,7 +14,7 @@ from database.queries import (
     QUERY_CREATE_TABLE_RANK_TEST,
     QUERY_CREATE_VIEW_FULL_RANK_TEST,
     QUERY_SELECT_ADDITIVE_NOISE_METHOD_ID, QUERY_SELECT_DENOISING_METHOD_ID,
-    QUERY_LIST_INITIALIZE_DB,
+    QUERY_LIST_INITIALIZE_DB, QUERY_FULL_RANK_TEST_GROUPED_A,
 )
 
 
@@ -246,7 +246,7 @@ def insert_legacy_rank_test_numpy_file_to_db(
                           average_rank=None)
 
 
-def create_pre_processing_table_info_md(database="main.db", path="docs"):
+def create_md__option_tables(database="main.db", path="docs"):
     project_dir = os.getenv("MASTER_THESIS_RESULTS")
     file_path = os.path.join(project_dir, path, "pre_processing_tables.md")
     additive_data = fetchall_query(
@@ -287,7 +287,7 @@ def create_pre_processing_table_info_md(database="main.db", path="docs"):
     file.close()
 
 
-def create_rank_test_table_info_md(database="main.db", path="docs"):
+def create_md__rank_test_tbl__meta_info(database="main.db", path="docs"):
     project_dir = os.getenv("MASTER_THESIS_RESULTS")
     file_path = os.path.join(project_dir, path, "rank_test_table_info.md")
     rank_test_rows = fetchall_query(
@@ -301,6 +301,45 @@ def create_rank_test_table_info_md(database="main.db", path="docs"):
 
     file = open(file_path, "a")
     file.write(f"Rows: {rank_test_rows[0][0]}")
+    file.write("\n")
+    file.close()
+
+
+def create_md__full_rank_test__grouped(database="main.db", path="docs"):
+    project_dir = os.getenv("MASTER_THESIS_RESULTS")
+    file_path = os.path.join(project_dir, path, "Rank_test__grouped.md")
+    full_rank_test_rows = fetchall_query(
+        database, QUERY_FULL_RANK_TEST_GROUPED_A
+    )
+    file = open(file_path, "w")
+
+    file.write("# Full Rank test tables - Unique rows\n")
+    file.write(f"Last updated: {datetime.today()}\n\n")
+    file.close()
+    file = open(file_path, "a")
+    file.write("| test_dataset | training_dataset | environment | distance | "
+               "device | training_model | keybyte | epoch | additive method | "
+               "param 1| value | param 2 | value | denoising method | param 1 "
+               "| value | param 2 | value | counted tp | avg tp's |\n")
+    file.write(
+        "|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|"
+        "---|---|---|\n"
+    )
+    for data in full_rank_test_rows:
+        file.write(
+            f"| {data[0]} | {data[1]} |"
+            f"{data[2]} | {data[3]} | "
+            f"{data[4]} | {data[5]} | "
+            f"{data[6]} | {data[7]} | "
+            f"{data[8]} | {data[9]} | "
+            f"{data[10]} | {data[11]} | "
+            f"{data[12]} | {data[13]} | "
+            f"{data[14]} | {data[15]} | "
+            f"{data[16]} | {data[17]} | "
+            f"{data[18]} | {data[19]} |"
+            "\n"
+        )
+
     file.write("\n")
     file.close()
 

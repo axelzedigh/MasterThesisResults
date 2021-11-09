@@ -16,7 +16,7 @@ from utils.db_utils import (
     fetchall_query,
     get_additive_noise_method_id,
     get_denoising_method_id, insert_legacy_rank_test_numpy_file_to_db,
-    create_pre_processing_table_info_md, get_db_absolute_path,
+    create_md__option_tables, get_db_absolute_path,
     get_test_trace_path, get_training_model_file_path,
 )
 
@@ -259,7 +259,7 @@ class AddToDatabaseTestCase(unittest.TestCase):
         file_path = os.path.join(project_dir, path, "pre_processing_tables.md")
 
         # Update file
-        create_pre_processing_table_info_md(self.database, path)
+        create_md__option_tables(self.database, path)
 
         file = open(file_path, "r")
         first_line = file.readline()
