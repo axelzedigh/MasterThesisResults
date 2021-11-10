@@ -438,3 +438,90 @@ def get_training_model_file_path(
     )
 
     return training_model_file_path
+
+
+def insert_data_and_date_to_db(
+        database: str,
+        test_dataset_id: int,
+        training_dataset_id: int,
+        environment_id: int,
+        distance: float,
+        device: int,
+        training_model_id: int,
+        keybyte: int,
+        epoch: int,
+        additive_noise_method_id: Optional[int],
+        denoising_method_id: Optional[int],
+        termination_point: int,
+        average_rank: Optional[int],
+        date: int,
+) -> None:
+    """
+
+    :param database: The database-file to write to.
+    :param test_dataset_id:
+    :param training_dataset_id:
+    :param environment_id:
+    :param distance: Distance between device under unittests and antenna.
+    :param device: Device under unittests.
+    :param training_model_id: The deep learning architecture model used.
+    :param keybyte: The keybyte trained and tested [0-15].
+    :param epoch: The epoch of the DL model. Between 1-100.
+    :param additive_noise_method_id: Foreign key id.
+    :param denoising_method_id: Foreign key id.
+    :param termination_point: Termination point from rank unittests.
+    :param average_rank:
+    :param date: THIS PARAM DIFFERS FROM insert_data_to_db()
+    """
+    database = get_db_file_path(database)
+    con = lite.connect(database)
+    cur = con.cursor()
+
+    cur.execute(
+        "INSERT INTO Rank_Test VALUES(NULL,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+        (
+            test_dataset_id,
+            training_dataset_id,
+            environment_id,
+            distance,
+            device,
+            training_model_id,
+            keybyte,
+            epoch,
+            additive_noise_method_id,
+            denoising_method_id,
+            termination_point,
+            average_rank,
+            date,
+        ),
+    )
+    con.commit()
+    con.close()
+
+
+def copy_rank_test_from_db1_to_db2(database_from, database_to):
+    """
+
+    :param database_from: Database to copy rank data from.
+    :param database_to: Database to copy rank data to.
+    """
+    database_from = get_db_file_path(database_from)
+    database_to = get_db_file_path(database_to)
+    data_from = fetchall_query(database_from, "select * from rank_test;")
+    for data in data_from:
+        insert_data_and_date_to_db(
+            database_to,
+            data[1],
+            data[2],
+            data[3],
+            data[4],
+            data[5],
+            data[6],
+            data[7],
+            data[8],
+            data[9],
+            data[10],
+            data[11],
+            data[12],
+            data[13],
+        )

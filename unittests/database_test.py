@@ -8,7 +8,8 @@ import numpy as np
 from database.queries import QUERY_FULL_RANK_TEST_GROUPED_A, \
     QUERY_RANK_TEST_GROUPED_A
 from database.variables import VIEW_RANK_TEST_INDEX
-from scripts.test_models__termination_point_to_db import termination_point_test_and_insert_to_db
+from scripts.test_models__termination_point_to_db import \
+    termination_point_test_and_insert_to_db
 from utils.db_utils import (
     create_db_with_tables,
     initialize_table_data,
@@ -18,6 +19,7 @@ from utils.db_utils import (
     get_denoising_method_id, insert_legacy_rank_test_numpy_file_to_db,
     create_md__option_tables, get_db_absolute_path,
     get_test_trace_path, get_training_model_file_path, get_db_file_path,
+    copy_rank_test_from_db1_to_db2,
 )
 
 
@@ -373,6 +375,36 @@ class AddToDatabaseTestCase(unittest.TestCase):
         )
 
         self.assertIsNotNone(training_model_file_path)
+
+    def test_copy_rank_test_from_db1_to_db2(self):
+        # Create secondary db
+        database_from = "test_database_2.db"
+        create_db_with_tables(database_from)
+        initialize_table_data(database_from)
+        data = fetchall_query(self.database, "select count(*) from rank_test;")
+        self.assertEqual(data[0][0], 0)
+
+        # Insert data to db2.
+        insert_data_to_db(database=database_from, test_dataset_id=1,
+                          training_dataset_id=1, environment_id=1, distance=15,
+                          device=9, training_model_id=1, keybyte=0, epoch=100,
+                          additive_noise_method_id=None, denoising_method_id=1,
+                          termination_point=101, average_rank=102)
+        insert_data_to_db(database=database_from, test_dataset_id=1,
+                          training_dataset_id=1, environment_id=1, distance=15,
+                          device=10, training_model_id=1, keybyte=0, epoch=100,
+                          additive_noise_method_id=None, denoising_method_id=1,
+                          termination_point=101, average_rank=102)
+
+        copy_rank_test_from_db1_to_db2(
+            database_from=database_from,
+            database_to=self.database,
+        )
+
+        data = fetchall_query(self.database, "select count(*) from rank_test;")
+        os.remove(get_db_file_path(database_from))
+        self.assertIsNotNone(data)
+        self.assertEqual(data[0][0], 2)
 
 
 class TerminationPointTest(unittest.TestCase):
