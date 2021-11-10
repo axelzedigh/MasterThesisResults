@@ -6,7 +6,8 @@ from typing import Tuple, Optional, Callable
 import numpy as np
 import tensorflow as tf
 
-from utils.db_utils import get_test_trace_path, get_training_model_file_path
+from utils.db_utils import get_test_trace_path, get_training_model_file_path, \
+    get_db_file_path
 
 AES_Sbox = np.array([
     0x63, 0x7C, 0x77, 0x7B, 0xF2, 0x6B, 0x6F, 0xC5, 0x30, 0x01, 0x67, 0x2B, 0xFE, 0xD7, 0xAB, 0x76,
@@ -200,6 +201,7 @@ def termination_point_test(
     :param denoising_method_id:
     :return:
     """
+    database = get_db_file_path(database)
 
     # load test traces
     test_path = get_test_trace_path(

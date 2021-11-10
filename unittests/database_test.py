@@ -17,7 +17,7 @@ from utils.db_utils import (
     get_additive_noise_method_id,
     get_denoising_method_id, insert_legacy_rank_test_numpy_file_to_db,
     create_md__option_tables, get_db_absolute_path,
-    get_test_trace_path, get_training_model_file_path,
+    get_test_trace_path, get_training_model_file_path, get_db_file_path,
 )
 
 
@@ -27,12 +27,12 @@ class AddToDatabaseTestCase(unittest.TestCase):
         self.database = "test_database.db"
         create_db_with_tables(self.database)
         initialize_table_data(self.database)
-        self.con = lite.connect(self.database)
+        self.con = lite.connect(get_db_file_path(self.database))
         self.cur = self.con.cursor()
 
     def tearDown(self) -> None:
         self.con.close()
-        os.remove(self.database)
+        os.remove(get_db_file_path(self.database))
 
     def test_fetch_environments(self):
         fetchall = self.cur.execute("SELECT * FROM Environments;").fetchall()
@@ -381,12 +381,12 @@ class TerminationPointTest(unittest.TestCase):
         self.database = "test_database.db"
         create_db_with_tables(self.database)
         initialize_table_data(self.database)
-        self.con = lite.connect(self.database)
+        self.con = lite.connect(get_db_file_path(self.database))
         self.cur = self.con.cursor()
 
     def tearDown(self) -> None:
         self.con.close()
-        os.remove(self.database)
+        os.remove(get_db_file_path(self.database))
 
     def test_termination_point_test_and_insert_to_db__additive_None(self):
         runs = 1

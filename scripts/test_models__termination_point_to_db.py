@@ -1,3 +1,4 @@
+import os
 import sys
 
 from tqdm import tqdm
@@ -60,6 +61,8 @@ def termination_point_test_and_insert_to_db(
 
 
 if __name__ == "__main__":
+    # proj_dir = os.getenv("MASTER_THESIS_RESULTS")
+    # sys.path.append(proj_dir)
     if sys.argv[11].strip() == "None":
         additive_id = None
     else:
@@ -76,7 +79,7 @@ if __name__ == "__main__":
         test_dataset_id=int(sys.argv[3]),
         training_dataset_id=int(sys.argv[4]),
         environment_id=int(sys.argv[5]),
-        distance=float(sys.argv[6]),
+        distance=int(sys.argv[6]),
         device=int(sys.argv[7]),
         training_model_id=int(sys.argv[8]),
         keybyte=int(sys.argv[9]),
