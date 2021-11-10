@@ -60,6 +60,16 @@ def termination_point_test_and_insert_to_db(
 
 
 if __name__ == "__main__":
+    if sys.argv[11].strip() == "None":
+        additive_id = None
+    else:
+        additive_id = int(sys.argv[11].strip())
+
+    if sys.argv[12].strip() == "None":
+        denoising_id = None
+    else:
+        denoising_id = int(sys.argv[12].strip())
+
     termination_point_test_and_insert_to_db(
         database=str(sys.argv[1]),
         runs=int(sys.argv[2]),
@@ -71,6 +81,6 @@ if __name__ == "__main__":
         training_model_id=int(sys.argv[8]),
         keybyte=int(sys.argv[9]),
         epoch=int(sys.argv[10]),
-        additive_noise_method_id=int(sys.argv[11]),
-        denoising_method_id=int(sys.argv[12]),
+        additive_noise_method_id=additive_id,
+        denoising_method_id=denoising_id
     )
