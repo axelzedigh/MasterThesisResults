@@ -1,3 +1,4 @@
+"""Util functions for interacting with the databases."""
 import sqlite3 as lite
 import os
 import numpy as np
@@ -19,12 +20,21 @@ from database.queries import (
 
 
 def get_db_file_path(database="main.db"):
+    """
+
+    :param database: Name of database.
+    :return: Path-string to database-file.
+    """
     project_dir = os.getenv("MASTER_THESIS_RESULTS")
     database_dir = os.path.join(project_dir, "database", database)
     return database_dir
 
 
 def get_db_dir_path():
+    """
+
+    :return: Path-string to database-folder.
+    """
     project_dir = os.getenv("MASTER_THESIS_RESULTS")
     database_dir = os.path.join(project_dir, "database")
     return database_dir
@@ -33,13 +43,13 @@ def get_db_dir_path():
 def create_db_with_tables(database="main.db") -> None:
     """
 
-    :return:
+    :param database: Database name.
     """
     database_dir = get_db_dir_path()
     dirs = os.listdir(database_dir)
     if database in dirs:
         # print("Database exists!")
-        return
+        pass
     else:
         database = get_db_file_path(database)
         con = lite.connect(database)
@@ -60,14 +70,12 @@ def create_db_with_tables(database="main.db") -> None:
         # Close connections
         cur.close()
         con.close()
-    return
 
 
 def initialize_table_data(database="main.db"):
     """
 
     :param database:
-    :return:
     """
     database_dir = get_db_dir_path()
     dirs = os.listdir(database_dir)
@@ -80,10 +88,8 @@ def initialize_table_data(database="main.db"):
 
         con.commit()
         con.close()
-        return
     else:
         print("Database file don't exist!")
-        return
 
 
 def insert_data_to_db(
@@ -146,6 +152,12 @@ def insert_data_to_db(
 
 def fetchall_query(database: str = "main.db",
                    query: str = "SELECT * FROM full_rank_test;"):
+    """
+
+    :param database:
+    :param query:
+    :return:
+    """
     database = get_db_file_path(database)
     con = lite.connect(database)
     cur = con.cursor()
@@ -162,6 +174,16 @@ def get_additive_noise_method_id(
         parameter_2: Optional[str],
         parameter_2_value: Optional[float],
 ):
+    """
+
+    :param database:
+    :param additive_noise_method:
+    :param parameter_1:
+    :param parameter_1_value:
+    :param parameter_2:
+    :param parameter_2_value:
+    :return:
+    """
     database = get_db_file_path(database)
     query_arguments = (
         additive_noise_method,
@@ -189,6 +211,16 @@ def get_denoising_method_id(
         parameter_2: Optional[str],
         parameter_2_value: Optional[float],
 ):
+    """
+
+    :param database:
+    :param denoising_method:
+    :param parameter_1:
+    :param parameter_1_value:
+    :param parameter_2:
+    :param parameter_2_value:
+    :return:
+    """
     database = get_db_file_path(database)
     query_arguments = (
         denoising_method,
@@ -266,6 +298,11 @@ def insert_legacy_rank_test_numpy_file_to_db(
 
 
 def create_md__option_tables(database="main.db", path="docs"):
+    """
+
+    :param database: Database to fetch data from.
+    :param path: path in project dir to store the doc.
+    """
     database = get_db_file_path(database)
     project_dir = os.getenv("MASTER_THESIS_RESULTS")
     file_path = os.path.join(project_dir, path, "pre_processing_tables.md")
@@ -308,6 +345,11 @@ def create_md__option_tables(database="main.db", path="docs"):
 
 
 def create_md__rank_test_tbl__meta_info(database="main.db", path="docs"):
+    """
+
+    :param database: Database to fetch data from.
+    :param path: path in project dir to store the doc.
+    """
     database = get_db_file_path(database)
     project_dir = os.getenv("MASTER_THESIS_RESULTS")
     file_path = os.path.join(project_dir, path, "rank_test_table_info.md")
@@ -327,6 +369,11 @@ def create_md__rank_test_tbl__meta_info(database="main.db", path="docs"):
 
 
 def create_md__full_rank_test__grouped(database="main.db", path="docs"):
+    """
+
+    :param database: Database to fetch data from.
+    :param path: path in project dir to store the doc.
+    """
     database = get_db_file_path(database)
     project_dir = os.getenv("MASTER_THESIS_RESULTS")
     file_path = os.path.join(project_dir, path, "Rank_test__grouped.md")
@@ -367,6 +414,12 @@ def create_md__full_rank_test__grouped(database="main.db", path="docs"):
 
 
 def get_db_absolute_path(database="main.db", path="database"):
+    """
+
+    :param database:
+    :param path:
+    :return:
+    """
     project_dir = os.getenv("MASTER_THESIS_RESULTS")
     database = os.path.join(project_dir, path, database)
     return database
@@ -379,6 +432,15 @@ def get_test_trace_path(
         distance,
         device
 ) -> str:
+    """
+
+    :param database:
+    :param test_dataset_id:
+    :param environment_id:
+    :param distance:
+    :param device:
+    :return:
+    """
     database = get_db_file_path(database)
     project_dir = os.getenv("MASTER_THESIS_RESULTS")
     path = "datasets/test_traces"
@@ -413,6 +475,16 @@ def get_training_model_file_path(
         epoch,
         keybyte
 ) -> str:
+    """
+
+    :param database:
+    :param training_model_id:
+    :param additive_noise_method_id:
+    :param denoising_method_id:
+    :param epoch:
+    :param keybyte:
+    :return:
+    """
     database = get_db_file_path(database)
     project_dir = os.getenv("MASTER_THESIS_RESULTS")
     path = "models"
