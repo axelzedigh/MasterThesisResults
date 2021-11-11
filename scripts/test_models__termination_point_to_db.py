@@ -1,4 +1,5 @@
-import os
+"""Python script to run from terminal for rank test (see shell_rank_test.sh)."""
+
 import sys
 
 from tqdm import tqdm
@@ -22,6 +23,21 @@ def termination_point_test_and_insert_to_db(
         additive_noise_method_id,
         denoising_method_id,
 ):
+    """
+
+    :param database:
+    :param runs:
+    :param test_dataset_id:
+    :param training_dataset_id:
+    :param environment_id:
+    :param distance:
+    :param device:
+    :param training_model_id:
+    :param keybyte:
+    :param epoch:
+    :param additive_noise_method_id:
+    :param denoising_method_id:
+    """
     filter_function = None
     if denoising_method_id == 1:
         filter_function = moving_average_filter_n3
@@ -62,8 +78,6 @@ def termination_point_test_and_insert_to_db(
 
 
 if __name__ == "__main__":
-    # proj_dir = os.getenv("MASTER_THESIS_RESULTS")
-    # sys.path.append(proj_dir)
     if sys.argv[11].strip() == "None":
         additive_id = None
     else:
