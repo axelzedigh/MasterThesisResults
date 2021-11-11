@@ -30,7 +30,7 @@ AES_Sbox = np.array([
 
 # HW = [bin(n).count("1") for n in range(256)]
 project_dir = os.getenv("MASTER_THESIS_RESULTS")
-path = "datasets/test_traces/Zedigh_2021/office_corridor/2m"
+path = "datasets/test_traces/Zedigh_2021/office_corridor/5m"
 device = "device_10"
 save_folder = os.path.join(project_dir, path, device, "data")
 
@@ -46,16 +46,18 @@ label_save = os.path.join(save_folder, 'label_lastround_Sout_0.npy')
 
 # ===========================================================
 # load_folder = save_folder + '/original_data/'
-load_folder = "/Users/xeezy/Documents/MASTER-THESIS/datasets/last_round_aes/experiment_axel/1029_trace_last/2.5m/D10"
+data_dir = os.getenv("MASTERTHESISTOP")
+load_folder = "datasets/last_round_aes/experiment_axel/1111_office_hall/5m/device_10"
+load_folder = os.path.join(data_dir, load_folder)
 mis_index_path = os.path.join(load_folder, 'mis_index.npy')
 plaintext_path = os.path.join(load_folder, 'pt_.txt')
 key_path = os.path.join(load_folder, 'key_.txt')
 trace_path = os.path.join(load_folder, 'all__')
 
 # total_number = 5250
-total_number = 10000
+total_number = 5000
 # select_number = 5000
-select_number = 9998
+select_number = 4800
 averaging = 1
 
 total_index = [i for i in range(total_number)]

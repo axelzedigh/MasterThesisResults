@@ -42,6 +42,7 @@ def termination_point_test_and_insert_to_db(
             additive_noise_method_id,
             denoising_method_id,
         )
+        print(termination_point)
         if termination_point is not None:
             insert_data_to_db(
                 database,
