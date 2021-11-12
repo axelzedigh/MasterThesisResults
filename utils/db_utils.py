@@ -356,6 +356,9 @@ def create_md__rank_test_tbl__meta_info(database="main.db", path="docs"):
     rank_test_rows = fetchall_query(
         database, "SELECT Count(*) from Rank_Test;"
     )
+    duplicate_dates = fetchall_query(
+        database, "SELECT date_added, COUNT(*) c FROM Rank_Test GROUP BY date_added HAVING c > 1;"
+    )
 
     file = open(file_path, "w")
     file.write("# Rank Test Table Info\n")
@@ -363,7 +366,8 @@ def create_md__rank_test_tbl__meta_info(database="main.db", path="docs"):
     file.close()
 
     file = open(file_path, "a")
-    file.write(f"Rows: {rank_test_rows[0][0]}")
+    file.write(f"Rows: {rank_test_rows[0][0]}\n\n")
+    file.write(f"Duplicate date_added rows: {duplicate_dates[0]}\n")
     file.write("\n")
     file.close()
 
