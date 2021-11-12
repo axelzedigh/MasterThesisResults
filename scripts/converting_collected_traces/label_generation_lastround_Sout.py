@@ -47,7 +47,7 @@ label_save = os.path.join(save_folder, 'label_lastround_Sout_0.npy')
 # ===========================================================
 # load_folder = save_folder + '/original_data/'
 data_dir = os.getenv("MASTERTHESISTOP")
-load_folder = "datasets/last_round_aes/experiment_axel/1111_office_hall/5m/device_10"
+load_folder = "datasets/last_round_aes/Zedigh_2021/office_corridor/5m/device_10"
 load_folder = os.path.join(data_dir, load_folder)
 mis_index_path = os.path.join(load_folder, 'mis_index.npy')
 plaintext_path = os.path.join(load_folder, 'pt_.txt')
