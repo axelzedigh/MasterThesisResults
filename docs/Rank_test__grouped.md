@@ -1,5 +1,5 @@
 # Full Rank test tables - Unique rows
-Last updated: 2021-11-11 21:50:08.846713
+Last updated: 2021-11-12 09:12:06.688666
 
 | test_dataset | training_dataset | environment | distance | device | training_model | keybyte | epoch | additive method | param 1| value | param 2 | value | denoising method | param 1 | value | param 2 | value | counted tp | avg tp's |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
@@ -9,13 +9,15 @@ Last updated: 2021-11-11 21:50:08.846713
 | Wang_2021 | Wang_2021 - Cable |office_corridor | 15.0 | 7 | cnn_110 | 0 | 65 | None | None | None | None | None | None | None | None | None | None | 210 | 650.5095238095238 |
 | Wang_2021 | Wang_2021 - Cable |office_corridor | 15.0 | 8 | cnn_110 | 0 | 65 | None | None | None | None | None | None | None | None | None | None | 315 | 604.2031746031746 |
 | Wang_2021 | Wang_2021 - Cable |office_corridor | 15.0 | 9 | cnn_110 | 0 | 65 | None | None | None | None | None | None | None | None | None | None | 311 | 779.91961414791 |
-| Wang_2021 | Wang_2021 - Cable |office_corridor | 15.0 | 10 | cnn_110 | 0 | 65 | None | None | None | None | None | None | None | None | None | None | 315 | 324.26984126984127 |
+| Wang_2021 | Wang_2021 - Cable |office_corridor | 15.0 | 10 | cnn_110 | 0 | 65 | None | None | None | None | None | None | None | None | None | None | 316 | 324.5189873417722 |
 | Wang_2021 | Wang_2021 - Cable |office_corridor | 15.0 | 6 | cnn_110 | 0 | 65 | None | None | None | None | None | Moving Average Filter | N | 3.0 | None | None | 190 | 836.2 |
 | Wang_2021 | Wang_2021 - Cable |office_corridor | 15.0 | 7 | cnn_110 | 0 | 65 | None | None | None | None | None | Moving Average Filter | N | 3.0 | None | None | 190 | 692.7894736842105 |
 | Wang_2021 | Wang_2021 - Cable |office_corridor | 15.0 | 8 | cnn_110 | 0 | 65 | None | None | None | None | None | Moving Average Filter | N | 3.0 | None | None | 190 | 659.4842105263158 |
 | Wang_2021 | Wang_2021 - Cable |office_corridor | 15.0 | 9 | cnn_110 | 0 | 65 | None | None | None | None | None | Moving Average Filter | N | 3.0 | None | None | 190 | 915.0 |
 | Wang_2021 | Wang_2021 - Cable |office_corridor | 15.0 | 10 | cnn_110 | 0 | 65 | None | None | None | None | None | Moving Average Filter | N | 3.0 | None | None | 190 | 355.03684210526313 |
 | Wang_2021 | Wang_2021 - Cable |office_corridor | 15.0 | 6 | cnn_110 | 0 | 50 | Collected | Scale | 25.0 | None | None | None | None | None | None | None | 100 | 423.83 |
+| Wang_2021 | Wang_2021 - Cable |office_corridor | 15.0 | 6 | cnn_110 | 0 | 65 | Collected | Scale | 25.0 | None | None | None | None | None | None | None | 105 | 425.7238095238095 |
+| Wang_2021 | Wang_2021 - Cable |office_corridor | 15.0 | 7 | cnn_110 | 0 | 65 | Collected | Scale | 25.0 | None | None | None | None | None | None | None | 105 | 424.8857142857143 |
 | Wang_2021 | Wang_2021 - Cable |office_corridor | 15.0 | 8 | cnn_110 | 0 | 65 | Collected | Scale | 25.0 | None | None | None | None | None | None | None | 105 | 335.4952380952381 |
 | Wang_2021 | Wang_2021 - Cable |office_corridor | 15.0 | 9 | cnn_110 | 0 | 65 | Collected | Scale | 25.0 | None | None | None | None | None | None | None | 105 | 439.2190476190476 |
 | Wang_2021 | Wang_2021 - Cable |office_corridor | 15.0 | 10 | cnn_110 | 0 | 65 | Collected | Scale | 25.0 | None | None | None | None | None | None | None | 105 | 149.9904761904762 |
@@ -35,19 +37,27 @@ Last updated: 2021-11-11 21:50:08.846713
 | Wang_2021 | Wang_2021 - Cable |office_corridor | 15.0 | 6 | cnn_110 | 0 | 95 | Collected | Scale | 50.0 | None | None | None | None | None | None | None | 20 | 415.45 |
 | Wang_2021 | Wang_2021 - Cable |office_corridor | 15.0 | 6 | cnn_110 | 0 | 100 | Collected | Scale | 50.0 | None | None | None | None | None | None | None | 20 | 432.2 |
 | Wang_2021 | Wang_2021 - Cable |office_corridor | 15.0 | 6 | cnn_110 | 0 | 50 | Collected | Scale | 75.0 | None | None | None | None | None | None | None | 100 | 500.15 |
+| Wang_2021 | Wang_2021 - Cable |office_corridor | 15.0 | 6 | cnn_110 | 0 | 65 | Collected | Scale | 75.0 | None | None | None | None | None | None | None | 104 | 425.96153846153845 |
+| Wang_2021 | Wang_2021 - Cable |office_corridor | 15.0 | 7 | cnn_110 | 0 | 65 | Collected | Scale | 75.0 | None | None | None | None | None | None | None | 105 | 438.84761904761905 |
 | Wang_2021 | Wang_2021 - Cable |office_corridor | 15.0 | 8 | cnn_110 | 0 | 65 | Collected | Scale | 75.0 | None | None | None | None | None | None | None | 105 | 333.44761904761907 |
 | Wang_2021 | Wang_2021 - Cable |office_corridor | 15.0 | 9 | cnn_110 | 0 | 65 | Collected | Scale | 75.0 | None | None | None | None | None | None | None | 105 | 499.9428571428571 |
 | Wang_2021 | Wang_2021 - Cable |office_corridor | 15.0 | 10 | cnn_110 | 0 | 65 | Collected | Scale | 75.0 | None | None | None | None | None | None | None | 105 | 173.47619047619048 |
 | Wang_2021 | Wang_2021 - Cable |office_corridor | 15.0 | 6 | cnn_110 | 0 | 50 | Collected | Scale | 105.0 | None | None | None | None | None | None | None | 100 | 707.19 |
+| Wang_2021 | Wang_2021 - Cable |office_corridor | 15.0 | 6 | cnn_110 | 0 | 65 | Collected | Scale | 105.0 | None | None | None | None | None | None | None | 104 | 634.6826923076923 |
+| Wang_2021 | Wang_2021 - Cable |office_corridor | 15.0 | 7 | cnn_110 | 0 | 65 | Collected | Scale | 105.0 | None | None | None | None | None | None | None | 99 | 1189.6060606060605 |
 | Wang_2021 | Wang_2021 - Cable |office_corridor | 15.0 | 8 | cnn_110 | 0 | 65 | Collected | Scale | 105.0 | None | None | None | None | None | None | None | 105 | 1111.9714285714285 |
 | Wang_2021 | Wang_2021 - Cable |office_corridor | 15.0 | 9 | cnn_110 | 0 | 65 | Collected | Scale | 105.0 | None | None | None | None | None | None | None | 29 | 1397.7931034482758 |
 | Wang_2021 | Wang_2021 - Cable |office_corridor | 15.0 | 10 | cnn_110 | 0 | 65 | Collected | Scale | 105.0 | None | None | None | None | None | None | None | 105 | 335.95238095238096 |
 | Wang_2021 | Wang_2021 - Cable |office_corridor | 15.0 | 6 | cnn_110 | 0 | 50 | Gaussian | Std | 0.01 | Mean | 0.0 | None | None | None | None | None | 100 | 502.84 |
+| Wang_2021 | Wang_2021 - Cable |office_corridor | 15.0 | 6 | cnn_110 | 0 | 65 | Gaussian | Std | 0.01 | Mean | 0.0 | None | None | None | None | None | 105 | 510.8857142857143 |
+| Wang_2021 | Wang_2021 - Cable |office_corridor | 15.0 | 7 | cnn_110 | 0 | 65 | Gaussian | Std | 0.01 | Mean | 0.0 | None | None | None | None | None | 105 | 421.6095238095238 |
 | Wang_2021 | Wang_2021 - Cable |office_corridor | 15.0 | 8 | cnn_110 | 0 | 65 | Gaussian | Std | 0.01 | Mean | 0.0 | None | None | None | None | None | 105 | 400.22857142857146 |
 | Wang_2021 | Wang_2021 - Cable |office_corridor | 15.0 | 9 | cnn_110 | 0 | 65 | Gaussian | Std | 0.01 | Mean | 0.0 | None | None | None | None | None | 105 | 639.6095238095238 |
 | Wang_2021 | Wang_2021 - Cable |office_corridor | 15.0 | 10 | cnn_110 | 0 | 65 | Gaussian | Std | 0.01 | Mean | 0.0 | None | None | None | None | None | 105 | 201.23809523809524 |
 | Wang_2021 | Wang_2021 - Cable |office_corridor | 15.0 | 6 | cnn_110 | 0 | 50 | Gaussian | Std | 0.02 | Mean | 0.0 | None | None | None | None | None | 100 | 416.52 |
 | Wang_2021 | Wang_2021 - Cable |office_corridor | 15.0 | 6 | cnn_110 | 0 | 50 | Gaussian | Std | 0.03 | Mean | 0.0 | None | None | None | None | None | 100 | 363.79 |
+| Wang_2021 | Wang_2021 - Cable |office_corridor | 15.0 | 6 | cnn_110 | 0 | 65 | Gaussian | Std | 0.03 | Mean | 0.0 | None | None | None | None | None | 104 | 346.09615384615387 |
+| Wang_2021 | Wang_2021 - Cable |office_corridor | 15.0 | 7 | cnn_110 | 0 | 65 | Gaussian | Std | 0.03 | Mean | 0.0 | None | None | None | None | None | 90 | 481.3 |
 | Wang_2021 | Wang_2021 - Cable |office_corridor | 15.0 | 8 | cnn_110 | 0 | 65 | Gaussian | Std | 0.03 | Mean | 0.0 | None | None | None | None | None | 105 | 368.8666666666667 |
 | Wang_2021 | Wang_2021 - Cable |office_corridor | 15.0 | 9 | cnn_110 | 0 | 65 | Gaussian | Std | 0.03 | Mean | 0.0 | None | None | None | None | None | 105 | 558.2380952380952 |
 | Wang_2021 | Wang_2021 - Cable |office_corridor | 15.0 | 10 | cnn_110 | 0 | 65 | Gaussian | Std | 0.03 | Mean | 0.0 | None | None | None | None | None | 105 | 173.59047619047618 |
@@ -59,6 +69,8 @@ Last updated: 2021-11-11 21:50:08.846713
 | Wang_2021 | Wang_2021 - Cable |office_corridor | 15.0 | 9 | cnn_110 | 0 | 65 | Gaussian | Std | 0.04 | Mean | 0.0 | None | None | None | None | None | 286 | 527.451048951049 |
 | Wang_2021 | Wang_2021 - Cable |office_corridor | 15.0 | 10 | cnn_110 | 0 | 65 | Gaussian | Std | 0.04 | Mean | 0.0 | None | None | None | None | None | 285 | 149.8842105263158 |
 | Wang_2021 | Wang_2021 - Cable |office_corridor | 15.0 | 6 | cnn_110 | 0 | 50 | Gaussian | Std | 0.05 | Mean | 0.0 | None | None | None | None | None | 100 | 470.44 |
+| Wang_2021 | Wang_2021 - Cable |office_corridor | 15.0 | 6 | cnn_110 | 0 | 65 | Gaussian | Std | 0.05 | Mean | 0.0 | None | None | None | None | None | 105 | 524.6285714285714 |
+| Wang_2021 | Wang_2021 - Cable |office_corridor | 15.0 | 7 | cnn_110 | 0 | 65 | Gaussian | Std | 0.05 | Mean | 0.0 | None | None | None | None | None | 105 | 589.5238095238095 |
 | Wang_2021 | Wang_2021 - Cable |office_corridor | 15.0 | 8 | cnn_110 | 0 | 65 | Gaussian | Std | 0.05 | Mean | 0.0 | None | None | None | None | None | 108 | 447.76851851851853 |
 | Wang_2021 | Wang_2021 - Cable |office_corridor | 15.0 | 9 | cnn_110 | 0 | 65 | Gaussian | Std | 0.05 | Mean | 0.0 | None | None | None | None | None | 108 | 763.8425925925926 |
 | Wang_2021 | Wang_2021 - Cable |office_corridor | 15.0 | 10 | cnn_110 | 0 | 65 | Gaussian | Std | 0.05 | Mean | 0.0 | None | None | None | None | None | 105 | 222.0 |
@@ -79,8 +91,21 @@ Last updated: 2021-11-11 21:50:08.846713
 | Wang_2021 | Wang_2021 - Cable |office_corridor | 15.0 | 6 | cnn_110 | 0 | 90 | Rayleigh | Mode | 0.0138 | None | None | None | None | None | None | None | 20 | 449.25 |
 | Wang_2021 | Wang_2021 - Cable |office_corridor | 15.0 | 6 | cnn_110 | 0 | 95 | Rayleigh | Mode | 0.0138 | None | None | None | None | None | None | None | 20 | 477.5 |
 | Wang_2021 | Wang_2021 - Cable |office_corridor | 15.0 | 6 | cnn_110 | 0 | 100 | Rayleigh | Mode | 0.0138 | None | None | None | None | None | None | None | 120 | 495.375 |
+| Wang_2021 | Wang_2021 - Cable |office_corridor | 15.0 | 6 | cnn_110 | 0 | 65 | Rayleigh | Mode | 0.0276 | None | None | None | None | None | None | None | 105 | 641.2761904761904 |
+| Wang_2021 | Wang_2021 - Cable |office_corridor | 15.0 | 7 | cnn_110 | 0 | 65 | Rayleigh | Mode | 0.0276 | None | None | None | None | None | None | None | 97 | 830.5463917525773 |
 | Wang_2021 | Wang_2021 - Cable |office_corridor | 15.0 | 8 | cnn_110 | 0 | 65 | Rayleigh | Mode | 0.0276 | None | None | None | None | None | None | None | 110 | 825.6818181818181 |
 | Wang_2021 | Wang_2021 - Cable |office_corridor | 15.0 | 9 | cnn_110 | 0 | 65 | Rayleigh | Mode | 0.0276 | None | None | None | None | None | None | None | 97 | 1298.7113402061855 |
 | Wang_2021 | Wang_2021 - Cable |office_corridor | 15.0 | 10 | cnn_110 | 0 | 65 | Rayleigh | Mode | 0.0276 | None | None | None | None | None | None | None | 105 | 359.1904761904762 |
 | Wang_2021 | Wang_2021 - Cable |office_corridor | 15.0 | 6 | cnn_110 | 0 | 100 | Rayleigh | Mode | 0.0276 | None | None | None | None | None | None | None | 100 | 467.1 |
+| Zedigh_2021 | Wang_2021 - Cable |office_corridor | 2.0 | 10 | cnn_110 | 0 | 65 | None | None | None | None | None | None | None | None | None | None | 105 | 474.0285714285714 |
+| Zedigh_2021 | Wang_2021 - Cable |office_corridor | 2.0 | 10 | cnn_110 | 0 | 65 | Collected | Scale | 25.0 | None | None | None | None | None | None | None | 211 | 274.74881516587675 |
+| Zedigh_2021 | Wang_2021 - Cable |office_corridor | 2.0 | 10 | cnn_110 | 0 | 65 | Collected | Scale | 50.0 | None | None | None | None | None | None | None | 105 | 306.6952380952381 |
+| Zedigh_2021 | Wang_2021 - Cable |office_corridor | 2.0 | 10 | cnn_110 | 0 | 65 | Collected | Scale | 75.0 | None | None | None | None | None | None | None | 105 | 294.62857142857143 |
+| Zedigh_2021 | Wang_2021 - Cable |office_corridor | 2.0 | 10 | cnn_110 | 0 | 65 | Collected | Scale | 105.0 | None | None | None | None | None | None | None | 105 | 535.4857142857143 |
+| Zedigh_2021 | Wang_2021 - Cable |office_corridor | 2.0 | 10 | cnn_110 | 0 | 65 | Gaussian | Std | 0.01 | Mean | 0.0 | None | None | None | None | None | 105 | 308.67619047619047 |
+| Zedigh_2021 | Wang_2021 - Cable |office_corridor | 2.0 | 10 | cnn_110 | 0 | 65 | Gaussian | Std | 0.03 | Mean | 0.0 | None | None | None | None | None | 105 | 358.6857142857143 |
+| Zedigh_2021 | Wang_2021 - Cable |office_corridor | 2.0 | 10 | cnn_110 | 0 | 65 | Gaussian | Std | 0.04 | Mean | 0.0 | None | None | None | None | None | 105 | 315.85714285714283 |
+| Zedigh_2021 | Wang_2021 - Cable |office_corridor | 2.0 | 10 | cnn_110 | 0 | 65 | Gaussian | Std | 0.05 | Mean | 0.0 | None | None | None | None | None | 211 | 555.2227488151659 |
+| Zedigh_2021 | Wang_2021 - Cable |office_corridor | 2.0 | 10 | cnn_110 | 0 | 65 | Rayleigh | Mode | 0.0138 | None | None | None | None | None | None | None | 105 | 320.95238095238096 |
+| Zedigh_2021 | Wang_2021 - Cable |office_corridor | 2.0 | 10 | cnn_110 | 0 | 65 | Rayleigh | Mode | 0.0276 | None | None | None | None | None | None | None | 105 | 621.5238095238095 |
 
