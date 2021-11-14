@@ -1,6 +1,7 @@
 """Math- and statistical utils."""
 import numpy as np
-
+from scipy import stats
+from typing import Tuple
 
 def hamming_weight__single(value) -> int:
     """
@@ -22,7 +23,7 @@ def hamming_weight__vector(vector) -> np.array:
     return hamming_weight_function(vector)
 
 
-def cross_correlation__traces(trace_1, trace_2) -> np.array:
+def cross_correlation_matrix(trace_1, trace_2) -> np.array:
     """
 
     :param trace_1:
@@ -30,3 +31,13 @@ def cross_correlation__traces(trace_1, trace_2) -> np.array:
     :return: Cross correlation matrix.
     """
     return np.corrcoef(trace_1, trace_2)
+
+
+def pearson_correlation_coefficient(a, b) -> Tuple:
+    """
+
+    :param a: Dataset A.
+    :param b: Dataset B.
+    :return: Pearsons correlation coefficients, tuple.
+    """
+    return stats.pearsonr(a, b)

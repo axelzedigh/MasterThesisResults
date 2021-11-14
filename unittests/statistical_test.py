@@ -4,7 +4,8 @@ import unittest
 
 import numpy as np
 
-from utils.statistic_utils import hamming_weight__single, hamming_weight__vector, cross_correlation__traces
+from utils.statistic_utils import hamming_weight__single, hamming_weight__vector, cross_correlation_matrix, \
+    pearson_correlation_coefficient
 
 
 class StatisticalFuncitonsTestCase(unittest.TestCase):
@@ -30,13 +31,23 @@ class StatisticalFuncitonsTestCase(unittest.TestCase):
         self.assertEqual(arr.tolist(), hw.tolist())
 
     def test_cross_correlation__traces(self):
-        trace_1 = [1, 2, 3, 4]
-        trace_2 = [2, 4, 6, 8]
-        ccr = cross_correlation__traces(trace_1, trace_2)
+        a = [1, 2, 3, 4]
+        b = [2, 4, 6, 8]
+        ccr = cross_correlation_matrix(a, b)
         self.assertEqual(ccr.tolist(), [[1, 1], [1, 1]])
 
-        trace_1 = [-1, -2, -3, -4]
-        trace_2 = [2, 4, 6, 8]
-        ccr = cross_correlation__traces(trace_1, trace_2)
+        a = [-1, -2, -3, -4]
+        b = [2, 4, 6, 8]
+        ccr = cross_correlation_matrix(a, b)
         self.assertEqual(ccr.tolist(), [[1, -1], [-1, 1]])
 
+    def test_pearson_correlation_coefficient(self):
+        a = [1, 2, 3, 4]
+        b = [2, 4, 6, 8]
+        pc = pearson_correlation_coefficient(a, b)
+        self.assertEqual(pc, (1, 0))
+
+        a = [-1, -2, -3, -4]
+        b = [2, 4, 6, 8]
+        pc = pearson_correlation_coefficient(a, b)
+        self.assertEqual(pc, (-1, 0))
