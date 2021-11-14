@@ -367,7 +367,7 @@ def create_md__rank_test_tbl__meta_info(database="main.db", path="docs"):
 
     file = open(file_path, "a")
     file.write(f"Rows: {rank_test_rows[0][0]}\n\n")
-    file.write(f"Duplicate date_added rows: {duplicate_dates[0]}\n")
+    file.write(f"Duplicate date_added rows: {duplicate_dates}\n")
     file.write("\n")
     file.close()
 

@@ -287,6 +287,6 @@ def termination_point_test(
             break
 
     average_ranks = np.sum(ranks_array, axis=0) / average
-    # plt.plot(average_ranks)
-    # plt.show()
+    #plt.plot(average_ranks)
+    #plt.show()
     return term_point, int(average_ranks.mean())
