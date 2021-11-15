@@ -4,11 +4,12 @@ import unittest
 
 import numpy as np
 
-from utils.statistic_utils import hamming_weight__single, hamming_weight__vector, cross_correlation_matrix, \
-    pearson_correlation_coefficient
+from utils.statistic_utils import hamming_weight__single, \
+    hamming_weight__vector, cross_correlation_matrix, \
+    pearson_correlation_coefficient, mycorr, snr_calculator
 
 
-class StatisticalFuncitonsTestCase(unittest.TestCase):
+class StatisticalFunctionsTestCase(unittest.TestCase):
 
     def setUp(self) -> None:
         pass
@@ -51,3 +52,17 @@ class StatisticalFuncitonsTestCase(unittest.TestCase):
         b = [2, 4, 6, 8]
         pc = pearson_correlation_coefficient(a, b)
         self.assertEqual(pc, (-1, 0))
+
+    # def test_mycorr(self):
+    #     x = np.array([1, 4], [1, 3])
+    #     y = np.array((4, 6), (1, 4))
+    #     corr = mycorr(x, y)
+    #     print(corr)
+    #     self.assertEqual(corr.tolist(), [1, 0])
+
+    def test_snr_calculator(self):
+        x = [1, 2, 3, 4]
+        y = [2, 4, 6, 8]
+        snr = snr_calculator(x, y)
+        print(snr)
+        self.assertEqual(snr, 1)

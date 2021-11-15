@@ -2,6 +2,8 @@
 import numpy as np
 from scipy import stats
 from typing import Tuple
+from numpy.matlib import repmat
+
 
 def hamming_weight__single(value) -> int:
     """
@@ -38,6 +40,32 @@ def pearson_correlation_coefficient(a, b) -> Tuple:
 
     :param a: Dataset A.
     :param b: Dataset B.
-    :return: Pearsons correlation coefficients, tuple.
+    :return: Pearson's correlation coefficients, tuple.
     """
     return stats.pearsonr(a, b)
+
+
+def mycorr(x, y):
+    xr, xc = x.shape
+    yr, yc = y.shape
+    assert xr == yr, "Matrix row count mismatch"
+
+    x = x - x.mean(0)
+    y = y - y.mean(0)
+    corr = x.T.dot(y)
+    xsq = np.atleast_2d(np.sqrt(np.sum(x ** 2, 0)))
+    ysq = np.atleast_2d(np.sqrt(np.sum(y ** 2, 0)))
+    corr = np.divide(corr, repmat(xsq.T, 1, yc))
+    corr = np.divide(corr, repmat(ysq, xc, 1))
+    return corr
+
+
+def snr_calculator(x, y):
+    mean_tmp = []
+    var_tmp = []
+    for i in np.unique(y):
+        index = np.where(y == i)[0]
+        mean_tmp.append(np.mean(x[index, :], axis=0))
+        var_tmp.append(np.var(x[index, :], axis=0))
+    snr = np.var(mean_tmp, axis=0) / np.mean(var_tmp, axis=0)
+    return snr
