@@ -1,8 +1,12 @@
 """Math- and statistical utils."""
+import os
+
 import numpy as np
 from scipy import stats
-from typing import Tuple
+from typing import Tuple, Optional
 from numpy.matlib import repmat
+
+from utils.db_utils import get_test_trace_path, get_db_file_path
 
 
 def hamming_weight__single(value) -> int:
@@ -61,6 +65,12 @@ def mycorr(x, y):
 
 
 def snr_calculator(x, y):
+    """
+
+    :param x:
+    :param y:
+    :return:
+    """
     mean_tmp = []
     var_tmp = []
     for i in np.unique(y):
@@ -81,3 +91,54 @@ def root_mean_square(vector):
     vector_squared_sum = np.sum(vector_squared)
     rms = np.sqrt(vector_squared_sum / vector_squared.size)
     return rms
+
+
+def get_trace_set_metadata__depth(
+        database: str,
+        test_dataset_id: Optional[int],
+        training_dataset_id: Optional[int],
+        environment_id: int,
+        distance: int,
+        device: int,
+        additive_noise_method_id: Optional[int],
+        trace_process_id: int,
+) -> np.array:
+    """
+
+    :param trace_process_id:
+    :param database:
+    :param test_dataset_id:
+    :param training_dataset_id:
+    :param environment_id:
+    :param distance:
+    :param device:
+    :param additive_noise_method_id:
+    :return:
+    """
+    if type(test_dataset_id) == type(training_dataset_id):
+        print("Dataset must be either test dataset or training dataset")
+        return
+
+    # Get path load raw data if trace_process_id is in {1, 2}
+    if trace_process_id == 1:
+        pass
+    else:
+        trace_path = get_test_trace_path(
+            database,
+            test_dataset_id=test_dataset_id,
+            environment_id=environment_id,
+            distance=distance,
+            device=device
+        )
+
+        if trace_process_id == 2:
+            file_path = os.path.join(trace_path, "traces.npy")
+            traces = np.load(file_path)
+        elif trace_process_id == 3:
+            file_path = os.path.join(trace_path, "nor_traces_maxmin.npy")
+            traces = np.load(file_path)
+        else:
+            print("Something went wrong.")
+            return 1
+
+        return traces

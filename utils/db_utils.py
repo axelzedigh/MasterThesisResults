@@ -15,7 +15,8 @@ from database.queries import (
     QUERY_CREATE_TABLE_RANK_TEST,
     QUERY_CREATE_VIEW_FULL_RANK_TEST,
     QUERY_SELECT_ADDITIVE_NOISE_METHOD_ID, QUERY_SELECT_DENOISING_METHOD_ID,
-    QUERY_LIST_INITIALIZE_DB, QUERY_FULL_RANK_TEST_GROUPED_A,
+    QUERY_LIST_INITIALIZE_DB, QUERY_FULL_RANK_TEST_GROUPED_A, QUERY_CREATE_TABLE_TRACE_PROCESSES,
+    QUERY_CREATE_TABLE_TRACE_METADATA_DEPTH,
 )
 
 
@@ -63,6 +64,8 @@ def create_db_with_tables(database="main.db") -> None:
         cur.execute(QUERY_CREATE_TABLE_ADDITIVE_NOISE_METHODS)
         cur.execute(QUERY_CREATE_TABLE_DENOISING_METHODS)
         cur.execute(QUERY_CREATE_TABLE_RANK_TEST)
+        cur.execute(QUERY_CREATE_TABLE_TRACE_PROCESSES)
+        cur.execute(QUERY_CREATE_TABLE_TRACE_METADATA_DEPTH)
 
         # Create views
         con.execute(QUERY_CREATE_VIEW_FULL_RANK_TEST)
@@ -516,7 +519,7 @@ def get_training_model_file_path(
     return training_model_file_path
 
 
-def insert_data_and_date_to_db(
+def insert_data_and_date_to_db__rank_test(
         database: str,
         test_dataset_id: int,
         training_dataset_id: int,
@@ -585,7 +588,7 @@ def copy_rank_test_from_db1_to_db2(database_from, database_to):
     database_to = get_db_file_path(database_to)
     data_from = fetchall_query(database_from, "select * from rank_test;")
     for data in data_from:
-        insert_data_and_date_to_db(
+        insert_data_and_date_to_db__rank_test(
             database_to,
             data[1],
             data[2],
@@ -601,3 +604,64 @@ def copy_rank_test_from_db1_to_db2(database_from, database_to):
             data[12],
             data[13],
         )
+
+
+def insert_data_to_db__trace_metadata_depth(
+        database: str,
+        test_dataset_id: int,
+        training_dataset_id: int,
+        environment_id: int,
+        distance: float,
+        device: int,
+        additive_noise_method_id: int,
+        trace_process_id: int,
+        data_point_index: int,
+        max_val: float,
+        min_val: float,
+        mean_val: float,
+        rms_val: float,
+        std_val: float,
+        snr_val: float,
+):
+    """
+
+    :param database:
+    :param test_dataset_id:
+    :param training_dataset_id:
+    :param environment_id:
+    :param distance:
+    :param device:
+    :param additive_noise_method_id:
+    :param trace_process_id:
+    :param data_point_index:
+    :param max_val:
+    :param min_val:
+    :param mean_val:
+    :param rms_val:
+    :param std_val:
+    :param snr_val:
+    """
+    database = get_db_file_path(database)
+    con = lite.connect(database)
+
+    con.execute(
+        "INSERT INTO Trace_Metadata_Depth VALUES(NULL,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+        (
+            test_dataset_id,
+            training_dataset_id,
+            environment_id,
+            distance,
+            device,
+            additive_noise_method_id,
+            trace_process_id,
+            data_point_index,
+            max_val,
+            min_val,
+            mean_val,
+            rms_val,
+            std_val,
+            snr_val,
+        ),
+    )
+    con.commit()
+    con.close()

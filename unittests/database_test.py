@@ -21,6 +21,7 @@ from utils.db_utils import (
     get_test_trace_path, get_training_model_file_path, get_db_file_path,
     copy_rank_test_from_db1_to_db2,
 )
+from utils.statistic_utils import get_trace_set_metadata__depth
 
 
 class AddToDatabaseTestCase(unittest.TestCase):
@@ -30,40 +31,39 @@ class AddToDatabaseTestCase(unittest.TestCase):
         create_db_with_tables(self.database)
         initialize_table_data(self.database)
         self.con = lite.connect(get_db_file_path(self.database))
-        self.cur = self.con.cursor()
 
     def tearDown(self) -> None:
         self.con.close()
         os.remove(get_db_file_path(self.database))
 
     def test_fetch_environments(self):
-        fetchall = self.cur.execute("SELECT * FROM Environments;").fetchall()
+        fetchall = self.con.execute("SELECT * FROM Environments;").fetchall()
         environments = [(1, "office_corridor"), (2, "big_hall")]
         self.assertEqual(fetchall[0], environments[0])
         self.assertEqual(fetchall[1], environments[1])
 
     def test_fetch_test_datasets(self):
-        fetchall = self.cur.execute("SELECT * FROM Test_Datasets;").fetchall()
+        fetchall = self.con.execute("SELECT * FROM Test_Datasets;").fetchall()
         test_datasets = [(1, "Wang_2021"), (2, "Zedigh_2021")]
         self.assertIsNotNone(fetchall)
         self.assertEqual(fetchall[0], test_datasets[0])
         self.assertEqual(fetchall[1], test_datasets[1])
 
     def test_fetch_training_datasets(self):
-        fetchall = self.cur.execute(
+        fetchall = self.con.execute(
             "SELECT * FROM Training_Datasets;").fetchall()
         self.assertIsNotNone(fetchall)
         training_datasets = [(1, "Wang_2021-Cable")]
         self.assertEqual(fetchall[0], training_datasets[0])
 
     def test_fetch_training_models(self):
-        fetchall = self.cur.execute("SELECT * FROM Training_Models;").fetchall()
+        fetchall = self.con.execute("SELECT * FROM Training_Models;").fetchall()
         self.assertIsNotNone(fetchall)
         training_models = [(1, "cnn_110")]
         self.assertEqual(fetchall[0], training_models[0])
 
     def test_fetch_additive_noise_methods(self):
-        fetchall = self.cur.execute(
+        fetchall = self.con.execute(
             "SELECT * FROM Additive_Noise_Methods;").fetchall()
         self.assertIsNotNone(fetchall)
         additive_noise_methods = [
@@ -82,18 +82,18 @@ class AddToDatabaseTestCase(unittest.TestCase):
         self.assertEqual(fetchall[10], additive_noise_methods[10])
 
     def test_fetch_denoising_methods(self):
-        fetchall = self.cur.execute(
+        fetchall = self.con.execute(
             "SELECT * FROM Denoising_Methods;").fetchall()
         self.assertIsNotNone(fetchall)
         denoising_methods = [(1, "Moving Average Filter", "N", 3.0, None, None)]
         self.assertEqual(fetchall[0], denoising_methods[0])
 
     def test_insert_denoising_method(self):
-        self.cur.execute(
+        self.con.execute(
             "INSERT INTO Denoising_Methods VALUES(NULL,'CDAE',NULL,NULL, "
             "NULL, NULL) "
         )
-        fetchall = self.cur.execute(
+        fetchall = self.con.execute(
             "SELECT * FROM Denoising_Methods;").fetchall()
         self.assertEqual("CDAE", fetchall[-1][1])
 
@@ -110,7 +110,7 @@ class AddToDatabaseTestCase(unittest.TestCase):
                           additive_noise_method_id=None,
                           denoising_method_id=None, termination_point=101,
                           average_rank=102)
-        fetchall = self.cur.execute("SELECT * FROM Rank_Test;").fetchall()
+        fetchall = self.con.execute("SELECT * FROM Rank_Test;").fetchall()
         self.assertIsNotNone(fetchall)
         device = fetchall[0][5]
         self.assertEqual(8, device)
@@ -406,6 +406,12 @@ class AddToDatabaseTestCase(unittest.TestCase):
         self.assertIsNotNone(data)
         self.assertEqual(data[0][0], 2)
 
+    def test_trace_processes(self):
+        fetchall = self.con.execute("SELECT * FROM Trace_processes;").fetchall()
+        processes = [(1, "Raw"), (2, "Randomized order"), (3, "Normalized - MaxMin")]
+        self.assertEqual(fetchall[0], processes[0])
+        self.assertEqual(fetchall[1], processes[1])
+
 
 class TerminationPointTest(unittest.TestCase):
 
@@ -512,3 +518,61 @@ class TerminationPointTest(unittest.TestCase):
         data = fetchall_query(self.database, "select Count(*) from rank_test;")
         self.assertNotEqual(data, [])
         # self.assertEqual(data[0][0], 0)
+
+
+class TestTraceMetadata(unittest.TestCase):
+
+    def setUp(self) -> None:
+        self.database = "test_database.db"
+        create_db_with_tables(self.database)
+        initialize_table_data(self.database)
+        self.con = lite.connect(get_db_file_path(self.database))
+
+    def tearDown(self) -> None:
+        self.con.close()
+        os.remove(get_db_file_path(self.database))
+
+    def test_get_trace_set_metadata__depth(self):
+        test_dataset_id = 1
+        training_dataset_id = None
+        environment_id = 1
+        distance = 15
+        device = 6
+        additive_noise_method_id = None
+        trace_process_id = 2
+
+        trace = get_trace_set_metadata__depth(
+            database=self.database,
+            test_dataset_id=test_dataset_id,
+            training_dataset_id=training_dataset_id,
+            environment_id=environment_id,
+            distance=distance,
+            device=device,
+            additive_noise_method_id=additive_noise_method_id,
+            trace_process_id=trace_process_id
+        )
+        self.assertEqual(trace.size, 2000000)
+        self.assertEqual(trace.shape, (5000, 400))
+        self.assertNotEqual(trace.max(), 1)
+
+        test_dataset_id = 1
+        training_dataset_id = None
+        environment_id = 1
+        distance = 15
+        device = 7
+        additive_noise_method_id = None
+        trace_process_id = 3
+
+        trace = get_trace_set_metadata__depth(
+            database=self.database,
+            test_dataset_id=test_dataset_id,
+            training_dataset_id=training_dataset_id,
+            environment_id=environment_id,
+            distance=distance,
+            device=device,
+            additive_noise_method_id=additive_noise_method_id,
+            trace_process_id=trace_process_id
+        )
+        self.assertEqual(trace.size, 2000000)
+        self.assertEqual(trace.shape, (5000, 400))
+        self.assertEqual(trace.max(), 1)

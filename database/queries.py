@@ -202,6 +202,10 @@ QUERY_LIST_INITIALIZE_DB = [
     "3, NULL, NULL); ",
     "INSERT INTO denoising_methods VALUES (2,'Moving Average Filter', 'N', "
     "5, NULL, NULL); ",
+
+    "INSERT INTO trace_processes VALUES (1, 'Raw');",
+    "INSERT INTO trace_processes VALUES (2, 'Randomized order');",
+    "INSERT INTO trace_processes VALUES (3, 'Normalized - MaxMin');",
 ]
 
 QUERY_RANK_TEST_GROUPED_A = """
@@ -278,4 +282,31 @@ GROUP BY
     device,
     training_model,
     keybyte
+"""
+
+QUERY_CREATE_TABLE_TRACE_PROCESSES = """
+        CREATE TABLE Trace_Processes(
+        id INTEGER PRIMARY KEY,
+        trace_process TEXT
+        );
+        """
+
+QUERY_CREATE_TABLE_TRACE_METADATA_DEPTH = """
+    CREATE TABLE Trace_Metadata_Depth(
+    id INTEGER PRIMARY KEY,
+    test_dataset_id INT,
+    training_dataset_id INT,
+    environment_id INT NOT NULL,
+    distance FLOAT NOT NULL,
+    device INT NOT NULL,
+    additive_noise_method_id INT,
+    trace_process_id INT NOT NULL,
+    data_point_index INT NOT NULL,
+    max_val FLOAT NOT NULL,
+    min_val FLOAT NOT NULL,
+    mean_val FLOAT NOT NULL,
+    rms_val FLOAT NOT NULL,
+    std_val FLOAT NOT NULL,
+    snr_val FLOAT NOT NULL
+    );
 """
