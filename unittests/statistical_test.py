@@ -3,19 +3,27 @@
 import unittest
 
 import numpy as np
+import sqlite3 as lite
+import os
 
+from utils.db_utils import create_db_with_tables, initialize_table_data, get_db_file_path
 from utils.statistic_utils import hamming_weight__single, \
     hamming_weight__vector, cross_correlation_matrix, \
-    pearson_correlation_coefficient, mycorr, snr_calculator, root_mean_square
+    pearson_correlation_coefficient, mycorr, snr_calculator, root_mean_square, get_trace_metadata__depth__processed, \
+    get_trace_set__processed, get_trace_set_metadata__depth
 
 
 class StatisticalFunctionsTestCase(unittest.TestCase):
 
     def setUp(self) -> None:
-        pass
+        self.database = "test_database.db"
+        create_db_with_tables(self.database)
+        initialize_table_data(self.database)
+        self.con = lite.connect(get_db_file_path(self.database))
 
     def tearDown(self) -> None:
-        pass
+        self.con.close()
+        os.remove(get_db_file_path(self.database))
 
     def test_hamming_weight_func(self):
         val = 2
@@ -72,3 +80,29 @@ class StatisticalFunctionsTestCase(unittest.TestCase):
         rms = root_mean_square(x)
         stub = np.sqrt(30/4)
         self.assertEqual(stub, rms)
+
+    def test_get_trace_metadata__depth__processed(self):
+        x = np.array([[1, 2, 3, 4], [1, 2, 2, 4]])
+        metadata = get_trace_metadata__depth__processed(x)
+        self.assertEqual(metadata.tolist()[0][0], 1)
+
+    def test_get_trace_set_metadata__depth(self):
+        test_dataset_id = 1
+        training_dataset_id = None
+        environment_id = 1
+        distance = 15
+        device = 7
+        additive_noise_method_id = None
+        trace_process_id = 2
+        metadata = get_trace_set_metadata__depth(
+            database=self.database,
+            test_dataset_id=test_dataset_id,
+            training_dataset_id=training_dataset_id,
+            environment_id=environment_id,
+            distance=distance,
+            device=device,
+            additive_noise_method_id=additive_noise_method_id,
+            trace_process_id=trace_process_id,
+        )
+        self.assertIsNotNone(metadata)
+        self.assertEqual(metadata.shape, (400, 6))

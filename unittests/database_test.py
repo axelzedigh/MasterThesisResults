@@ -21,7 +21,7 @@ from utils.db_utils import (
     get_test_trace_path, get_training_model_file_path, get_db_file_path,
     copy_rank_test_from_db1_to_db2,
 )
-from utils.statistic_utils import get_trace_set_metadata__depth
+from utils.statistic_utils import get_trace_set_metadata__depth, get_trace_set__processed
 
 
 class AddToDatabaseTestCase(unittest.TestCase):
@@ -532,29 +532,7 @@ class TestTraceMetadata(unittest.TestCase):
         self.con.close()
         os.remove(get_db_file_path(self.database))
 
-    def test_get_trace_set_metadata__depth(self):
-        test_dataset_id = 1
-        training_dataset_id = None
-        environment_id = 1
-        distance = 15
-        device = 6
-        additive_noise_method_id = None
-        trace_process_id = 2
-
-        trace = get_trace_set_metadata__depth(
-            database=self.database,
-            test_dataset_id=test_dataset_id,
-            training_dataset_id=training_dataset_id,
-            environment_id=environment_id,
-            distance=distance,
-            device=device,
-            additive_noise_method_id=additive_noise_method_id,
-            trace_process_id=trace_process_id
-        )
-        self.assertEqual(trace.size, 2000000)
-        self.assertEqual(trace.shape, (5000, 400))
-        self.assertNotEqual(trace.max(), 1)
-
+    def test_get_trace_set__processed(self):
         test_dataset_id = 1
         training_dataset_id = None
         environment_id = 1
@@ -562,17 +540,33 @@ class TestTraceMetadata(unittest.TestCase):
         device = 7
         additive_noise_method_id = None
         trace_process_id = 3
-
-        trace = get_trace_set_metadata__depth(
+        trace_set = get_trace_set__processed(
             database=self.database,
             test_dataset_id=test_dataset_id,
-            training_dataset_id=training_dataset_id,
             environment_id=environment_id,
             distance=distance,
             device=device,
-            additive_noise_method_id=additive_noise_method_id,
-            trace_process_id=trace_process_id
+            trace_process_id=trace_process_id,
         )
-        self.assertEqual(trace.size, 2000000)
-        self.assertEqual(trace.shape, (5000, 400))
-        self.assertEqual(trace.max(), 1)
+        self.assertEqual(trace_set.size, 2000000)
+        self.assertEqual(trace_set.shape, (5000, 400))
+        self.assertEqual(trace_set.max(), 1)
+
+        test_dataset_id = 1
+        training_dataset_id = None
+        environment_id = 1
+        distance = 15
+        device = 7
+        additive_noise_method_id = None
+        trace_process_id = 2
+        trace_set = get_trace_set__processed(
+            database=self.database,
+            test_dataset_id=test_dataset_id,
+            environment_id=environment_id,
+            distance=distance,
+            device=device,
+            trace_process_id=trace_process_id,
+        )
+        self.assertEqual(trace_set.size, 2000000)
+        self.assertEqual(trace_set.shape, (5000, 400))
+        self.assertNotEqual(trace_set.max(), 1)
