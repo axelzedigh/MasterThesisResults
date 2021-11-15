@@ -6,7 +6,7 @@ import numpy as np
 
 from utils.statistic_utils import hamming_weight__single, \
     hamming_weight__vector, cross_correlation_matrix, \
-    pearson_correlation_coefficient, mycorr, snr_calculator
+    pearson_correlation_coefficient, mycorr, snr_calculator, root_mean_square
 
 
 class StatisticalFunctionsTestCase(unittest.TestCase):
@@ -66,3 +66,9 @@ class StatisticalFunctionsTestCase(unittest.TestCase):
         snr = snr_calculator(x, y)
         print(snr)
         self.assertEqual(snr, 1)
+
+    def test_root_mean_square(self):
+        x = np.array([1, 2, 3, 4])
+        rms = root_mean_square(x)
+        stub = np.sqrt(30/4)
+        self.assertEqual(stub, rms)

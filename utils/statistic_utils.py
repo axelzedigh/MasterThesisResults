@@ -69,3 +69,15 @@ def snr_calculator(x, y):
         var_tmp.append(np.var(x[index, :], axis=0))
     snr = np.var(mean_tmp, axis=0) / np.mean(var_tmp, axis=0)
     return snr
+
+
+def root_mean_square(vector):
+    """
+
+    :param vector: vector with values to calculate.
+    :return: RMS.
+    """
+    vector_squared = np.array(vector) ** 2
+    vector_squared_sum = np.sum(vector_squared)
+    rms = np.sqrt(vector_squared_sum / vector_squared.size)
+    return rms
