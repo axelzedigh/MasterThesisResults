@@ -1,12 +1,9 @@
 """Math- and statistical utils."""
-import os
 
 import numpy as np
 from scipy import stats
-from typing import Tuple, Optional, List
+from typing import Tuple
 from numpy.matlib import repmat
-
-from utils.db_utils import get_test_trace_path, get_db_file_path
 
 
 def hamming_weight__single(value) -> int:
@@ -81,6 +78,16 @@ def snr_calculator(x, y):
     return snr
 
 
+def signal_to_noise_ratio__sqrt_mean_std(mean, std):
+    """
+
+    :param mean: µ
+    :param std: ∂
+    :return:
+    """
+    return (mean ** 2) / (std ** 2)
+
+
 def root_mean_square(vector):
     """
 
@@ -93,101 +100,3 @@ def root_mean_square(vector):
     return rms
 
 
-def get_trace_set_metadata__depth(
-        database: str,
-        test_dataset_id: Optional[int],
-        training_dataset_id: Optional[int],
-        environment_id: int,
-        distance: int,
-        device: int,
-        additive_noise_method_id: Optional[int],
-        trace_process_id: int,
-) -> np.array:
-    """
-
-    :param trace_process_id:
-    :param database:
-    :param test_dataset_id:
-    :param training_dataset_id:
-    :param environment_id:
-    :param distance:
-    :param device:
-    :param additive_noise_method_id:
-    :return:
-    """
-    if type(test_dataset_id) == type(training_dataset_id):
-        print("Dataset must be either test dataset or training dataset")
-        return
-
-    # Get path load raw data if trace_process_id is in {1, 2}
-    if trace_process_id == 1:
-        pass
-    else:
-        trace = get_trace_set__processed(
-            database,
-            test_dataset_id,
-            environment_id,
-            distance,
-            device,
-            trace_process_id,
-        )
-        meta_data = get_trace_metadata__depth__processed(trace)
-        return meta_data
-
-
-def get_trace_set__processed(
-        database,
-        test_dataset_id,
-        environment_id,
-        distance,
-        device,
-        trace_process_id,
-) -> np.array:
-    """
-
-    :param database:
-    :param test_dataset_id:
-    :param environment_id:
-    :param distance:
-    :param device:
-    :param trace_process_id:
-    :return:
-    """
-    trace_path = get_test_trace_path(
-        database,
-        test_dataset_id=test_dataset_id,
-        environment_id=environment_id,
-        distance=distance,
-        device=device
-    )
-
-    if trace_process_id == 2:
-        file_path = os.path.join(trace_path, "traces.npy")
-        traces = np.load(file_path)
-    elif trace_process_id == 3:
-        file_path = os.path.join(trace_path, "nor_traces_maxmin.npy")
-        traces = np.load(file_path)
-    else:
-        print("Something went wrong.")
-        return 1
-
-    return traces
-
-
-def get_trace_metadata__depth__processed(trace_set):
-    """
-
-    :param trace_set:
-    :return:
-    """
-    meta_data = []
-    for index in range(trace_set.shape[1]):
-        max_value = np.max(trace_set[:, index], axis=0)
-        min_value = np.min(trace_set[:, index], axis=0)
-        mean_value = np.mean(trace_set[:, index], axis=0)
-        rms_value = root_mean_square(trace_set[:, index])
-        std_value = np.std(trace_set[:, index], axis=0)
-        snr_value = (mean_value ** 2) / (std_value ** 2)
-        meta_data.append([max_value, min_value, mean_value, rms_value, std_value, snr_value])
-
-    return np.array(meta_data)

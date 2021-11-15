@@ -9,8 +9,9 @@ import os
 from utils.db_utils import create_db_with_tables, initialize_table_data, get_db_file_path
 from utils.statistic_utils import hamming_weight__single, \
     hamming_weight__vector, cross_correlation_matrix, \
-    pearson_correlation_coefficient, mycorr, snr_calculator, root_mean_square, get_trace_metadata__depth__processed, \
-    get_trace_set__processed, get_trace_set_metadata__depth
+    pearson_correlation_coefficient, mycorr, snr_calculator, root_mean_square
+from utils.trace_utils import get_trace_set_metadata__depth, get_trace_set__processed, \
+    get_trace_metadata__depth__processed
 
 
 class StatisticalFunctionsTestCase(unittest.TestCase):
@@ -94,6 +95,30 @@ class StatisticalFunctionsTestCase(unittest.TestCase):
         device = 7
         additive_noise_method_id = None
         trace_process_id = 2
+        metadata = get_trace_set_metadata__depth(
+            database=self.database,
+            test_dataset_id=test_dataset_id,
+            training_dataset_id=training_dataset_id,
+            environment_id=environment_id,
+            distance=distance,
+            device=device,
+            additive_noise_method_id=additive_noise_method_id,
+            trace_process_id=trace_process_id,
+        )
+        print(metadata[:, 0])
+        max_val = int(np.max(metadata[:, 0]))
+        print(max_val)
+        self.assertNotEqual(1, max_val)
+        self.assertIsNotNone(metadata)
+        self.assertEqual(metadata.shape, (400, 6))
+
+        test_dataset_id = 1
+        training_dataset_id = None
+        environment_id = 1
+        distance = 15
+        device = 7
+        additive_noise_method_id = None
+        trace_process_id = 3
         metadata = get_trace_set_metadata__depth(
             database=self.database,
             test_dataset_id=test_dataset_id,

@@ -474,6 +474,47 @@ def get_test_trace_path(
     return test_traces_path
 
 
+def get_test_trace_path__raw_data(
+        database,
+        test_dataset_id,
+        environment_id,
+        distance,
+        device
+) -> str:
+    """
+
+    :param database:
+    :param test_dataset_id:
+    :param environment_id:
+    :param distance:
+    :param device:
+    :return:
+    """
+    database = get_db_file_path(database)
+    project_dir = os.getenv("MASTER_THESIS_RESULTS_RAW_DATA")
+    path = "datasets/test_traces"
+    test_dataset_query = f"""
+    select test_dataset from test_datasets
+    where id = {test_dataset_id};"""
+    test_dataset = fetchall_query(database, test_dataset_query)[0][0]
+
+    environment_query = f"""
+    select environment from environments
+    where id = {environment_id};"""
+    environment = fetchall_query(database, environment_query)[0][0]
+
+    test_traces_path = os.path.join(
+        project_dir,
+        path,
+        test_dataset,
+        environment,
+        f"{distance}m",
+        f"device_{device}",
+    )
+
+    return test_traces_path
+
+
 def get_training_model_file_path(
         database,
         training_model_id,
@@ -554,9 +595,7 @@ def insert_data_and_date_to_db__rank_test(
     """
     database = get_db_file_path(database)
     con = lite.connect(database)
-    cur = con.cursor()
-
-    cur.execute(
+    con.execute(
         "INSERT INTO Rank_Test VALUES(NULL,?,?,?,?,?,?,?,?,?,?,?,?,?)",
         (
             test_dataset_id,
@@ -606,14 +645,14 @@ def copy_rank_test_from_db1_to_db2(database_from, database_to):
         )
 
 
-def insert_data_to_db__trace_metadata_depth(
+def insert_data_to_db__trace_metadata__depth(
         database: str,
-        test_dataset_id: int,
-        training_dataset_id: int,
+        test_dataset_id: Optional[int],
+        training_dataset_id: Optional[int],
         environment_id: int,
         distance: float,
         device: int,
-        additive_noise_method_id: int,
+        additive_noise_method_id: Optional[int],
         trace_process_id: int,
         data_point_index: int,
         max_val: float,
@@ -624,6 +663,7 @@ def insert_data_to_db__trace_metadata_depth(
         snr_val: float,
 ):
     """
+    Important: either test_dataset_id or training_dataset id is passed.
 
     :param database:
     :param test_dataset_id:

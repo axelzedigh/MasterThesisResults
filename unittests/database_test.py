@@ -19,9 +19,10 @@ from utils.db_utils import (
     get_denoising_method_id, insert_legacy_rank_test_numpy_file_to_db,
     create_md__option_tables, get_db_absolute_path,
     get_test_trace_path, get_training_model_file_path, get_db_file_path,
-    copy_rank_test_from_db1_to_db2,
+    copy_rank_test_from_db1_to_db2, insert_data_to_db__trace_metadata__depth,
 )
-from utils.statistic_utils import get_trace_set_metadata__depth, get_trace_set__processed
+from utils.trace_utils import get_trace_set_metadata__depth, get_trace_set__processed, \
+    insert_all_trace_metadata_depth_to_db
 
 
 class AddToDatabaseTestCase(unittest.TestCase):
@@ -570,3 +571,12 @@ class TestTraceMetadata(unittest.TestCase):
         self.assertEqual(trace_set.size, 2000000)
         self.assertEqual(trace_set.shape, (5000, 400))
         self.assertNotEqual(trace_set.max(), 1)
+
+    def test_insert_all_trace_metadata_depth_to_db(self):
+        insert_all_trace_metadata_depth_to_db(self.database)
+        query = """
+        Select * from Trace_Metadata_Depth;
+        """
+        all_metadata = fetchall_query(self.database, query)
+        print(all_metadata)
+        self.assertEqual(len(all_metadata), 10400)
