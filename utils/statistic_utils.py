@@ -98,5 +98,3 @@ def root_mean_square(vector):
     vector_squared_sum = np.sum(vector_squared)
     rms = np.sqrt(vector_squared_sum / vector_squared.size)
     return rms
-
-
