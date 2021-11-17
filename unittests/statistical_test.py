@@ -9,9 +9,9 @@ import os
 from utils.db_utils import create_db_with_tables, initialize_table_data, get_db_file_path
 from utils.statistic_utils import hamming_weight__single, \
     hamming_weight__vector, cross_correlation_matrix, \
-    pearson_correlation_coefficient, mycorr, snr_calculator, root_mean_square
+    pearson_correlation_coefficient, correlation_matrix, snr_calculator, root_mean_square
 from utils.trace_utils import get_trace_set_metadata__depth, get_training_trace_set__processed, \
-    get_trace_metadata__depth__processed
+    get_trace_set_metadata__depth__processed
 
 
 class StatisticalFunctionsTestCase(unittest.TestCase):
@@ -84,7 +84,7 @@ class StatisticalFunctionsTestCase(unittest.TestCase):
 
     def test_get_trace_metadata__depth__processed(self):
         x = np.array([[1, 2, 3, 4], [1, 2, 2, 4]])
-        metadata = get_trace_metadata__depth__processed(x)
+        metadata = get_trace_set_metadata__depth__processed(x)
         self.assertEqual(metadata.tolist()[0][0], 1)
 
     def test_get_trace_set_metadata__depth(self):

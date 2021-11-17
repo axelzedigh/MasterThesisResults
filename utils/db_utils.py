@@ -15,7 +15,8 @@ from database.queries import (
     QUERY_CREATE_TABLE_RANK_TEST,
     QUERY_CREATE_VIEW_FULL_RANK_TEST,
     QUERY_SELECT_ADDITIVE_NOISE_METHOD_ID, QUERY_SELECT_DENOISING_METHOD_ID,
-    QUERY_LIST_INITIALIZE_DB, QUERY_FULL_RANK_TEST_GROUPED_A, QUERY_CREATE_TABLE_TRACE_PROCESSES,
+    QUERY_LIST_INITIALIZE_DB, QUERY_FULL_RANK_TEST_GROUPED_A,
+    QUERY_CREATE_TABLE_TRACE_PROCESSES,
     QUERY_CREATE_TABLE_TRACE_METADATA_DEPTH,
 )
 
@@ -360,7 +361,8 @@ def create_md__rank_test_tbl__meta_info(database="main.db", path="docs"):
         database, "SELECT Count(*) from Rank_Test;"
     )
     duplicate_dates = fetchall_query(
-        database, "SELECT date_added, COUNT(*) c FROM Rank_Test GROUP BY date_added HAVING c > 1;"
+        database,
+        "SELECT date_added, COUNT(*) c FROM Rank_Test GROUP BY date_added HAVING c > 1;"
     )
 
     file = open(file_path, "w")
@@ -492,6 +494,11 @@ def get_test_trace_path__raw_data(
     """
     database = get_db_file_path(database)
     project_dir = os.getenv("MASTER_THESIS_RESULTS_RAW_DATA")
+    if project_dir is None:
+        raise """
+        Either your computer don't have raw data or you forgot to set the 
+        env-variable MASTER_THESIS_RESULTS_RAW_DATA to the raw data directory.
+        """
     path = "datasets/test_traces"
     test_dataset_query = f"""
     select test_dataset from test_datasets
@@ -720,7 +727,13 @@ def insert_data_to_db__trace_metadata__depth(
     con = lite.connect(database)
 
     con.execute(
-        "INSERT INTO Trace_Metadata_Depth VALUES(NULL,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+        """
+        INSERT INTO 
+            Trace_Metadata_Depth 
+        VALUES(
+            NULL,?,?,?,?,?,?,?,?,?,?,?,?,?,?
+        );
+        """,
         (
             test_dataset_id,
             training_dataset_id,
@@ -736,6 +749,71 @@ def insert_data_to_db__trace_metadata__depth(
             rms_val,
             std_val,
             snr_val,
+        ),
+    )
+    con.commit()
+    con.close()
+
+
+def insert_data_to_db__trace_metadata__width(
+        database: str,
+        test_dataset_id: Optional[int],
+        training_dataset_id: Optional[int],
+        environment_id: Optional[int],
+        distance: Optional[float],
+        device: Optional[int],
+        additive_noise_method_id: Optional[int],
+        trace_process_id: int,
+        trace_index: int,
+        max_val: float,
+        min_val: float,
+        mean_val: float,
+        rms_val: float,
+        std_val: float,
+):
+    """
+    Important: either test_dataset_id or training_dataset id is passed.
+
+    :param database:
+    :param test_dataset_id:
+    :param training_dataset_id:
+    :param environment_id:
+    :param distance:
+    :param device:
+    :param additive_noise_method_id:
+    :param trace_process_id:
+    :param trace_index:
+    :param max_val:
+    :param min_val:
+    :param mean_val:
+    :param rms_val:
+    :param std_val:
+    """
+    database = get_db_file_path(database)
+    con = lite.connect(database)
+
+    con.execute(
+        """
+        INSERT INTO 
+            Trace_Metadata_Width
+        VALUES(
+            NULL,?,?,?,?,?,?,?,?,?,?,?,?,?
+        );
+        """,
+        (
+            test_dataset_id,
+            training_dataset_id,
+            environment_id,
+            distance,
+            device,
+            additive_noise_method_id,
+            trace_process_id,
+            trace_index,
+            max_val,
+            min_val,
+            mean_val,
+            rms_val,
+            std_val,
         ),
     )
     con.commit()

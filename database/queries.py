@@ -206,6 +206,7 @@ QUERY_LIST_INITIALIZE_DB = [
     "INSERT INTO trace_processes VALUES (1, 'Raw');",
     "INSERT INTO trace_processes VALUES (2, 'Randomized order');",
     "INSERT INTO trace_processes VALUES (3, 'Normalized - MaxMin');",
+    "INSERT INTO trace_processes VALUES (4, 'Normalized - MaxMin S-Box Range');"
 ]
 
 QUERY_RANK_TEST_GROUPED_A = """
@@ -309,4 +310,23 @@ QUERY_CREATE_TABLE_TRACE_METADATA_DEPTH = """
     std_val FLOAT NOT NULL,
     snr_val FLOAT NOT NULL
     );
+"""
+
+QUERY_CREATE_TABLE_TRACE_METADATA_WIDTH = """
+ CREATE TABLE Trace_Metadata_Width(
+    id INTEGER PRIMARY KEY,
+    test_dataset_id INT,
+    training_dataset_id INT,
+    environment_id INT,
+    distance FLOAT,
+    device INT,
+    additive_noise_method_id INT,
+    trace_process_id INT NOT NULL,
+    trace_index INT NOT NULL,
+    max_val FLOAT NOT NULL,
+    min_val FLOAT NOT NULL,
+    mean_val FLOAT NOT NULL,
+    rms_val FLOAT NOT NULL,
+    std_val FLOAT NOT NULL,
+ );
 """

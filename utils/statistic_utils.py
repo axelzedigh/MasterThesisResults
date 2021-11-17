@@ -6,7 +6,7 @@ from typing import Tuple
 from numpy.matlib import repmat
 
 
-def hamming_weight__single(value) -> int:
+def hamming_weight__single(value: int) -> int:
     """
 
     :param value: The value to count the hamming-weight.
@@ -46,7 +46,7 @@ def pearson_correlation_coefficient(a, b) -> Tuple:
     return stats.pearsonr(a, b)
 
 
-def mycorr(x, y):
+def correlation_matrix(x, y):
     xr, xc = x.shape
     yr, yc = y.shape
     assert xr == yr, "Matrix row count mismatch"
@@ -61,19 +61,19 @@ def mycorr(x, y):
     return corr
 
 
-def snr_calculator(x, y):
+def snr_calculator(trace_set, label_set):
     """
 
-    :param x:
-    :param y:
+    :param trace_set:
+    :param label_set:
     :return:
     """
     mean_tmp = []
     var_tmp = []
-    for i in np.unique(y):
-        index = np.where(y == i)[0]
-        mean_tmp.append(np.mean(x[index, :], axis=0))
-        var_tmp.append(np.var(x[index, :], axis=0))
+    for i in np.unique(label_set):
+        index = np.where(label_set == i)[0]
+        mean_tmp.append(np.mean(trace_set[index, :], axis=0))
+        var_tmp.append(np.var(trace_set[index, :], axis=0))
     snr = np.var(mean_tmp, axis=0) / np.mean(var_tmp, axis=0)
     return snr
 
@@ -98,3 +98,15 @@ def root_mean_square(vector):
     vector_squared_sum = np.sum(vector_squared)
     rms = np.sqrt(vector_squared_sum / vector_squared.size)
     return rms
+
+
+def signal_to_noise_ratio__amplitude(
+        rms_signal: float, rms_noise: float
+) -> float:
+    """
+
+    :param rms_signal: The RMS amplitude of the signal.
+    :param rms_noise: The RMS amplitude of the noise.
+    :return: The SNR metric value.
+    """
+    return (rms_signal ** 2) / (rms_noise ** 2)
