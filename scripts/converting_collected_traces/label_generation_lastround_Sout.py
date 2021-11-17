@@ -1,4 +1,4 @@
-"""Function for preparing the collected test traces."""
+"""Function for normalizing the collected test traces."""
 
 import os
 import random
@@ -45,19 +45,16 @@ nor_trace_meanstd_save = os.path.join(save_folder, 'nor_traces_meanstd.npy')
 label_save = os.path.join(save_folder, 'label_lastround_Sout_0.npy')
 
 # ===========================================================
-# load_folder = save_folder + '/original_data/'
-data_dir = os.getenv("MASTERTHESISTOP")
-load_folder = "datasets/last_round_aes/Zedigh_2021/office_corridor/2.5m/device_9"
+data_dir = os.getenv("MASTER_THESIS_RESULTS_RAW_DATA")
+load_folder = "datasets/test_traces/Zedigh_2021/office_corridor/2m/device_9"
 load_folder = os.path.join(data_dir, load_folder)
 mis_index_path = os.path.join(load_folder, 'mis_index.npy')
 plaintext_path = os.path.join(load_folder, 'pt_.txt')
 key_path = os.path.join(load_folder, 'key_.txt')
 trace_path = os.path.join(load_folder, 'all__')
 
-# total_number = 5250
-total_number = 3110
-# select_number = 5000
-select_number = 3000
+total_number = 3000
+select_number = 2900
 averaging = 1
 
 total_index = [i for i in range(total_number)]
@@ -65,50 +62,26 @@ missing_index = np.load(mis_index_path)
 real_index = [x for x in total_index if x not in missing_index]
 
 select = random.sample(range(len(real_index)), select_number)
+#select = [x for x in range(select_number)]
 
 # read trace data-----------------------------------------------
 Trace = []
 nor_trace_maxmin = []
 nor_trace_meanstd = []
 
-'''
-#path = trace_path + str(real_index[117095]) + '.npy'
-#np.load(path)
-
-
-rere = []
-for i in tqdm(real_index):
-    path = trace_path + str(i) + '.npy'
-    time.sleep(0.0001)
-    all_trace = np.load(path)
-    if all_trace.shape[0]<100:
-        rere.append(i)
-
-
-        print(len(rere))
-
-
-np.save('rere.npy',rere)
-
-'''
-
 print(list(missing_index))
-
 # print(real_index[3962])
 
 for i in tqdm(real_index[:], ncols=60):
     path = trace_path + str(i) + '.npy'
     all_trace = np.load(path)
-
     trace_select = random.sample(range(0, len(all_trace)), averaging)
-
     one_trace = all_trace[trace_select].mean(axis=0)
-
     Trace.append(one_trace)
 
     # for max-min normalization
-    MAX = np.max(one_trace)
-    MIN = np.min(one_trace)
+    MAX = np.max(one_trace[204:314])
+    MIN = np.min(one_trace[204:314])
 
     nor_one_trace_maxmin = (one_trace - MIN) / (MAX - MIN)
     nor_trace_maxmin.append(nor_one_trace_maxmin)
@@ -136,18 +109,14 @@ np.save(nor_trace_maxmin_save, nor_trace_maxmin)  # for machine learning
 # np.save(nor_trace_meanstd_save, nor_trace_meanstd)  # for machine learning
 
 # read plaintext data-----------------------------------------------
-
 plaintext = []
-
 with open(plaintext_path, "r") as f:
     for line in f.readlines():
         line = line.strip('\n')  # delete /n
         plaintext.append(line)
 
 for i in range(len(plaintext)):
-
     temp = []
-
     for j in range(16):
         byte = plaintext[i][2 * j: 2 * j + 2]
         dec = int(byte, 16)
@@ -165,8 +134,6 @@ print('pt shape:', plaintext.shape)
 np.save(pt_save, plaintext)  # for chipwhisperer
 
 # read key data-----------------------------------------------
-
-
 with open(key_path, 'r') as f:
     data = f.read()
 
@@ -195,9 +162,7 @@ np.save(key_save, key)  # for chipwhisperer
 np.save(keylist_save, key_list)  # for chipwhisperer
 
 # get ciphertext --------------------------------------------------------
-
 ciphertexts = []
-
 str_key = ''
 for i in range(len(key)):
     str_key += format(key[i], '#04x').split('x')[-1]
@@ -205,24 +170,18 @@ for i in range(len(key)):
 print('str_key:', str_key)
 
 for pt in tqdm(plaintext, ncols=60):
-
     str_pt = ''
-
     for i in range(len(pt)):
         str_pt += format(pt[i], '#04x').split('x')[-1]
 
     KEY = str_key
     DATA = str_pt
-
     aes = ENCRYPT.AES(mode='ecb', input_type='hex')
     ct = aes.encryption(DATA, KEY)
-
     ciphertexts.append(ct)
 
 for i in range(len(ciphertexts)):
-
     temp = []
-
     for j in range(16):
         byte = ciphertexts[i][2 * j: 2 * j + 2]
         dec = int(byte, 16)
@@ -231,12 +190,9 @@ for i in range(len(ciphertexts)):
     ciphertexts[i] = temp
 
 ciphertexts = np.array(ciphertexts)
-
 np.save(ct_save, ciphertexts)
 
 # get round key and get label of sbox out in the LAST round----------------------------------------------------
-
-
 roundkey = produce_round_key.keyScheduleRounds(key, 0, 10)
 roundkey = np.array(roundkey)
 print('10th roundkey:', roundkey)
