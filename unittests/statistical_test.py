@@ -10,7 +10,7 @@ from utils.db_utils import create_db_with_tables, initialize_table_data, get_db_
 from utils.statistic_utils import hamming_weight__single, \
     hamming_weight__vector, cross_correlation_matrix, \
     pearson_correlation_coefficient, mycorr, snr_calculator, root_mean_square
-from utils.trace_utils import get_trace_set_metadata__depth, get_trace_set__processed, \
+from utils.trace_utils import get_trace_set_metadata__depth, get_training_trace_set__processed, \
     get_trace_metadata__depth__processed
 
 

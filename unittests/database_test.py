@@ -21,7 +21,7 @@ from utils.db_utils import (
     get_test_trace_path, get_training_model_file_path, get_db_file_path,
     copy_rank_test_from_db1_to_db2, insert_data_to_db__trace_metadata__depth,
 )
-from utils.trace_utils import get_trace_set_metadata__depth, get_trace_set__processed, \
+from utils.trace_utils import get_trace_set_metadata__depth, get_training_trace_set__processed, \
     insert_all_trace_metadata_depth_to_db
 
 
@@ -541,7 +541,7 @@ class TestTraceMetadata(unittest.TestCase):
         device = 7
         additive_noise_method_id = None
         trace_process_id = 3
-        trace_set = get_trace_set__processed(
+        trace_set = get_training_trace_set__processed(
             database=self.database,
             test_dataset_id=test_dataset_id,
             environment_id=environment_id,
@@ -560,7 +560,7 @@ class TestTraceMetadata(unittest.TestCase):
         device = 7
         additive_noise_method_id = None
         trace_process_id = 2
-        trace_set = get_trace_set__processed(
+        trace_set = get_training_trace_set__processed(
             database=self.database,
             test_dataset_id=test_dataset_id,
             environment_id=environment_id,
@@ -578,5 +578,4 @@ class TestTraceMetadata(unittest.TestCase):
         Select * from Trace_Metadata_Depth;
         """
         all_metadata = fetchall_query(self.database, query)
-        print(all_metadata)
-        self.assertEqual(len(all_metadata), 10400)
+        self.assertEqual(len(all_metadata), 14400)

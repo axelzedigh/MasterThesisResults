@@ -515,6 +515,28 @@ def get_test_trace_path__raw_data(
     return test_traces_path
 
 
+def get_training_trace_path__raw_data(
+        database,
+        device
+) -> str:
+    """
+
+    :param database:
+    :param device:
+    :return:
+    """
+    database = get_db_file_path(database)
+    project_dir = os.getenv("MASTER_THESIS_RESULTS_RAW_DATA")
+    path = f"datasets/training_traces/Wang_2021/Cable/original_data/20k_d{device}/100avg"
+
+    training_traces_path = os.path.join(
+        project_dir,
+        path,
+    )
+
+    return training_traces_path
+
+
 def get_training_model_file_path(
         database,
         training_model_id,
@@ -649,8 +671,8 @@ def insert_data_to_db__trace_metadata__depth(
         database: str,
         test_dataset_id: Optional[int],
         training_dataset_id: Optional[int],
-        environment_id: int,
-        distance: float,
+        environment_id: Optional[int],
+        distance: Optional[float],
         device: int,
         additive_noise_method_id: Optional[int],
         trace_process_id: int,
