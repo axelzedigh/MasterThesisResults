@@ -578,4 +578,4 @@ class TestTraceMetadata(unittest.TestCase):
         Select * from Trace_Metadata_Depth;
         """
         all_metadata = fetchall_query(self.database, query)
-        self.assertEqual(len(all_metadata), 14400)
+        self.assertEqual(len(all_metadata), 10800)

@@ -298,7 +298,7 @@ QUERY_CREATE_TABLE_TRACE_METADATA_DEPTH = """
     training_dataset_id INT,
     environment_id INT,
     distance FLOAT,
-    device INT NOT NULL,
+    device INT,
     additive_noise_method_id INT,
     trace_process_id INT NOT NULL,
     data_point_index INT NOT NULL,
