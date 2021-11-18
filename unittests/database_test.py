@@ -22,7 +22,7 @@ from utils.db_utils import (
     copy_rank_test_from_db1_to_db2, insert_data_to_db__trace_metadata__depth,
 )
 from utils.trace_utils import get_trace_set_metadata__depth, \
-    get_training_trace_set__processed, \
+    get_trace_set__processed, \
     insert_all_trace_metadata_depth_to_db, get_trace_set_metadata__width
 
 
@@ -542,7 +542,7 @@ class TestTraceMetadata(unittest.TestCase):
         device = 7
         additive_noise_method_id = None
         trace_process_id = 3
-        trace_set = get_training_trace_set__processed(
+        trace_set = get_trace_set__processed(
             database=self.database,
             test_dataset_id=test_dataset_id,
             environment_id=environment_id,
@@ -561,7 +561,7 @@ class TestTraceMetadata(unittest.TestCase):
         device = 7
         additive_noise_method_id = None
         trace_process_id = 2
-        trace_set = get_training_trace_set__processed(
+        trace_set = get_trace_set__processed(
             database=self.database,
             test_dataset_id=test_dataset_id,
             environment_id=environment_id,
@@ -582,11 +582,11 @@ class TestTraceMetadata(unittest.TestCase):
         self.assertEqual(len(all_metadata), 10800)
 
     def test_get_trace_set_metadata__width(self):
-        test_dataset_id = 1
-        training_dataset_id = None
+        test_dataset_id = None
+        training_dataset_id = 1
         environment_id = 1
         distance = 15
-        device = 7
+        device = 1
         additive_noise_method_id = None
         trace_process_id = 3
         metadata = get_trace_set_metadata__width(
@@ -600,4 +600,4 @@ class TestTraceMetadata(unittest.TestCase):
             trace_process_id=trace_process_id,
         )
         print(metadata)
-        self.assertEqual(5000, metadata.shape[0])
+        self.assertEqual(573637, metadata.shape[0])

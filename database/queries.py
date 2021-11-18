@@ -327,6 +327,6 @@ QUERY_CREATE_TABLE_TRACE_METADATA_WIDTH = """
     min_val FLOAT NOT NULL,
     mean_val FLOAT NOT NULL,
     rms_val FLOAT NOT NULL,
-    std_val FLOAT NOT NULL,
+    std_val FLOAT NOT NULL
  );
 """
