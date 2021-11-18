@@ -582,13 +582,13 @@ class TestTraceMetadata(unittest.TestCase):
         self.assertEqual(len(all_metadata), 10800)
 
     def test_get_trace_set_metadata__width(self):
-        test_dataset_id = None
-        training_dataset_id = 1
+        test_dataset_id = 1
+        training_dataset_id = None
         environment_id = 1
         distance = 15
-        device = 1
+        device = 6
         additive_noise_method_id = None
-        trace_process_id = 3
+        trace_process_id = 1
         metadata = get_trace_set_metadata__width(
             database=self.database,
             test_dataset_id=test_dataset_id,

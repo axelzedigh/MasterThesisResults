@@ -64,13 +64,12 @@ real_index = [x for x in total_index if x not in missing_index]
 select = random.sample(range(len(real_index)), select_number)
 #select = [x for x in range(select_number)]
 
-# read trace data-----------------------------------------------
+# Read trace data
 Trace = []
 nor_trace_maxmin = []
 nor_trace_meanstd = []
 
 print(list(missing_index))
-# print(real_index[3962])
 
 for i in tqdm(real_index[:], ncols=60):
     path = trace_path + str(i) + '.npy'
@@ -79,7 +78,9 @@ for i in tqdm(real_index[:], ncols=60):
     one_trace = all_trace[trace_select].mean(axis=0)
     Trace.append(one_trace)
 
-    # for max-min normalization
+    # Max-min normalization
+    # MAX = np.max(one_trace)
+    # MIN = np.min(one_trace)
     MAX = np.max(one_trace[204:314])
     MIN = np.min(one_trace[204:314])
 

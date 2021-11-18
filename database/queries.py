@@ -1,33 +1,33 @@
 QUERY_CREATE_TABLE_ENVIRONMENTS = """
-        CREATE TABLE Environments(
+        CREATE TABLE IF NOT EXISTS Environments(
         id INTEGER PRIMARY KEY,
         environment TEXT NOT NULL
         );
         """
 
 QUERY_CREATE_TABLE_TEST_DATASETS = """
-        CREATE TABLE Test_Datasets(
+        CREATE TABLE IF NOT EXISTS Test_Datasets(
         id INTEGER PRIMARY KEY,
         test_dataset TEXT
         );
         """
 
 QUERY_CREATE_TABLE_TRAINING_DATASETS = """
-        CREATE TABLE Training_Datasets(
+        CREATE TABLE IF NOT EXISTS Training_Datasets(
         id INTEGER PRIMARY KEY,
         training_dataset TEXT
         );
         """
 
 QUERY_CREATE_TABLE_TRAINING_MODELS = """
-        CREATE TABLE Training_Models(
+        CREATE TABLE IF NOT EXISTS Training_Models(
         id INTEGER PRIMARY KEY,
         training_model TEXT
         );
         """
 
 QUERY_CREATE_TABLE_ADDITIVE_NOISE_METHODS = """
-        CREATE TABLE Additive_Noise_Methods(
+        CREATE TABLE IF NOT EXISTS Additive_Noise_Methods(
         id INTEGER PRIMARY KEY,
         additive_noise_method TEXT,
         additive_noise_method_parameter_1 TEXT,
@@ -38,7 +38,7 @@ QUERY_CREATE_TABLE_ADDITIVE_NOISE_METHODS = """
         """
 
 QUERY_CREATE_TABLE_DENOISING_METHODS = """
-        CREATE TABLE Denoising_Methods(
+        CREATE TABLE IF NOT EXISTS Denoising_Methods(
         id INTEGER PRIMARY KEY,
         denoising_method TEXT,
         denoising_method_parameter_1 TEXT,
@@ -49,7 +49,7 @@ QUERY_CREATE_TABLE_DENOISING_METHODS = """
         """
 
 QUERY_CREATE_TABLE_RANK_TEST = """
-        CREATE TABLE Rank_Test(
+        CREATE TABLE IF NOT EXISTS Rank_Test(
         id INTEGER PRIMARY KEY,
         test_dataset_id INTEGER NOT NULL,
         training_dataset_id INTEGER NOT NULL,
@@ -81,7 +81,7 @@ QUERY_CREATE_TABLE_RANK_TEST = """
         """
 
 QUERY_CREATE_VIEW_FULL_RANK_TEST = """
-        CREATE VIEW full_rank_test
+        CREATE VIEW IF NOT EXISTS full_rank_test
         AS
         SELECT
             Rank_Test.id,
@@ -293,7 +293,7 @@ QUERY_CREATE_TABLE_TRACE_PROCESSES = """
         """
 
 QUERY_CREATE_TABLE_TRACE_METADATA_DEPTH = """
-    CREATE TABLE Trace_Metadata_Depth(
+    CREATE TABLE IF NOT EXISTS Trace_Metadata_Depth(
     id INTEGER PRIMARY KEY,
     test_dataset_id INT,
     training_dataset_id INT,
@@ -313,7 +313,7 @@ QUERY_CREATE_TABLE_TRACE_METADATA_DEPTH = """
 """
 
 QUERY_CREATE_TABLE_TRACE_METADATA_WIDTH = """
- CREATE TABLE Trace_Metadata_Width(
+ CREATE TABLE IF NOT EXISTS Trace_Metadata_Width(
     id INTEGER PRIMARY KEY,
     test_dataset_id INT,
     training_dataset_id INT,

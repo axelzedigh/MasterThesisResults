@@ -1,6 +1,7 @@
 import os
 import sqlite3 as lite
 from typing import Optional
+from tqdm import tqdm
 
 import numpy as np
 
@@ -441,25 +442,28 @@ def get_trace_set_metadata__width(
                 device=device
             )
             all__traces = [x for x in np.array(os.listdir(trace_path)) if x[0:3] == "all"]
+            # Placeholder variable (undecided atm what analysis to be performed)
+            trace_or_trace_set = "trace_set"
             for i in all__traces:
                 try:
                     trace_set = np.load(os.path.join(trace_path, i))
                     if len(trace_set) == 0:
                         print(i)
                         continue
-                    # for trace in trace_set:
-                    #     meta_data.append(
-                    #         get_trace_metadata__width__metrics(
-                    #             trace[range_start:range_end]
-                    #         )
-                    #     )
-
-                    max_value = np.max(trace_set.flatten())
-                    min_value = np.min(trace_set.flatten())
-                    mean_value = np.mean(trace_set.flatten())
-                    std_value = np.std(trace_set.flatten())
-                    rms_value = root_mean_square(trace_set.flatten())
-                    meta_data.append([max_value, min_value, mean_value, std_value, rms_value])
+                    if trace_or_trace_set == "trace":
+                        for trace in trace_set:
+                            meta_data.append(
+                                get_trace_metadata__width__metrics(
+                                    trace[range_start:range_end]
+                                )
+                            )
+                    elif trace_or_trace_set == "trace_set":
+                        max_value = np.max(trace_set[:, range_start:range_end].flatten())
+                        min_value = np.min(trace_set[:, range_start:range_end].flatten())
+                        mean_value = np.mean(trace_set[:, range_start:range_end].flatten())
+                        std_value = np.std(trace_set[:, range_start:range_end].flatten())
+                        rms_value = root_mean_square(trace_set[:, range_start:range_end].flatten())
+                        meta_data.append([max_value, min_value, mean_value, std_value, rms_value])
                 except ValueError:
                     print(f"Problem with: {i}")
         elif trace_process_id == 2:
@@ -511,11 +515,12 @@ def insert_all_trace_metadata_width_to_db(database):
     """
     # Remove all previous width metadata.
     database = get_db_file_path(database)
-    con = lite.connect(database=database)
-    con.execute("DELETE FROM Trace_Metadata_Width;")
-    con.commit()
-    con.close()
+    # con = lite.connect(database=database)
+    # con.execute("DELETE FROM Trace_Metadata_Width;")
+    # con.commit()
+    # con.close()
 
+    """
     # Insert all training_traces from Wang_2021
     test_dataset_id = None
     training_dataset_id = 1
@@ -527,7 +532,9 @@ def insert_all_trace_metadata_width_to_db(database):
     trace_process_ids = [1, 3]
 
     for device in devices:
+        print(device)
         for trace_process_id in trace_process_ids:
+            print(trace_process_id)
             metadata = get_trace_set_metadata__width(
                 database=database,
                 test_dataset_id=test_dataset_id,
@@ -539,7 +546,7 @@ def insert_all_trace_metadata_width_to_db(database):
                 trace_process_id=trace_process_id,
             )
             i = 0
-            for row in metadata:
+            for row in tqdm(metadata):
                 insert_data_to_db__trace_metadata__width(
                     database=database,
                     test_dataset_id=test_dataset_id,
@@ -567,7 +574,9 @@ def insert_all_trace_metadata_width_to_db(database):
     trace_process_ids = [1, 3]
 
     for device in devices:
+        print(device)
         for trace_process_id in trace_process_ids:
+            print(trace_process_id)
             metadata = get_trace_set_metadata__width(
                 database=database,
                 test_dataset_id=test_dataset_id,
@@ -579,7 +588,7 @@ def insert_all_trace_metadata_width_to_db(database):
                 trace_process_id=trace_process_id,
             )
             i = 0
-            for row in metadata:
+            for row in tqdm(metadata):
                 insert_data_to_db__trace_metadata__width(
                     database=database,
                     test_dataset_id=test_dataset_id,
@@ -597,9 +606,10 @@ def insert_all_trace_metadata_width_to_db(database):
                     std_val=row[4],
                 )
                 i += 1
+    """
 
     # Insert test_traces for 2.5m from Zedigh_2021
-    test_dataset_id = 1
+    test_dataset_id = 2
     training_dataset_id = None
     environment_id = 1
     distance = 2
@@ -608,7 +618,9 @@ def insert_all_trace_metadata_width_to_db(database):
     trace_process_ids = [1, 3]
 
     for device in devices:
+        print(device)
         for trace_process_id in trace_process_ids:
+            print(trace_process_id)
             metadata = get_trace_set_metadata__width(
                 database=database,
                 test_dataset_id=test_dataset_id,
@@ -620,7 +632,7 @@ def insert_all_trace_metadata_width_to_db(database):
                 trace_process_id=trace_process_id,
             )
             i = 0
-            for row in metadata:
+            for row in tqdm(metadata):
                 insert_data_to_db__trace_metadata__width(
                     database=database,
                     test_dataset_id=test_dataset_id,
@@ -640,7 +652,7 @@ def insert_all_trace_metadata_width_to_db(database):
                 i += 1
 
     # Insert test_traces for 5/10m from Zedigh_2021
-    test_dataset_id = 1
+    test_dataset_id = 2
     training_dataset_id = None
     environment_id = 1
     distances = [5, 10]
@@ -649,8 +661,11 @@ def insert_all_trace_metadata_width_to_db(database):
     trace_process_ids = [1, 3]
 
     for distance in distances:
+        print(distance)
         for device in devices:
+            print(device)
             for trace_process_id in trace_process_ids:
+                print(trace_process_id)
                 metadata = get_trace_set_metadata__width(
                     database=database,
                     test_dataset_id=test_dataset_id,
@@ -662,7 +677,7 @@ def insert_all_trace_metadata_width_to_db(database):
                     trace_process_id=trace_process_id,
                 )
                 i = 0
-                for row in metadata:
+                for row in tqdm(metadata):
                     insert_data_to_db__trace_metadata__width(
                         database=database,
                         test_dataset_id=test_dataset_id,

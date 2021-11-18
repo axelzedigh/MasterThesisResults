@@ -16,4 +16,4 @@ def update_trace_metadata_db(new_db=False):
 
 
 if __name__ == "__main__":
-    update_trace_metadata_db(True)
+    update_trace_metadata_db(False)
