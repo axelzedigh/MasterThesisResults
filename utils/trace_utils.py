@@ -520,12 +520,11 @@ def insert_all_trace_metadata_width_to_db(database):
     # con.commit()
     # con.close()
 
-    """
     # Insert all training_traces from Wang_2021
     test_dataset_id = None
     training_dataset_id = 1
-    environment_id = 1
-    distance = 15
+    environment_id = None
+    distance = None
     # devices = [6, 7, 8, 9, 10]
     devices = [1, 2, 3, 4, 5]
     additive_noise_method_id = None
@@ -606,7 +605,6 @@ def insert_all_trace_metadata_width_to_db(database):
                     std_val=row[4],
                 )
                 i += 1
-    """
 
     # Insert test_traces for 2.5m from Zedigh_2021
     test_dataset_id = 2
