@@ -1,5 +1,5 @@
 # Full Rank test tables - Unique rows
-Last updated: 2021-11-13 21:29:48.948917
+Last updated: 2021-11-19 11:47:13.116275
 
 | test_dataset | training_dataset | environment | distance | device | training_model | keybyte | epoch | additive method | param 1| value | param 2 | value | denoising method | param 1 | value | param 2 | value | counted tp | avg tp's |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
