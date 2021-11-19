@@ -3,7 +3,7 @@ Denoising functions.
 """
 
 import numpy as np
-
+import scipy.signal as signal
 
 def moving_average_filter(test_trace, n):
     """
@@ -48,3 +48,15 @@ def moving_average_filter_n5(test_trace_set):
         filtered_trace_set[i] = np.pad(moving_average_filter(test_trace_set[i], n), (0, 4), 'constant')
 
     return filtered_trace_set, range_start, range_end
+
+
+def wiener_filter(trace, noise_power):
+    """
+
+    :param trace:
+    :return:
+    """
+    # TODO: finalize this
+    shape = None
+    filtered_trace = signal.wiener(trace, noise=noise_power)
+    return filtered_trace

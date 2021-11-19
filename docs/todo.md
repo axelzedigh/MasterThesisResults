@@ -1,10 +1,9 @@
 # Todos
 ## Now
-
+- Create queries/views for trace-metrics vs avg(termination_points)
 ---
 
 ## Database
-- Create queries/views for trace-metrics vs avg(termination_points)
 - Create table with noise_data (additive_noise_id, scale, rms)
 - SNR-table (test_trace_id, SNR)
 
@@ -48,6 +47,7 @@
 - Hypothesis functions
   - chi2
   - Student t-test
+- Averaging std, snr etc. correctly (update plot functions.)
 
 ## Writing
 - Make a short pdf with the most interesting plots/tables as a presentation

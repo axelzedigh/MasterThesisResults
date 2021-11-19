@@ -5,8 +5,10 @@ import unittest
 import numpy as np
 import sqlite3 as lite
 import os
+import matplotlib.pyplot as plt
 
 from utils.db_utils import create_db_with_tables, initialize_table_data, get_db_file_path
+from utils.denoising_utils import wiener_filter
 from utils.statistic_utils import hamming_weight__single, \
     hamming_weight__vector, cross_correlation_matrix, \
     pearson_correlation_coefficient, correlation_matrix, snr_calculator, root_mean_square
@@ -131,3 +133,24 @@ class StatisticalFunctionsTestCase(unittest.TestCase):
         )
         self.assertIsNotNone(metadata)
         self.assertEqual(metadata.shape, (400, 6))
+
+    def test_wiener_filter(self):
+        trace = get_trace_set__processed(
+            self.database,
+            test_dataset_id=1,
+            training_dataset_id=None,
+            environment_id=1,
+            distance=15,
+            device=10,
+            trace_process_id=3,
+        )
+
+        print(trace)
+        plt.ioff()
+        plt.figure(figsize=(15,10))
+        plt.subplot(1, 2, 1)
+        plt.plot(trace)
+        filtered_trace = wiener_filter(trace)
+        plt.subplot(1, 2, 2)
+        plt.plot(filtered_trace)
+        plt.show()
