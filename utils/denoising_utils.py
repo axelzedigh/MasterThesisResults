@@ -54,6 +54,7 @@ def wiener_filter(trace, noise_power):
     """
 
     :param trace:
+    :param noise_power:
     :return:
     """
     # TODO: finalize this

@@ -18,6 +18,8 @@
 
 ## Denoising
 - Do Weiner-filter
+  - Figure out the "right" level of noise-power
+  - Decide 2-3 levels of weiner filter, add to denoising-methods
 - Do CDAE-filter
 
 ## Trace analysis
