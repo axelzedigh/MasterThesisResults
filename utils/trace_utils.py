@@ -211,9 +211,9 @@ def insert_all_trace_metadata_depth_to_db(database):
     test_dataset_id = 2
     training_dataset_id = None
     environment_id = 1
-    distance = 10
+    distance = 15
     # devices = [9, 10]
-    devices = [8]
+    devices = [9]
     additive_noise_method_id = None
     trace_process_ids = [2, 3]
 

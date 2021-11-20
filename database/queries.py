@@ -341,6 +341,7 @@ QUERY_QUALITY_TABLE = """
         rank_test__grouped.device,
         rank_test__grouped.epoch,
         rank_test__grouped.additive_noise_method_id,
+        rank_test__grouped.denoising_method_id,
         rank_test__grouped.count_term_p,
         rank_test__grouped.avg_term_p,
         trace_metadata_depth__grouped.trace_process_id,

@@ -30,8 +30,8 @@ AES_Sbox = np.array([
 
 # HW = [bin(n).count("1") for n in range(256)]
 project_dir = os.getenv("MASTER_THESIS_RESULTS")
-path = "datasets/test_traces/Zedigh_2021/office_corridor/10m/"
-device = "device_8"
+path = "datasets/test_traces/Zedigh_2021/office_corridor/15m/"
+device = "device_9"
 save_folder = os.path.join(project_dir, path, device, "data")
 
 pt_save = os.path.join(save_folder, 'pt.npy')
@@ -48,7 +48,7 @@ label_save = os.path.join(save_folder, 'label_lastround_Sout_0.npy')
 # data_dir = os.getenv("MASTER_THESIS_RESULTS_RAW_DATA")
 data_dir = os.getenv("HOME")
 # load_folder = "datasets/test_traces/Zedigh_2021/office_corridor/2m/device_9"
-load_folder = "Desktop/1120_office_hall/10m/device_8_pointed"
+load_folder = "Desktop/1120_office_hall/15m/device_9_pointed"
 load_folder = os.path.join(data_dir, load_folder)
 mis_index_path = os.path.join(load_folder, 'mis_index.npy')
 plaintext_path = os.path.join(load_folder, 'pt_.txt')
@@ -61,6 +61,7 @@ averaging = 1
 
 total_index = [i for i in range(total_number)]
 missing_index = np.load(mis_index_path)
+#missing_index = np.append(missing_index, [1040])
 real_index = [x for x in total_index if x not in missing_index]
 
 select = random.sample(range(len(real_index)), select_number)
