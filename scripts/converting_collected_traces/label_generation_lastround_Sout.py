@@ -30,8 +30,8 @@ AES_Sbox = np.array([
 
 # HW = [bin(n).count("1") for n in range(256)]
 project_dir = os.getenv("MASTER_THESIS_RESULTS")
-path = "datasets/test_traces/Zedigh_2021/office_corridor/2m/"
-device = "device_9"
+path = "datasets/test_traces/Zedigh_2021/office_corridor/10m/"
+device = "device_8"
 save_folder = os.path.join(project_dir, path, device, "data")
 
 pt_save = os.path.join(save_folder, 'pt.npy')
@@ -45,16 +45,18 @@ nor_trace_meanstd_save = os.path.join(save_folder, 'nor_traces_meanstd.npy')
 label_save = os.path.join(save_folder, 'label_lastround_Sout_0.npy')
 
 # ===========================================================
-data_dir = os.getenv("MASTER_THESIS_RESULTS_RAW_DATA")
-load_folder = "datasets/test_traces/Zedigh_2021/office_corridor/2m/device_9"
+# data_dir = os.getenv("MASTER_THESIS_RESULTS_RAW_DATA")
+data_dir = os.getenv("HOME")
+# load_folder = "datasets/test_traces/Zedigh_2021/office_corridor/2m/device_9"
+load_folder = "Desktop/1120_office_hall/10m/device_8_pointed"
 load_folder = os.path.join(data_dir, load_folder)
 mis_index_path = os.path.join(load_folder, 'mis_index.npy')
 plaintext_path = os.path.join(load_folder, 'pt_.txt')
 key_path = os.path.join(load_folder, 'key_.txt')
 trace_path = os.path.join(load_folder, 'all__')
 
-total_number = 3000
-select_number = 2900
+total_number = 5000
+select_number = 4900
 averaging = 1
 
 total_index = [i for i in range(total_number)]
@@ -79,10 +81,10 @@ for i in tqdm(real_index[:], ncols=60):
     Trace.append(one_trace)
 
     # Max-min normalization
-    # MAX = np.max(one_trace)
-    # MIN = np.min(one_trace)
-    MAX = np.max(one_trace[204:314])
-    MIN = np.min(one_trace[204:314])
+    MAX = np.max(one_trace)
+    MIN = np.min(one_trace)
+    # MAX = np.max(one_trace[204:314])
+    # MIN = np.min(one_trace[204:314])
 
     nor_one_trace_maxmin = (one_trace - MIN) / (MAX - MIN)
     nor_trace_maxmin.append(nor_one_trace_maxmin)

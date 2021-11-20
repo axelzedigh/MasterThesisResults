@@ -332,47 +332,78 @@ QUERY_CREATE_TABLE_TRACE_METADATA_WIDTH = """
 """
 
 QUERY_QUALITY_TABLE = """
-        SELECT
-            Rank_Test.id,
-            Test_Datasets.test_dataset AS test_dataset,
-            Training_Datasets.training_dataset AS training_dataset,
-            Environments.environment AS environment,
-            Rank_Test.distance,
-            Rank_Test.device,
-            Training_Models.training_model AS training_model,
-            Rank_Test.epoch,
-            Additive_Noise_Methods.additive_noise_method 
-                AS additive_noise_method,
-            Additive_Noise_Methods.additive_noise_method_parameter_1 
-                AS additive_noise_method_parameter_1,
-            Additive_Noise_Methods.additive_noise_method_parameter_1_value 
-                AS additive_noise_method_parameter_1_value,
-            Additive_Noise_Methods.additive_noise_method_parameter_2 
-                AS additive_noise_method_parameter_2,
-            Additive_Noise_Methods.additive_noise_method_parameter_2_value 
-                AS additive_noise_method_parameter_2_value,
-            Denoising_Methods.denoising_method AS denoising_method,
-            Denoising_Methods.denoising_method_parameter_1 
-                AS denoising_method_parameter_1,
-            Denoising_Methods.denoising_method_parameter_1_value 
-                AS denoising_method_parameter_1_value,
-            Denoising_Methods.denoising_method_parameter_2 
-                AS denoising_method_parameter_2,
-            Denoising_Methods.denoising_method_parameter_2_value 
-                AS denoising_method_parameter_2_value,
-            Rank_Test.termination_point,
+    CREATE VIEW IF NOT EXISTS quality_table
+    AS
+    SELECT
+        rank_test__grouped.test_dataset_id,
+        rank_test__grouped.environment_id,
+        rank_test__grouped.distance,
+        rank_test__grouped.device,
+        rank_test__grouped.epoch,
+        rank_test__grouped.additive_noise_method_id,
+        rank_test__grouped.count_term_p,
+        rank_test__grouped.avg_term_p,
+        trace_metadata_depth__grouped.trace_process_id,
+        trace_metadata_depth__grouped.max_max,
+        trace_metadata_depth__grouped.min_min,
+        trace_metadata_depth__grouped.avg_mean,
+        trace_metadata_depth__grouped.avg_rms
         FROM
-            Rank_Test
-        LEFT JOIN Test_Datasets 
-            ON Test_Datasets.id = Rank_Test.test_dataset_id
-        LEFT JOIN Training_Datasets 
-            ON Training_Datasets.id = Rank_Test.training_dataset_id
-        LEFT JOIN Environments 
-            ON Environments.id = Rank_Test.environment_id
-        LEFT JOIN Training_Models 
-            ON Training_Models.id = Rank_Test.training_model_id
-        LEFT JOIN Additive_Noise_Methods 
-            ON Additive_Noise_Methods.id = Rank_test.additive_noise_method_id
-        LEFT JOIN Denoising_Methods 
-            ON Denoising_Methods.id = Rank_Test.denoising_method_id;
+        rank_test__grouped
+        LEFT JOIN trace_metadata_depth__grouped 
+        ON trace_metadata_depth__grouped.test_dataset_id = rank_test__grouped.test_dataset_id
+        AND trace_metadata_depth__grouped.environment_id=rank_test__grouped.environment_id
+        AND trace_metadata_depth__grouped.distance=rank_test__grouped.distance
+        AND trace_metadata_depth__grouped.device=rank_test__grouped.device;
+"""
+
+QUERY_CREATE_VIEW_RANK_TEST__GROUPED = """
+    CREATE VIEW IF NOT EXISTS rank_test__grouped
+    AS
+    SELECT
+        test_dataset_id,
+        training_dataset_id,
+        environment_id,
+        distance,
+        device,
+        training_model_id,
+        epoch,
+        additive_noise_method_id,
+        denoising_method_id,
+        Count(termination_point) 
+            AS count_term_p,
+        avg(termination_point)
+            AS avg_term_p
+    FROM
+        rank_test
+    GROUP BY
+        test_dataset_id,
+        training_dataset_id,
+        environment_id,
+        distance,
+        additive_noise_method_id,
+        denoising_method_id,
+        epoch,
+        device
+    ORDER BY 
+        avg_term_p
+"""
+
+QUERY_CREATE_VIEW_TRACE_METADATA_DEPTH__GROUPED = """
+    CREATE VIEW IF NOT EXISTS trace_metadata_depth__grouped
+    AS
+    SELECT
+        *,
+        max(max_val) AS max_max,
+        min(min_val) AS min_min,
+        avg(mean_val) AS avg_mean,
+        avg(rms_val) AS avg_rms
+    FROM
+        Trace_Metadata_Depth
+    GROUP BY
+        test_dataset_id,
+        environment_id,
+        distance,
+        device,
+        trace_process_id
 """

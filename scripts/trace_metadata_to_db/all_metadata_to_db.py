@@ -7,7 +7,7 @@ def update_trace_metadata_db(new_db=False):
     """
     Run to update all trace metadata.
     """
-    database = "trace_metadata_width.db"
+    database = "5m.db"
     if new_db:
         create_db_with_tables(database)
         initialize_table_data(database)
