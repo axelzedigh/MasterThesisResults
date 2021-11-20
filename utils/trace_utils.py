@@ -213,7 +213,7 @@ def insert_all_trace_metadata_depth_to_db(database):
     environment_id = 1
     distance = 15
     # devices = [9, 10]
-    devices = [9]
+    devices = [8]
     additive_noise_method_id = None
     trace_process_ids = [2, 3]
 

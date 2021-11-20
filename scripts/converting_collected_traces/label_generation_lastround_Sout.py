@@ -31,7 +31,7 @@ AES_Sbox = np.array([
 # HW = [bin(n).count("1") for n in range(256)]
 project_dir = os.getenv("MASTER_THESIS_RESULTS")
 path = "datasets/test_traces/Zedigh_2021/office_corridor/15m/"
-device = "device_9"
+device = "device_8"
 save_folder = os.path.join(project_dir, path, device, "data")
 
 pt_save = os.path.join(save_folder, 'pt.npy')
@@ -48,7 +48,7 @@ label_save = os.path.join(save_folder, 'label_lastround_Sout_0.npy')
 # data_dir = os.getenv("MASTER_THESIS_RESULTS_RAW_DATA")
 data_dir = os.getenv("HOME")
 # load_folder = "datasets/test_traces/Zedigh_2021/office_corridor/2m/device_9"
-load_folder = "Desktop/1120_office_hall/15m/device_9_pointed"
+load_folder = "Desktop/1120_office_hall/15m/device_8_pointed"
 load_folder = os.path.join(data_dir, load_folder)
 mis_index_path = os.path.join(load_folder, 'mis_index.npy')
 plaintext_path = os.path.join(load_folder, 'pt_.txt')

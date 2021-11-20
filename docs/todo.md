@@ -1,10 +1,6 @@
 # Todos
 ## Now
 - Create queries/views for trace-metrics vs avg(termination_points)
-  - Create view: grouped trace_metadata_depth
-  - Create view: grouped rank_test
-    - change max and min value (from avg to max/min)
-      - Drop view in main.db
 ---
 
 ## Database
