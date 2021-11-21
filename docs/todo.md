@@ -1,6 +1,14 @@
 # Todos
 ## Now
 - Create queries/views for trace-metrics vs avg(termination_points)
+- Collect data from big hall:
+  - Noise, 2.5m, 5m
+- Collect 2.5m, device 8
+- Collect 2.5m device 10 again (compare difference between measurements)
+- Drop avg_rank column in rank_test, replace with trace_processing_id
+  - Assign trace_process_id 3 to all previous analyses
+  - Assign trace_process_id 4 to 
+
 ---
 
 ## Database
@@ -28,13 +36,6 @@
 - How to average std?
 
 ## Data collecting
-- Collect 2.5m, device 8
-- Collect 2.5m device 10 again (compare difference between measurements)
-- Collect 5m device 10 (same angle as previously papers)
-  - Try to attack. If successful recollect for devices 8, 9
-  - Collect traces from 
-- Collect data from big hall:
-  - Noise, 2.5m, 5m
 
 ## Training
 - Rescale training and test traces to maxmin for the range (204:314) (create third test_trace_id)
