@@ -103,10 +103,12 @@ def get_trace_set__processed(
             device=device
         )
     elif training_dataset_id:
-        # trace_path = get_training_trace_path__raw_20k_data(
-        # device=device
-        # )
-        trace_path = get_training_trace_path__raw_200k_data()
+        if device:
+            trace_path = get_training_trace_path__raw_20k_data(
+                device=device
+            )
+        else:
+            trace_path = get_training_trace_path__raw_200k_data()
     else:
         raise "Both test_dataset_id and training_dataset_id was passed. Not ok!"
 
@@ -160,60 +162,17 @@ def insert_all_trace_metadata_depth_to_db(database):
 
     # Remove all previous metadata.
     database = get_db_file_path(database)
-    # con = lite.connect(database=database)
-    # con.execute("DELETE FROM Trace_Metadata_Depth;")
-    # con.commit()
-    # con.close()
+    con = lite.connect(database=database)
+    con.execute("DELETE FROM Trace_Metadata_Depth;")
+    con.commit()
+    con.close()
 
     # # Insert all from Wang_2021
-    # test_dataset_id = 1
-    # training_dataset_id = None
-    # environment_id = 1
-    # distance = 15
-    # devices = [6, 7, 8, 9, 10]
-    # additive_noise_method_id = None
-    # trace_process_ids = [2, 3]
-    #
-    # for device in devices:
-    #     for trace_process_id in trace_process_ids:
-    #         metadata = get_trace_set_metadata__depth(
-    #             database=database,
-    #             test_dataset_id=test_dataset_id,
-    #             training_dataset_id=training_dataset_id,
-    #             environment_id=environment_id,
-    #             distance=distance,
-    #             device=device,
-    #             additive_noise_method_id=additive_noise_method_id,
-    #             trace_process_id=trace_process_id,
-    #         )
-    #         i = 0
-    #         for row in metadata:
-    #             insert_data_to_db__trace_metadata__depth(
-    #                 database=database,
-    #                 test_dataset_id=test_dataset_id,
-    #                 training_dataset_id=training_dataset_id,
-    #                 environment_id=environment_id,
-    #                 distance=distance,
-    #                 device=device,
-    #                 additive_noise_method_id=additive_noise_method_id,
-    #                 trace_process_id=trace_process_id,
-    #                 data_point_index=i,
-    #                 max_val=row[0],
-    #                 min_val=row[1],
-    #                 mean_val=row[2],
-    #                 rms_val=row[3],
-    #                 std_val=row[4],
-    #                 snr_val=row[5],
-    #             )
-    #             i += 1
-
-    # Insert all from Zedigh_2021 (distance 2m)
-    test_dataset_id = 2
+    test_dataset_id = 1
     training_dataset_id = None
     environment_id = 1
     distance = 15
-    # devices = [9, 10]
-    devices = [8]
+    devices = [6, 7, 8, 9, 10]
     additive_noise_method_id = None
     trace_process_ids = [2, 3]
 
@@ -250,141 +209,187 @@ def insert_all_trace_metadata_depth_to_db(database):
                 )
                 i += 1
 
-    # # Insert all from Zedigh_2021 (distance 5m & 10m)
-    # test_dataset_id = 2
-    # training_dataset_id = None
-    # environment_id = 1
-    # distances = [5, 10]
-    # devices = [8, 9, 10]
-    # additive_noise_method_id = None
-    # trace_process_ids = [2, 3]
-    #
-    # for distance in distances:
-    #     for device in devices:
-    #         for trace_process_id in trace_process_ids:
-    #             metadata = get_trace_set_metadata__depth(
-    #                 database=database,
-    #                 test_dataset_id=test_dataset_id,
-    #                 training_dataset_id=training_dataset_id,
-    #                 environment_id=environment_id,
-    #                 distance=distance,
-    #                 device=device,
-    #                 additive_noise_method_id=additive_noise_method_id,
-    #                 trace_process_id=trace_process_id,
-    #             )
-    #             i = 0
-    #             for row in metadata:
-    #                 insert_data_to_db__trace_metadata__depth(
-    #                     database=database,
-    #                     test_dataset_id=test_dataset_id,
-    #                     training_dataset_id=training_dataset_id,
-    #                     environment_id=environment_id,
-    #                     distance=distance,
-    #                     device=device,
-    #                     additive_noise_method_id=additive_noise_method_id,
-    #                     trace_process_id=trace_process_id,
-    #                     data_point_index=i,
-    #                     max_val=row[0],
-    #                     min_val=row[1],
-    #                     mean_val=row[2],
-    #                     rms_val=row[3],
-    #                     std_val=row[4],
-    #                     snr_val=row[5],
-    #                 )
-    #                 i += 1
+    # Insert all from Zedigh_2021 (distance 2m)
+    test_dataset_id = 2
+    training_dataset_id = None
+    environment_id = 1
+    distance = 2
+    devices = [9, 10]
+    additive_noise_method_id = None
+    trace_process_ids = [2, 3]
+
+    for device in devices:
+        for trace_process_id in trace_process_ids:
+            metadata = get_trace_set_metadata__depth(
+                database=database,
+                test_dataset_id=test_dataset_id,
+                training_dataset_id=training_dataset_id,
+                environment_id=environment_id,
+                distance=distance,
+                device=device,
+                additive_noise_method_id=additive_noise_method_id,
+                trace_process_id=trace_process_id,
+            )
+            i = 0
+            for row in metadata:
+                insert_data_to_db__trace_metadata__depth(
+                    database=database,
+                    test_dataset_id=test_dataset_id,
+                    training_dataset_id=training_dataset_id,
+                    environment_id=environment_id,
+                    distance=distance,
+                    device=device,
+                    additive_noise_method_id=additive_noise_method_id,
+                    trace_process_id=trace_process_id,
+                    data_point_index=i,
+                    max_val=row[0],
+                    min_val=row[1],
+                    mean_val=row[2],
+                    rms_val=row[3],
+                    std_val=row[4],
+                    snr_val=row[5],
+                )
+                i += 1
+
+    # # Insert all from Zedigh_2021 (distance 5/10/15m)
+    test_dataset_id = 2
+    training_dataset_id = None
+    environment_id = 1
+    distances = [5, 10, 15]
+    devices = [8, 9, 10]
+    additive_noise_method_id = None
+    trace_process_ids = [2, 3]
+
+    for distance in distances:
+        print(f"Distance: {distance}")
+        for device in devices:
+            print(f"Device: {device}")
+            for trace_process_id in tqdm(trace_process_ids):
+                metadata = get_trace_set_metadata__depth(
+                    database=database,
+                    test_dataset_id=test_dataset_id,
+                    training_dataset_id=training_dataset_id,
+                    environment_id=environment_id,
+                    distance=distance,
+                    device=device,
+                    additive_noise_method_id=additive_noise_method_id,
+                    trace_process_id=trace_process_id,
+                )
+                i = 0
+                for row in metadata:
+                    insert_data_to_db__trace_metadata__depth(
+                        database=database,
+                        test_dataset_id=test_dataset_id,
+                        training_dataset_id=training_dataset_id,
+                        environment_id=environment_id,
+                        distance=distance,
+                        device=device,
+                        additive_noise_method_id=additive_noise_method_id,
+                        trace_process_id=trace_process_id,
+                        data_point_index=i,
+                        max_val=row[0],
+                        min_val=row[1],
+                        mean_val=row[2],
+                        rms_val=row[3],
+                        std_val=row[4],
+                        snr_val=row[5],
+                    )
+                    i += 1
 
     # # Insert all training traces (device 1-5, cable)
-    # test_dataset_id = None
-    # training_dataset_id = 1
-    # environment_id = None
-    # distance = None
-    # devices = [1, 2, 3, 4, 5]
-    # additive_noise_method_id = None
-    # trace_process_ids = [2, 3]
-    #
-    # for device in devices:
-    #     for trace_process_id in trace_process_ids:
-    #         metadata = get_trace_set_metadata__depth(
-    #             database=database,
-    #             test_dataset_id=test_dataset_id,
-    #             training_dataset_id=training_dataset_id,
-    #             environment_id=environment_id,
-    #             distance=distance,
-    #             device=device,
-    #             additive_noise_method_id=additive_noise_method_id,
-    #             trace_process_id=trace_process_id,
-    #         )
-    #         i = 0
-    #         for row in metadata:
-    #             insert_data_to_db__trace_metadata__depth(
-    #                 database=database,
-    #                 test_dataset_id=test_dataset_id,
-    #                 training_dataset_id=training_dataset_id,
-    #                 environment_id=environment_id,
-    #                 distance=distance,
-    #                 device=device,
-    #                 additive_noise_method_id=additive_noise_method_id,
-    #                 trace_process_id=trace_process_id,
-    #                 data_point_index=i,
-    #                 max_val=row[0],
-    #                 min_val=row[1],
-    #                 mean_val=row[2],
-    #                 rms_val=row[3],
-    #                 std_val=row[4],
-    #                 snr_val=row[5],
-    #             )
-    #             i += 1
+    test_dataset_id = None
+    training_dataset_id = 1
+    environment_id = None
+    distance = None
+    devices = [1, 2, 3, 4, 5]
+    additive_noise_method_id = None
+    trace_process_ids = [2, 3]
+
+    for device in devices:
+        print(f"Device: {device}")
+        for trace_process_id in tqdm(trace_process_ids):
+            metadata = get_trace_set_metadata__depth(
+                database=database,
+                test_dataset_id=test_dataset_id,
+                training_dataset_id=training_dataset_id,
+                environment_id=environment_id,
+                distance=distance,
+                device=device,
+                additive_noise_method_id=additive_noise_method_id,
+                trace_process_id=trace_process_id,
+            )
+            i = 0
+            for row in metadata:
+                insert_data_to_db__trace_metadata__depth(
+                    database=database,
+                    test_dataset_id=test_dataset_id,
+                    training_dataset_id=training_dataset_id,
+                    environment_id=environment_id,
+                    distance=distance,
+                    device=device,
+                    additive_noise_method_id=additive_noise_method_id,
+                    trace_process_id=trace_process_id,
+                    data_point_index=i,
+                    max_val=row[0],
+                    min_val=row[1],
+                    mean_val=row[2],
+                    rms_val=row[3],
+                    std_val=row[4],
+                    snr_val=row[5],
+                )
+                i += 1
 
     # Insert once the maxmin training dataset
-    # test_dataset_id = None
-    # training_dataset_id = 1
-    # environment_id = None
-    # distance = None
-    # device = None
-    # additive_noise_method_id = None
-    # trace_process_ids = [3]
-    #
-    # for trace_process_id in trace_process_ids:
-    #     metadata = get_trace_set_metadata__depth(
-    #         database=database,
-    #         test_dataset_id=test_dataset_id,
-    #         training_dataset_id=training_dataset_id,
-    #         environment_id=environment_id,
-    #         distance=distance,
-    #         device=device,
-    #         additive_noise_method_id=additive_noise_method_id,
-    #         trace_process_id=trace_process_id,
-    #     )
-    #     i = 0
-    #     for row in metadata:
-    #         insert_data_to_db__trace_metadata__depth(
-    #             database=database,
-    #             test_dataset_id=test_dataset_id,
-    #             training_dataset_id=training_dataset_id,
-    #             environment_id=environment_id,
-    #             distance=distance,
-    #             device=device,
-    #             additive_noise_method_id=additive_noise_method_id,
-    #             trace_process_id=trace_process_id,
-    #             data_point_index=i,
-    #             max_val=row[0],
-    #             min_val=row[1],
-    #             mean_val=row[2],
-    #             rms_val=row[3],
-    #             std_val=row[4],
-    #             snr_val=row[5],
-    #         )
-    #         i += 1
+    test_dataset_id = None
+    training_dataset_id = 1
+    environment_id = None
+    distance = None
+    device = None
+    additive_noise_method_id = None
+    trace_process_ids = [3]
+
+    for trace_process_id in tqdm(trace_process_ids):
+        metadata = get_trace_set_metadata__depth(
+            database=database,
+            test_dataset_id=test_dataset_id,
+            training_dataset_id=training_dataset_id,
+            environment_id=environment_id,
+            distance=distance,
+            device=device,
+            additive_noise_method_id=additive_noise_method_id,
+            trace_process_id=trace_process_id,
+        )
+        i = 0
+        for row in metadata:
+            insert_data_to_db__trace_metadata__depth(
+                database=database,
+                test_dataset_id=test_dataset_id,
+                training_dataset_id=training_dataset_id,
+                environment_id=environment_id,
+                distance=distance,
+                device=device,
+                additive_noise_method_id=additive_noise_method_id,
+                trace_process_id=trace_process_id,
+                data_point_index=i,
+                max_val=row[0],
+                min_val=row[1],
+                mean_val=row[2],
+                rms_val=row[3],
+                std_val=row[4],
+                snr_val=row[5],
+            )
+            i += 1
+
 
 def get_trace_set_metadata__width(
-    database: str,
-    test_dataset_id: Optional[int],
-    training_dataset_id: Optional[int],
-    environment_id: Optional[int],
-    distance: Optional[int],
-    device: Optional[int],
-    additive_noise_method_id: Optional[int],
-    trace_process_id: int,
+        database: str,
+        test_dataset_id: Optional[int],
+        training_dataset_id: Optional[int],
+        environment_id: Optional[int],
+        distance: Optional[int],
+        device: Optional[int],
+        additive_noise_method_id: Optional[int],
+        trace_process_id: int,
 ):
     """
 
@@ -516,20 +521,103 @@ def insert_all_trace_metadata_width_to_db(database):
     """
     # Remove all previous width metadata.
     database = get_db_file_path(database)
-    # con = lite.connect(database=database)
-    # con.execute("DELETE FROM Trace_Metadata_Width;")
-    # con.commit()
-    # con.close()
+    con = lite.connect(database=database)
+    con.execute("DELETE FROM Trace_Metadata_Width;")
+    con.commit()
+    con.close()
+
+    # Insert all test_traces from Wang_2021
+    test_dataset_id = 1
+    training_dataset_id = None
+    environment_id = 1
+    distance = 15
+    devices = [6, 7, 8, 9, 10]
+    additive_noise_method_id = None
+    trace_process_ids = [1, 3]
+
+    for device in devices:
+        print(device)
+        for trace_process_id in trace_process_ids:
+            print(trace_process_id)
+            metadata = get_trace_set_metadata__width(
+                database=database,
+                test_dataset_id=test_dataset_id,
+                training_dataset_id=training_dataset_id,
+                environment_id=environment_id,
+                distance=distance,
+                device=device,
+                additive_noise_method_id=additive_noise_method_id,
+                trace_process_id=trace_process_id,
+            )
+            i = 0
+            for row in tqdm(metadata):
+                insert_data_to_db__trace_metadata__width(
+                    database=database,
+                    test_dataset_id=test_dataset_id,
+                    training_dataset_id=training_dataset_id,
+                    environment_id=environment_id,
+                    distance=distance,
+                    device=device,
+                    additive_noise_method_id=additive_noise_method_id,
+                    trace_process_id=trace_process_id,
+                    trace_index=i,
+                    max_val=row[0],
+                    min_val=row[1],
+                    mean_val=row[2],
+                    rms_val=row[3],
+                    std_val=row[4],
+                )
+                i += 1
+
+    # Insert maxmin-training_trace from Wang_2021
+    test_dataset_id = None
+    training_dataset_id = 1
+    environment_id = None
+    distance = None
+    device = None
+    additive_noise_method_id = None
+    trace_process_ids = [3]
+
+    for trace_process_id in trace_process_ids:
+        print(trace_process_id)
+        metadata = get_trace_set_metadata__width(
+            database=database,
+            test_dataset_id=test_dataset_id,
+            training_dataset_id=training_dataset_id,
+            environment_id=environment_id,
+            distance=distance,
+            device=device,
+            additive_noise_method_id=additive_noise_method_id,
+            trace_process_id=trace_process_id,
+        )
+        i = 0
+        for row in tqdm(metadata):
+            insert_data_to_db__trace_metadata__width(
+                database=database,
+                test_dataset_id=test_dataset_id,
+                training_dataset_id=training_dataset_id,
+                environment_id=environment_id,
+                distance=distance,
+                device=device,
+                additive_noise_method_id=additive_noise_method_id,
+                trace_process_id=trace_process_id,
+                trace_index=i,
+                max_val=row[0],
+                min_val=row[1],
+                mean_val=row[2],
+                rms_val=row[3],
+                std_val=row[4],
+            )
+            i += 1
 
     # Insert all training_traces from Wang_2021
     test_dataset_id = None
     training_dataset_id = 1
     environment_id = None
     distance = None
-    # devices = [6, 7, 8, 9, 10]
     devices = [1, 2, 3, 4, 5]
     additive_noise_method_id = None
-    trace_process_ids = [1, 3]
+    trace_process_ids = [1]
 
     for device in devices:
         print(device)
@@ -650,11 +738,11 @@ def insert_all_trace_metadata_width_to_db(database):
                 )
                 i += 1
 
-    # Insert test_traces for 5/10m from Zedigh_2021
+    # Insert test_traces for 5/10/15m from Zedigh_2021
     test_dataset_id = 2
     training_dataset_id = None
     environment_id = 1
-    distances = [5, 10]
+    distances = [5, 10, 15]
     devices = [8, 9, 10]
     additive_noise_method_id = None
     trace_process_ids = [1, 3]
