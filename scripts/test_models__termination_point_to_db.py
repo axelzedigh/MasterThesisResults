@@ -43,9 +43,10 @@ def termination_point_test_and_insert_to_db(
         filter_function = moving_average_filter_n3
     if denoising_method_id == 2:
         filter_function = moving_average_filter_n5
-
+    # TODO: fix the trace process id thing (pass as argument to shell-script?
+    trace_process_id = 3
     for _ in tqdm(range(0, runs)):
-        termination_point, average_ranks = termination_point_test(
+        termination_point = termination_point_test(
             database,
             filter_function,
             test_dataset_id,
@@ -73,7 +74,7 @@ def termination_point_test_and_insert_to_db(
                 additive_noise_method_id=additive_noise_method_id,
                 denoising_method_id=denoising_method_id,
                 termination_point=termination_point,
-                average_rank=average_ranks,
+                trace_process_id=trace_process_id,
             )
 
 

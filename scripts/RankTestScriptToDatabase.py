@@ -186,7 +186,7 @@ def termination_point_test(
         epoch: int,
         additive_noise_method_id: int,
         denoising_method_id: int
-) -> Tuple[Optional[int], Optional[float]]:
+) -> Optional[int]:
     """
 
     :param database:
@@ -286,7 +286,7 @@ def termination_point_test(
             term_point = i
             break
 
-    average_ranks = np.sum(ranks_array, axis=0) / average
-    #plt.plot(average_ranks)
-    #plt.show()
-    return term_point, int(average_ranks.mean())
+    # average_ranks = np.sum(ranks_array, axis=0) / average
+    # plt.plot(average_ranks)
+    # plt.show()
+    return term_point
