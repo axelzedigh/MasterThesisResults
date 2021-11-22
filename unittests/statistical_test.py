@@ -6,12 +6,15 @@ import numpy as np
 import sqlite3 as lite
 import os
 import matplotlib.pyplot as plt
+import sklearn.preprocessing
+from pprint import pprint
 
 from utils.db_utils import create_db_with_tables, initialize_table_data, get_db_file_path
 from utils.denoising_utils import wiener_filter
 from utils.statistic_utils import hamming_weight__single, \
     hamming_weight__vector, cross_correlation_matrix, \
-    pearson_correlation_coefficient, correlation_matrix, snr_calculator, root_mean_square
+    pearson_correlation_coefficient, correlation_matrix, snr_calculator, root_mean_square, sklearn_normalizing__max, \
+    maxmin_scaling_of_trace__400_to_110
 from utils.trace_utils import get_trace_set_metadata__depth, get_trace_set__processed, \
     get_trace_set_metadata__depth__processed
 
@@ -154,3 +157,33 @@ class StatisticalFunctionsTestCase(unittest.TestCase):
         plt.subplot(1, 2, 2)
         plt.plot(filtered_trace)
         plt.show()
+
+    def test_sklearn_normalizing(self):
+        trace = get_trace_set__processed(
+            self.database,
+            test_dataset_id=1,
+            training_dataset_id=None,
+            environment_id=1,
+            distance=15,
+            device=10,
+            trace_process_id=3,
+        )
+        X = np.array([[1, 2, 3], [3, 2, 3], [4, 3, 1]])
+        normalized_trace = sklearn_normalizing__max(X)
+        print(normalized_trace)
+        self.assertNotEqual(X.tolist(), normalized_trace.tolist())
+
+    def test_sklearn_maxmin(self):
+        trace = get_trace_set__processed(
+            self.database,
+            test_dataset_id=1,
+            training_dataset_id=None,
+            environment_id=1,
+            distance=15,
+            device=10,
+            trace_process_id=3,
+        )
+        pprint(trace[0])
+        scaled_trace = maxmin_scaling_of_trace__400_to_110(trace[0].reshape(-1, 1), range_start=204, range_end=314)
+        pprint(scaled_trace)
+        self.assertIsNotNone(scaled_trace)

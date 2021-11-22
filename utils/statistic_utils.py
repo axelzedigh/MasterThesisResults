@@ -4,6 +4,7 @@ import numpy as np
 from scipy import stats
 from typing import Tuple
 from numpy.matlib import repmat
+from sklearn import preprocessing
 
 
 def hamming_weight__single(value: int) -> int:
@@ -110,3 +111,25 @@ def signal_to_noise_ratio__amplitude(
     :return: The SNR metric value.
     """
     return (rms_signal ** 2) / (rms_noise ** 2)
+
+
+def sklearn_normalizing__max(trace):
+    """
+
+    :param trace:
+    :return:
+    """
+    normalized_trace = preprocessing.normalize(trace, norm='max')
+    return normalized_trace
+
+
+def maxmin_scaling_of_trace__400_to_110(trace, range_start, range_end):
+    """
+
+    :param trace:
+    :return:
+    """
+    trace_cut = trace[range_start:range_end]
+    maxmin_scaler = preprocessing.MinMaxScaler()
+    scaled_trace = maxmin_scaler.fit_transform(trace_cut)
+    return scaled_trace
