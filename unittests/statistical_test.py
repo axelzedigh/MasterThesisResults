@@ -14,7 +14,7 @@ from utils.denoising_utils import wiener_filter
 from utils.statistic_utils import hamming_weight__single, \
     hamming_weight__vector, cross_correlation_matrix, \
     pearson_correlation_coefficient, correlation_matrix, snr_calculator, root_mean_square, sklearn_normalizing__max, \
-    maxmin_scaling_of_trace__400_to_110
+    maxmin_scaling_of_trace_set
 from utils.trace_utils import get_trace_set_metadata__depth, get_trace_set__processed, \
     get_trace_set_metadata__depth__processed
 
@@ -184,6 +184,6 @@ class StatisticalFunctionsTestCase(unittest.TestCase):
             trace_process_id=3,
         )
         pprint(trace[0])
-        scaled_trace = maxmin_scaling_of_trace__400_to_110(trace[0].reshape(-1, 1), range_start=204, range_end=314)
+        scaled_trace = maxmin_scaling_of_trace_set(trace[0].reshape(-1, 1), range_start=204, range_end=314)
         pprint(scaled_trace)
         self.assertIsNotNone(scaled_trace)

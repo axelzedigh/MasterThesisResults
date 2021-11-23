@@ -11,6 +11,12 @@ from keras.optimizers import RMSprop
 from keras.utils import to_categorical
 from tqdm import tqdm
 
+from typing import Callable, Optional
+
+from utils.db_utils import get_db_file_path, \
+    fetchall_query, get_training_trace_path__raw_200k_data
+from utils.statistic_utils import maxmin_scaling_of_trace_set
+
 
 def check_if_file_exists(file_path):
     """
@@ -41,7 +47,7 @@ def cnn_110_model(classes=256):
     """
     CNN with input size 110, batch-size 128.
     :param classes:
-    :return:
+    :return: Keras/TF sequential CNN model with input size 110, classes 256.
     """
     sequential_model = Sequential()
     sequential_model.add(
@@ -87,31 +93,30 @@ def cnn_110_model(classes=256):
 def train_model(
         x_profiling,
         y_profiling,
-        dl_model,
-        save_file_name,
+        deep_learning_model,
+        model_save_path,
         epochs,
         batch_size,
-        model_type
-):
+) -> Callable:
     """
 
     :param x_profiling:
     :param y_profiling:
-    :param dl_model:
-    :param save_file_name:
+    :param deep_learning_model:
+    :param model_save_path:
     :param epochs:
     :param batch_size:
-    :param model_type:
-    :return:
+    :return: History-function.
     """
-    check_if_file_exists(os.path.dirname(save_file_name))
+    # Check if file-path exists
+    check_if_file_exists(os.path.dirname(model_save_path))
 
     # Save model every epoch
-    save_model = ModelCheckpoint(save_file_name)
+    save_model = ModelCheckpoint(model_save_path)
     callbacks = [save_model]
 
     # Get the input layer shape
-    input_layer_shape = dl_model.get_layer(index=0).input_shape
+    input_layer_shape = deep_learning_model.get_layer(index=0).input_shape
 
     # Sanity check
     if input_layer_shape[1] != len(x_profiling[0]):
@@ -125,117 +130,322 @@ def train_model(
             (x_profiling.shape[0], x_profiling.shape[1], 1)
         )
         reshaped_y_profiling = to_categorical(y_profiling, num_classes=256)
-        if model_type == 6:
-            reshaped_y_profiling = y_profiling.reshape(
-                (y_profiling.shape[0], y_profiling.shape[1], 1)
-            )
     else:
         print(
             f"Error: model input shape length "
             f"{len(input_layer_shape)} is not expected ...")
         sys.exit(-1)
 
-    history = dl_model.fit(x=reshaped_x_profiling,
-                           y=reshaped_y_profiling,
-                           batch_size=batch_size,
-                           verbose=1,
-                           epochs=epochs,
-                           callbacks=callbacks,
-                           validation_split=0.1
-                           )
+    history = deep_learning_model.fit(
+        x=reshaped_x_profiling,
+        y=reshaped_y_profiling,
+        batch_size=batch_size,
+        verbose=1,
+        epochs=epochs,
+        callbacks=callbacks,
+        validation_split=0.1
+    )
     return history
 
-MODEL_TYPE = 2 #CNN
-INTEREST_BYTE = 0
-MODEL_FOLDER = "cnn_110_maf_n3/"
-TRAINING_MODEL = MODEL_FOLDER + 'cnn_model-{epoch:01d}.h5'
-USER = os.getenv("USER")
-traces = np.load('data/nor_traces_maxmin.npy')
-#traces = traces[:,[i for i in range(204,314)]]
+
+def cut_trace_set__column_range(trace_set, range_start, range_end):
+    """
+    :param trace_set: Trace set to cut.
+    :param range_start: Start column position.
+    :param range_end: End column position.
+    :return:
+    """
+    assert (range_start and range_end) < len(trace_set)
+    return trace_set[:, range_start:range_end]
 
 
-#traces_fixed = traces.copy()
-#noise_traces_flattened_fixed = traces_fixed.flatten()
-
-noise_data = np.load(f"/Users/{USER}/Documents/MASTER-THESIS/datasets/last_round_aes/experiment_axel/test_1/traces.npy")
-index_1 = int(512400 / 400)
-index_2 = int(1824800 / 400)
-noise_data[index_1] = noise_data[index_1 -20]
-noise_data[index_2] = noise_data[index_2 -20]
-noise_data = noise_data[:,[i for i in range(204,314)]]
-noise_data_flatten = noise_data.flatten()
-scale = 75
-translation = 0
-noise_data = (noise_data - translation) * scale
-
-nr = int(len(traces) / len(noise_data))
-noise_data_2 = np.tile(noise_data, (nr,1))
-
-
-# Add noise traces to traces
-noise_traces = traces.copy()
-
-for i in range(len(traces)):
-    noise_traces[i] = noise_data_2[i] + noise_traces[i]
-
-# Add modelled noise to training traces
-# Rayleigh
-
-for i in range(len(traces)):
-    #noise = np.random.rayleigh(0.0138*2,110)
-    noise = np.random.normal(0,0.05,110)
-    noise_traces[i] = noise_traces[i] + noise
-
-
-# MAF filter training data
-
-def moving_avg_trace(trace, n):
-    #trace = trace.copy()
-    cumsum = np.cumsum(np.insert(trace, 0, 0))
-    return (cumsum[n:] - cumsum[:-n]) / float(n)
-
-#filtered_traces = traces.copy()
-filtered_traces = np.empty_like(traces)
-
-for i in tqdm(range(len(traces))):
-    #np.append(filtered_traces, moving_avg_trace(traces[i], 3))
-    filtered_traces[i] = np.pad(moving_avg_trace(traces[i], 3), (0,2),'constant')
-filtered_traces = filtered_traces[:,[i for i in range(203,313)]]
+def additive_noise_to_trace_set(
+        trace_set: np.array,
+        additive_noise_method_id: int
+) -> np.array:
+    """
+    :param trace_set: Trace set to add noise to.
+    :param additive_noise_method_id: Additive noise to add (according to table).
+    :return: Trace set with noise.
+    """
+    if additive_noise_method_id is None:
+        return trace_set
+    elif additive_noise_method_id == 1:
+        return additive_noise__gaussian(trace_set=trace_set, mean=0, std=0.01)
+    elif additive_noise_method_id == 2:
+        return additive_noise__gaussian(trace_set=trace_set, mean=0, std=0.02)
+    elif additive_noise_method_id == 3:
+        return additive_noise__gaussian(trace_set=trace_set, mean=0, std=0.03)
+    elif additive_noise_method_id == 4:
+        return additive_noise__gaussian(trace_set=trace_set, mean=0, std=0.04)
+    elif additive_noise_method_id == 5:
+        return additive_noise__gaussian(trace_set=trace_set, mean=0, std=0.05)
+    elif additive_noise_method_id == 6:
+        return additive_noise__collected_noise__office_corridor(
+            trace_set=trace_set, scaling_factor=25
+        )
+    elif additive_noise_method_id == 7:
+        return additive_noise__collected_noise__office_corridor(
+            trace_set=trace_set, scaling_factor=50
+        )
+    elif additive_noise_method_id == 8:
+        return additive_noise__collected_noise__office_corridor(
+            trace_set=trace_set, scaling_factor=75
+        )
+    elif additive_noise_method_id == 9:
+        return additive_noise__collected_noise__office_corridor(
+            trace_set=trace_set, scaling_factor=105
+        )
+    elif additive_noise_method_id == 10:
+        return additive_noise__rayleigh(trace_set=trace_set, mode=0.0138)
+    elif additive_noise_method_id == 11:
+        return additive_noise__rayleigh(trace_set=trace_set, mode=0.0276)
 
 
-gauss_noise = np.random.normal(0,0.02,110)
-rayleigh_noise = np.random.rayleigh(0.02, 110)
-
-#plt.plot(traces[0])
-plt.plot(filtered_traces[0])
-plt.plot(filtered_traces[2])
-#plt.plot(noise_traces[2])
-#plt.plot(noise_data_2[0])
-#plt.plot(gauss_noise)
-#plt.plot(noise)
-#plt.axvline(x=204)
-#plt.axvline(x=314)
-#plt.ylabel('accuracy')
-#plt.xlabel('epoch')
-#plt.grid(True)
-plt.show()
-
-
-ct = np.load('data/ct.npy')
-key=np.load('data/lastroundkey.npy')
-key= key.astype(int)
-#print(key[:,interest_byte].shape)
-lastround_sboxout= np.bitwise_xor(ct[:,INTEREST_BYTE],key[:,INTEREST_BYTE])
-#lastround_input= Inv_SBox[lastround_sboxout]
-labels=lastround_sboxout
-
-# CNN model
-model = cnn_110_model()
-print(model.summary())
-
-EPOCHS = 100
-BATCH_SIZE = 256
+def additive_noise__gaussian(
+        trace_set: np.array, mean: float, std: float
+) -> np.array:
+    """
+    Applies Gaussian distributed noise to the trace set.
+    :param trace_set: The training trace set.
+    :param mean: µ of the noise (usually 0)
+    :param std: ∂ of the noise.
+    :return: Trace set with additive Gaussian distributed noise.
+    """
+    noise_traces = trace_set.copy()
+    for i in range(len(trace_set)):
+        gaussian_noise = np.random.normal(mean, std, 110)
+        noise_traces[i] += gaussian_noise
+    return noise_traces
 
 
-history_log = train_model(filtered_traces, labels, model, TRAINING_MODEL, EPOCHS, BATCH_SIZE, MODEL_TYPE)
-np.save(MODEL_FOLDER + "history_log.npy", history_log.history)
+def additive_noise__rayleigh(
+        trace_set: np.array, mode: float
+) -> np.array:
+    """
+    Applies Rayleigh distributed noise to the trace set.
+    :param trace_set: The training trace set.
+    :param mode: The mode of the distribution.
+    :return: Trace set with additive Rayleigh distributed noise.
+    """
+    noise_traces = trace_set.copy()
+    for i in range(len(trace_set)):
+        rayleigh_noise = np.random.rayleigh(mode, 110)
+        noise_traces[i] += rayleigh_noise
+    return noise_traces
+
+
+def additive_noise__collected_noise__office_corridor(
+        trace_set: np.array,
+        scaling_factor: float,
+        mean_adjust: bool = False,
+) -> np.array:
+    """
+    Applies collected noise to the trace set.
+    :param trace_set:
+    :param scaling_factor: Scaling factor of the noise.
+    :param mean_adjust:
+    :return: Trace set with additive collected noise.
+    """
+    # Load the office corridor noise.
+    project_dir = os.getenv("MASTER_THESIS_RESULTS")
+    noise_trace_path = os.path.join(
+        project_dir, "datasets/test_traces/Zedigh_2021/office_corridor/Noise",
+        "traces.npy"
+    )
+    noise_set = np.load(noise_trace_path)
+
+    # Remove outlier noise traces from the set.
+    index_1 = int(512400 / 400)
+    index_2 = int(1824800 / 400)
+    noise_set[index_1] = noise_set[index_1 - 20]
+    noise_set[index_2] = noise_set[index_2 - 20]
+
+    # Q: Randomize the data points in the collected trace?
+    # A: No. Not atm.
+
+    # Make noise trace set equally long as training trace set.
+    multiplier = int(len(trace_set) / len(noise_set))
+    noise_set = np.tile(noise_set, (multiplier, 1))
+
+    # Q: Transform noise to have mean around 0?
+    # A: No. Not atm.
+    if mean_adjust:
+        pass
+
+    # Scale the noise
+    noise_set *= scaling_factor
+
+    # Apply the noise to trace set
+    for i in range(len(trace_set)):
+        trace_set[i] += noise_set[i]
+
+    return trace_set
+
+
+def get_training_model_file_save_path(
+        keybyte: int = 0,
+        additive_noise_method_id: Optional[int] = None,
+        denoising_method_id: Optional[int] = None,
+        training_model_id: int = 1,
+        trace_process_id: int = 3,
+) -> str:
+    """
+    :param keybyte:
+    :param additive_noise_method_id:
+    :param denoising_method_id:
+    :param training_model_id:
+    :param trace_process_id:
+    :return:
+    """
+    database = get_db_file_path()
+    project_dir = os.getenv("MASTER_THESIS_RESULTS")
+    path = f"models/trace_process_{trace_process_id}"
+    training_model_query = f"""
+    select training_model from training_models
+    where id = {training_model_id};"""
+    training_model = fetchall_query(
+        database, training_model_query)[0][0]
+    if additive_noise_method_id is None:
+        additive_noise_method_id = "None"
+    if denoising_method_id is None:
+        denoising_method_id = "None"
+
+    training_model_file_save_path = os.path.join(
+        project_dir,
+        path,
+        f"keybyte_{keybyte}",
+        f"{additive_noise_method_id}_{denoising_method_id}",
+        (f"{training_model}-" + "{epoch:01d}.h5")
+    )
+    return training_model_file_save_path
+
+
+def training_cnn_110(
+        keybyte: int = 0,
+        epochs: int = 100,
+        batch_size: int = 256,
+        additive_noise_method_id: Optional[int] = None,
+        denoising_method_id: Optional[int] = None,
+        training_model_id: int = 1,
+        trace_process_id: int = 3,
+        verbose: bool = False,
+) -> None:
+    """
+    The main function for training the CNN 110 classifier.
+    Uses training traces from Wang_2021 (5 devices).
+    Only CNN with input size 110 and output size 256 is used now.
+
+    :param keybyte: The keybyte classifier to train.
+    :param epochs: Number of epochs to perform.
+    :param batch_size: The batch-size used in training.
+    :param additive_noise_method_id: Id to additive noise method.
+    :param denoising_method_id: Id to denoising method.
+    :param training_model_id: The deep learning model type to use.
+    :param trace_process_id: The trace pre-process done.
+    :param verbose: Show plot and extra information if true.
+    :return: None.
+    """
+    # Initialise variables
+    sbox_range_start = 204
+    sbox_range_end = 314
+
+    # Get training traces numpy array.
+    training_set_path = get_training_trace_path__raw_200k_data()
+    if trace_process_id == 3:
+        trace_set_file_path = os.path.join(
+            training_set_path, "nor_traces_maxmin.npy"
+        )
+        training_trace_set = np.load(trace_set_file_path)
+    elif trace_process_id == 4:
+        trace_set_file_path = os.path.join(
+            training_set_path, "nor_traces_maxmin__sbox_range.npy"
+        )
+        training_trace_set = np.load(trace_set_file_path)
+    else:
+        raise "Trace process id is not correct."
+
+    # Get cipher-text numpy array..
+    cipher_text_file_path = os.path.join(
+        training_set_path, "ct.npy"
+    )
+    cipher_text = np.load(cipher_text_file_path)
+
+    # Get last round key numpy array, transform to labels array.
+    last_roundkey_file_path = os.path.join(
+        training_set_path, "lastroundkey.npy"
+    )
+    last_roundkey = np.load(last_roundkey_file_path)
+    last_roundkey.astype(int)  # TODO: is this doing anything?
+    last_round_sbox_output = np.bitwise_xor(
+        cipher_text[:, keybyte], last_roundkey[:, keybyte]
+    )
+    labels = last_round_sbox_output
+
+    # Get path to store model
+    model_save_path = get_training_model_file_save_path(
+        keybyte=keybyte,
+        additive_noise_method_id=additive_noise_method_id,
+        denoising_method_id=denoising_method_id,
+        training_model_id=training_model_id,
+        trace_process_id=trace_process_id
+    )
+
+    # Get the DL-model
+    if training_model_id == 1:
+        deep_learning_model = cnn_110_model()
+    else:
+        raise "No other model is currently investigated."
+    if verbose:
+        print(deep_learning_model.summary())
+
+    # Apply additive noise
+    if additive_noise_method_id is not None:
+        training_trace_set = additive_noise_to_trace_set(
+            trace_set=training_trace_set,
+            additive_noise_method_id=additive_noise_method_id
+        )
+
+    # Denoise the trace set.
+    if denoising_method_id is not None:
+        training_trace_set = additive_noise_to_trace_set(
+            trace_set=training_trace_set,
+            additive_noise_method_id=additive_noise_method_id
+        )
+
+    # Cut trace set to the sbox output range
+    training_trace_set = cut_trace_set__column_range(
+        trace_set=training_trace_set,
+        range_start=sbox_range_start,
+        range_end=sbox_range_end,
+    )
+
+    # TODO: Normalize the trace set in sbox range
+    if trace_process_id == 4:
+        training_trace_set = maxmin_scaling_of_trace_set(
+            trace_set=training_trace_set,
+        )
+
+    # Plot the traces as a final check
+    if verbose:
+        # TODO: make additive and denoising functions
+        # return 1 clean, 1 noise trace to plot here
+        pass
+        plt.plot(training_trace_set[0])
+        plt.show()
+
+    # Train the model
+    history_log = train_model(
+        x_profiling=training_trace_set,
+        y_profiling=labels,
+        deep_learning_model=deep_learning_model,
+        model_save_path=model_save_path,
+        epochs=epochs,
+        batch_size=batch_size
+    )
+
+    # Store the accuracy and loss data
+    history_log_file_path = os.path.join(model_save_path, "history_log.npy")
+    np.save(history_log_file_path, history_log.history)
+
+    return

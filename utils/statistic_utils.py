@@ -123,13 +123,12 @@ def sklearn_normalizing__max(trace):
     return normalized_trace
 
 
-def maxmin_scaling_of_trace__400_to_110(trace, range_start, range_end):
+def maxmin_scaling_of_trace_set(trace_set):
     """
 
-    :param trace:
+    :param trace_set:
     :return:
     """
-    trace_cut = trace[range_start:range_end]
     maxmin_scaler = preprocessing.MinMaxScaler()
-    scaled_trace = maxmin_scaler.fit_transform(trace_cut)
-    return scaled_trace
+    scaled_trace_set = maxmin_scaler.fit_transform(trace_set)
+    return scaled_trace_set
