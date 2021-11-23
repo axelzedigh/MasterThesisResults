@@ -1,6 +1,7 @@
 """Math- and statistical utils."""
 
 import numpy as np
+from numba import jit
 from scipy import stats
 from typing import Tuple
 from numpy.matlib import repmat
@@ -17,6 +18,7 @@ def hamming_weight__single(value: int) -> int:
     return hamming_weight
 
 
+@jit
 def hamming_weight__vector(vector) -> np.array:
     """
 
@@ -27,6 +29,7 @@ def hamming_weight__vector(vector) -> np.array:
     return hamming_weight_function(vector)
 
 
+@jit
 def cross_correlation_matrix(trace_1, trace_2) -> np.array:
     """
 
@@ -47,6 +50,7 @@ def pearson_correlation_coefficient(a, b) -> Tuple:
     return stats.pearsonr(a, b)
 
 
+@jit
 def correlation_matrix(x, y):
     xr, xc = x.shape
     yr, yc = y.shape
@@ -62,6 +66,7 @@ def correlation_matrix(x, y):
     return corr
 
 
+@jit
 def snr_calculator(trace_set, label_set):
     """
 
@@ -79,6 +84,7 @@ def snr_calculator(trace_set, label_set):
     return snr
 
 
+@jit
 def signal_to_noise_ratio__sqrt_mean_std(mean, std):
     """
 
@@ -89,6 +95,7 @@ def signal_to_noise_ratio__sqrt_mean_std(mean, std):
     return (mean ** 2) / (std ** 2)
 
 
+@jit
 def root_mean_square(vector):
     """
 
@@ -101,6 +108,7 @@ def root_mean_square(vector):
     return rms
 
 
+@jit
 def signal_to_noise_ratio__amplitude(
         rms_signal: float, rms_noise: float
 ) -> float:
@@ -123,12 +131,33 @@ def sklearn_normalizing__max(trace):
     return normalized_trace
 
 
-def maxmin_scaling_of_trace_set(trace_set):
+def maxmin_scaling_of_trace_set__whole_trace_set_fit(trace_set):
     """
-
+    Scaler that performs normalization based on max and min in WHOLE trace-set.
     :param trace_set:
     :return:
     """
-    maxmin_scaler = preprocessing.MinMaxScaler()
-    scaled_trace_set = maxmin_scaler.fit_transform(trace_set)
+    maxmin_scaler = preprocessing.MinMaxScaler(feature_range=(0, 1), copy=False)
+    maxmin_scaler.fit_transform(trace_set)
+    return trace_set
+
+
+@jit
+def maxmin_scaling_of_trace_set__per_trace_fit(
+        trace_set, range_start, range_end
+) -> np.array:
+    """
+    Scaler that performs normalization based on max and min per trace in the set
+    :param trace_set:
+    :param range_start:
+    :param range_end:
+    :return:
+    """
+    scaled_trace_set = np.empty_like(trace_set)
+    for i, trace in enumerate(trace_set):
+        max_value = np.max(trace[range_start:range_end])
+        min_value = np.min(trace[range_start:range_end])
+        scaled_trace = (trace - min_value) / (max_value - min_value)
+        scaled_trace_set[i] = scaled_trace
+
     return scaled_trace_set

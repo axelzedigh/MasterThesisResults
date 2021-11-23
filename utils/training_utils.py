@@ -1,5 +1,6 @@
 import os
 import sys
+from typing import Callable, Optional, Tuple
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -9,15 +10,13 @@ from keras.layers import *
 from keras.models import Sequential
 from keras.optimizers import RMSprop
 from keras.utils import to_categorical
-from tqdm import tqdm
+from numba import jit
 
-from typing import Callable, Optional, Tuple
-
-from utils.db_utils import get_db_file_path, \
-    fetchall_query, get_training_trace_path__raw_200k_data
+from utils.db_utils import get_training_trace_path__raw_200k_data
 from utils.denoising_utils import moving_average_filter_n3, \
     moving_average_filter_n5
-from utils.statistic_utils import maxmin_scaling_of_trace_set
+from utils.statistic_utils import maxmin_scaling_of_trace_set__per_trace_fit
+from utils.trace_utils import get_training_model_file_save_path
 
 
 def check_if_file_exists(file_path):
@@ -150,7 +149,10 @@ def train_model(
     return history
 
 
-def cut_trace_set__column_range(trace_set, range_start, range_end):
+@jit
+def cut_trace_set__column_range(
+        trace_set, range_start=204, range_end=314
+) -> np.array:
     """
     :param trace_set: Trace set to cut.
     :param range_start: Start column position.
@@ -204,6 +206,7 @@ def additive_noise_to_trace_set(
         return additive_noise__rayleigh(trace_set=trace_set, mode=0.0276)
 
 
+@jit
 def additive_noise__gaussian(
         trace_set: np.array, mean: float, std: float
 ) -> Tuple[np.array, np.array]:
@@ -215,13 +218,14 @@ def additive_noise__gaussian(
     :return: Trace set with Gaussian distributed noise and example noise trace.
     """
     noise_traces = trace_set.copy()
-    example_additive_noise_trace = np.random.normal(mean, std, 110)
+    ex_additive_noise_trace = np.random.normal(mean, std, trace_set.shape[1])
     for i in range(len(trace_set)):
-        gaussian_noise = np.random.normal(mean, std, 110)
+        gaussian_noise = np.random.normal(mean, std, trace_set.shape[1])
         noise_traces[i] += gaussian_noise
-    return noise_traces, example_additive_noise_trace
+    return noise_traces, ex_additive_noise_trace
 
 
+@jit
 def additive_noise__rayleigh(
         trace_set: np.array, mode: float
 ) -> Tuple[np.array, np.array]:
@@ -232,9 +236,9 @@ def additive_noise__rayleigh(
     :return: Trace set with Rayleigh distributed noise and example noise trace.
     """
     noise_traces = trace_set.copy()
-    example_additive_noise_trace = np.random.rayleigh(mode, 110)
+    example_additive_noise_trace = np.random.rayleigh(mode, trace_set.shape[1])
     for i in range(len(trace_set)):
-        rayleigh_noise = np.random.rayleigh(mode, 110)
+        rayleigh_noise = np.random.rayleigh(mode, trace_set.shape[1])
         noise_traces[i] += rayleigh_noise
     return noise_traces, example_additive_noise_trace
 
@@ -246,7 +250,7 @@ def additive_noise__collected_noise__office_corridor(
 ) -> Tuple[np.array, np.array]:
     """
     Applies collected noise to the trace set.
-    :param trace_set:
+    :param trace_set: Needs to have column-size 400 atm! TODO: fix?
     :param scaling_factor: Scaling factor of the noise.
     :param mean_adjust:
     :return: Trace set with additive collected noise and example noise trace.
@@ -254,7 +258,9 @@ def additive_noise__collected_noise__office_corridor(
     # Load the office corridor noise.
     project_dir = os.getenv("MASTER_THESIS_RESULTS")
     noise_trace_path = os.path.join(
-        project_dir, "datasets/test_traces/Zedigh_2021/office_corridor/Noise",
+        project_dir,
+        "datasets/test_traces/Zedigh_2021/office_corridor/Noise",
+        "data",
         "traces.npy"
     )
     noise_set = np.load(noise_trace_path)
@@ -314,51 +320,12 @@ def denoising_of_trace_set(
         raise f"Denoising method id {denoising_method_id} is not correct."
 
 
-def get_training_model_file_save_path(
-        keybyte: int = 0,
-        additive_noise_method_id: Optional[int] = None,
-        denoising_method_id: Optional[int] = None,
-        training_model_id: int = 1,
-        trace_process_id: int = 3,
-) -> str:
-    """
-    :param keybyte:
-    :param additive_noise_method_id:
-    :param denoising_method_id:
-    :param training_model_id:
-    :param trace_process_id:
-    :return: Path to training model is save-path.
-    """
-    database = get_db_file_path()
-    project_dir = os.getenv("MASTER_THESIS_RESULTS")
-    path = f"models/trace_process_{trace_process_id}"
-    training_model_query = f"""
-    select training_model from training_models
-    where id = {training_model_id};"""
-    training_model = fetchall_query(
-        database, training_model_query)[0][0]
-    if additive_noise_method_id is None:
-        additive_noise_method_id = "None"
-    if denoising_method_id is None:
-        denoising_method_id = "None"
-
-    training_model_file_save_path = os.path.join(
-        project_dir,
-        path,
-        f"keybyte_{keybyte}",
-        f"{additive_noise_method_id}_{denoising_method_id}",
-        (f"{training_model}-" + "{epoch:01d}.h5")
-    )
-    return training_model_file_save_path
-
-
 def training_cnn_110(
         keybyte: int = 0,
         epochs: int = 100,
         batch_size: int = 256,
         additive_noise_method_id: Optional[int] = None,
         denoising_method_id: Optional[int] = None,
-        training_model_id: int = 1,
         trace_process_id: int = 3,
         verbose: bool = False,
 ) -> None:
@@ -372,14 +339,14 @@ def training_cnn_110(
     :param batch_size: The batch-size used in training.
     :param additive_noise_method_id: Id to additive noise method.
     :param denoising_method_id: Id to denoising method.
-    :param training_model_id: The deep learning model type to use.
     :param trace_process_id: The trace pre-process done.
     :param verbose: Show plot and extra information if true.
     :return: None.
     """
     # Initialise variables
-    sbox_range_start = 204
-    sbox_range_end = 314
+    training_model_id = 1
+    start = 204
+    end = 314
 
     # Get training traces numpy array.
     training_set_path = get_training_trace_path__raw_200k_data()
@@ -390,7 +357,7 @@ def training_cnn_110(
         training_trace_set = np.load(trace_set_file_path)
     elif trace_process_id == 4:
         trace_set_file_path = os.path.join(
-            training_set_path, "nor_traces_maxmin__sbox_range.npy"
+            training_set_path, "nor_traces_maxmin__sbox_range_204_314.npy"
         )
         training_trace_set = np.load(trace_set_file_path)
     else:
@@ -407,7 +374,7 @@ def training_cnn_110(
         training_set_path, "lastroundkey.npy"
     )
     last_roundkey = np.load(last_roundkey_file_path)
-    last_roundkey.astype(int)  # TODO: is this doing anything?
+    last_roundkey = last_roundkey.astype(int)
     last_round_sbox_output = np.bitwise_xor(
         cipher_text[:, keybyte], last_roundkey[:, keybyte]
     )
@@ -439,10 +406,7 @@ def training_cnn_110(
 
     # Denoise the trace set.
     if denoising_method_id is not None:
-        training_trace_set, \
-        sbox_range_start, \
-        sbox_range_end, \
-        clean_trace = denoising_of_trace_set(
+        training_trace_set, start, end, clean_trace = denoising_of_trace_set(
             trace_set=training_trace_set,
             denoising_method_id=denoising_method_id,
         )
@@ -450,25 +414,24 @@ def training_cnn_110(
     # Cut trace set to the sbox output range
     training_trace_set = cut_trace_set__column_range(
         trace_set=training_trace_set,
-        range_start=sbox_range_start,
-        range_end=sbox_range_end,
+        range_start=start,
+        range_end=end,
     )
 
-    # TODO: Normalize the trace set in sbox range
+    # Normalize the trace set in sbox range
     if trace_process_id == 4:
-        training_trace_set = maxmin_scaling_of_trace_set(
+        training_trace_set = maxmin_scaling_of_trace_set__per_trace_fit(
             trace_set=training_trace_set,
+            range_start=0,
+            range_end=len(training_trace_set[1])
         )
 
     # Plot the traces as a final check
     if verbose:
-        # TODO: make additive and denoising functions
-        # return 1 clean, 1 noise trace to plot here
-        pass
         plt.plot(training_trace_set[0], color="b")
         if additive_noise_method_id is not None:
             plt.plot(additive_noise_trace, color="g")
-        if denoising_method_id:
+        if denoising_method_id is not None:
             plt.plot(clean_trace, color="orange")
         plt.show()
 

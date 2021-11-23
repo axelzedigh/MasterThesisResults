@@ -1,22 +1,25 @@
 """Unittests for statistical functions."""
 
-import unittest
-
-import numpy as np
-import sqlite3 as lite
 import os
-import matplotlib.pyplot as plt
-import sklearn.preprocessing
+import sqlite3 as lite
+import unittest
 from pprint import pprint
 
-from utils.db_utils import create_db_with_tables, initialize_table_data, get_db_file_path
+import matplotlib.pyplot as plt
+import numpy as np
+
+from utils.db_utils import create_db_with_tables, initialize_table_data, \
+    get_db_file_path
 from utils.denoising_utils import wiener_filter
 from utils.statistic_utils import hamming_weight__single, \
     hamming_weight__vector, cross_correlation_matrix, \
-    pearson_correlation_coefficient, correlation_matrix, snr_calculator, root_mean_square, sklearn_normalizing__max, \
-    maxmin_scaling_of_trace_set
-from utils.trace_utils import get_trace_set_metadata__depth, get_trace_set__processed, \
+    pearson_correlation_coefficient, snr_calculator, \
+    root_mean_square, sklearn_normalizing__max, \
+    maxmin_scaling_of_trace_set__per_trace_fit
+from utils.trace_utils import get_trace_set_metadata__depth, \
+    get_trace_set__processed, \
     get_trace_set_metadata__depth__processed
+from utils.training_utils import cut_trace_set__column_range
 
 
 class StatisticalFunctionsTestCase(unittest.TestCase):
@@ -137,7 +140,7 @@ class StatisticalFunctionsTestCase(unittest.TestCase):
         self.assertIsNotNone(metadata)
         self.assertEqual(metadata.shape, (400, 6))
 
-    def test_wiener_filter(self):
+    def test_maxmin_per_trace(self):
         trace = get_trace_set__processed(
             self.database,
             test_dataset_id=1,
@@ -145,45 +148,14 @@ class StatisticalFunctionsTestCase(unittest.TestCase):
             environment_id=1,
             distance=15,
             device=10,
-            trace_process_id=3,
+            trace_process_id=2,
         )
-
-        print(trace)
-        plt.ioff()
-        plt.figure(figsize=(15,10))
-        plt.subplot(1, 2, 1)
-        plt.plot(trace)
-        filtered_trace = wiener_filter(trace)
-        plt.subplot(1, 2, 2)
-        plt.plot(filtered_trace)
-        plt.show()
-
-    def test_sklearn_normalizing(self):
-        trace = get_trace_set__processed(
-            self.database,
-            test_dataset_id=1,
-            training_dataset_id=None,
-            environment_id=1,
-            distance=15,
-            device=10,
-            trace_process_id=3,
+        trace = cut_trace_set__column_range(trace, 204, 314)
+        scaled_trace = maxmin_scaling_of_trace_set__per_trace_fit(
+            trace, 0, len(trace)
         )
-        X = np.array([[1, 2, 3], [3, 2, 3], [4, 3, 1]])
-        normalized_trace = sklearn_normalizing__max(X)
-        print(normalized_trace)
-        self.assertNotEqual(X.tolist(), normalized_trace.tolist())
-
-    def test_sklearn_maxmin(self):
-        trace = get_trace_set__processed(
-            self.database,
-            test_dataset_id=1,
-            training_dataset_id=None,
-            environment_id=1,
-            distance=15,
-            device=10,
-            trace_process_id=3,
-        )
-        pprint(trace[0])
-        scaled_trace = maxmin_scaling_of_trace_set(trace[0].reshape(-1, 1), range_start=204, range_end=314)
-        pprint(scaled_trace)
-        self.assertIsNotNone(scaled_trace)
+        self.assertEqual(110, scaled_trace.shape[1])
+        self.assertIn(1, scaled_trace[1])
+        self.assertIn(0, scaled_trace[1])
+        self.assertIn(1, scaled_trace[10])
+        self.assertIn(0, scaled_trace[10])

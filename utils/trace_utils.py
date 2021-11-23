@@ -9,7 +9,7 @@ from utils.db_utils import get_test_trace_path, \
     insert_data_to_db__trace_metadata__depth, get_db_file_path, \
     get_training_trace_path__raw_200k_data, get_test_trace_path__raw_data, \
     get_training_trace_path__raw_20k_data, \
-    insert_data_to_db__trace_metadata__width
+    insert_data_to_db__trace_metadata__width, fetchall_query
 from utils.statistic_utils import root_mean_square, \
     signal_to_noise_ratio__sqrt_mean_std
 
@@ -71,13 +71,13 @@ def get_trace_set_metadata__depth(
 
 
 def get_trace_set__processed(
-        database,
-        test_dataset_id,
-        training_dataset_id,
-        environment_id,
-        distance,
-        device,
-        trace_process_id,
+        database: str,
+        test_dataset_id: int,
+        training_dataset_id: Optional[int],
+        environment_id: int,
+        distance: float,
+        device: int,
+        trace_process_id: int,
 ) -> np.array:
     """
 
@@ -782,3 +782,41 @@ def insert_all_trace_metadata_width_to_db(database):
                         std_val=row[4],
                     )
                     i += 1
+
+
+def get_training_model_file_save_path(
+        keybyte: int = 0,
+        additive_noise_method_id: Optional[int] = None,
+        denoising_method_id: Optional[int] = None,
+        training_model_id: int = 1,
+        trace_process_id: int = 3,
+) -> str:
+    """
+    :param keybyte:
+    :param additive_noise_method_id:
+    :param denoising_method_id:
+    :param training_model_id:
+    :param trace_process_id:
+    :return: Path to training model is save-path.
+    """
+    database = get_db_file_path()
+    project_dir = os.getenv("MASTER_THESIS_RESULTS")
+    path = f"models/trace_process_{trace_process_id}"
+    training_model_query = f"""
+    select training_model from training_models
+    where id = {training_model_id};"""
+    training_model = fetchall_query(
+        database, training_model_query)[0][0]
+    if additive_noise_method_id is None:
+        additive_noise_method_id = "None"
+    if denoising_method_id is None:
+        denoising_method_id = "None"
+
+    training_model_file_save_path = os.path.join(
+        project_dir,
+        path,
+        f"keybyte_{keybyte}",
+        f"{additive_noise_method_id}_{denoising_method_id}",
+        (f"{training_model}-" + "{epoch:01d}.h5")
+    )
+    return training_model_file_save_path

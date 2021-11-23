@@ -64,7 +64,7 @@ def moving_average_filter_n5(
     return filtered_trace_set, range_start, range_end
 
 
-def wiener_filter(trace, noise_power):
+def wiener_filter(trace, noise_power=0.0001):
     """
 
     :param trace:
