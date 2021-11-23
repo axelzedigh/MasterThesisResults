@@ -11,10 +11,12 @@ from keras.optimizers import RMSprop
 from keras.utils import to_categorical
 from tqdm import tqdm
 
-from typing import Callable, Optional
+from typing import Callable, Optional, Tuple
 
 from utils.db_utils import get_db_file_path, \
     fetchall_query, get_training_trace_path__raw_200k_data
+from utils.denoising_utils import moving_average_filter_n3, \
+    moving_average_filter_n5
 from utils.statistic_utils import maxmin_scaling_of_trace_set
 
 
@@ -162,11 +164,11 @@ def cut_trace_set__column_range(trace_set, range_start, range_end):
 def additive_noise_to_trace_set(
         trace_set: np.array,
         additive_noise_method_id: int
-) -> np.array:
+) -> Tuple[np.array, np.array]:
     """
     :param trace_set: Trace set to add noise to.
     :param additive_noise_method_id: Additive noise to add (according to table).
-    :return: Trace set with noise.
+    :return: Trace set with noise and example noise trace.
     """
     if additive_noise_method_id is None:
         return trace_set
@@ -204,48 +206,50 @@ def additive_noise_to_trace_set(
 
 def additive_noise__gaussian(
         trace_set: np.array, mean: float, std: float
-) -> np.array:
+) -> Tuple[np.array, np.array]:
     """
     Applies Gaussian distributed noise to the trace set.
     :param trace_set: The training trace set.
     :param mean: µ of the noise (usually 0)
     :param std: ∂ of the noise.
-    :return: Trace set with additive Gaussian distributed noise.
+    :return: Trace set with Gaussian distributed noise and example noise trace.
     """
     noise_traces = trace_set.copy()
+    example_additive_noise_trace = np.random.normal(mean, std, 110)
     for i in range(len(trace_set)):
         gaussian_noise = np.random.normal(mean, std, 110)
         noise_traces[i] += gaussian_noise
-    return noise_traces
+    return noise_traces, example_additive_noise_trace
 
 
 def additive_noise__rayleigh(
         trace_set: np.array, mode: float
-) -> np.array:
+) -> Tuple[np.array, np.array]:
     """
     Applies Rayleigh distributed noise to the trace set.
     :param trace_set: The training trace set.
     :param mode: The mode of the distribution.
-    :return: Trace set with additive Rayleigh distributed noise.
+    :return: Trace set with Rayleigh distributed noise and example noise trace.
     """
     noise_traces = trace_set.copy()
+    example_additive_noise_trace = np.random.rayleigh(mode, 110)
     for i in range(len(trace_set)):
         rayleigh_noise = np.random.rayleigh(mode, 110)
         noise_traces[i] += rayleigh_noise
-    return noise_traces
+    return noise_traces, example_additive_noise_trace
 
 
 def additive_noise__collected_noise__office_corridor(
         trace_set: np.array,
         scaling_factor: float,
         mean_adjust: bool = False,
-) -> np.array:
+) -> Tuple[np.array, np.array]:
     """
     Applies collected noise to the trace set.
     :param trace_set:
     :param scaling_factor: Scaling factor of the noise.
     :param mean_adjust:
-    :return: Trace set with additive collected noise.
+    :return: Trace set with additive collected noise and example noise trace.
     """
     # Load the office corridor noise.
     project_dir = os.getenv("MASTER_THESIS_RESULTS")
@@ -276,11 +280,38 @@ def additive_noise__collected_noise__office_corridor(
     # Scale the noise
     noise_set *= scaling_factor
 
+    # Get example additive noise trace
+    example_additive_noise_trace = noise_set[1]
+
     # Apply the noise to trace set
     for i in range(len(trace_set)):
         trace_set[i] += noise_set[i]
 
-    return trace_set
+    return trace_set, example_additive_noise_trace
+
+
+def denoising_of_trace_set(
+        trace_set,
+        denoising_method_id
+) -> Tuple[np.array, int, int, np.array]:
+    """
+    :param trace_set:
+    :param denoising_method_id:
+    :return:
+    """
+    example_not_denoised_trace = trace_set[1].copy()
+    if denoising_method_id == 1:
+        filtered_set, range_start, range_end = moving_average_filter_n3(
+            trace_set
+        )
+        return filtered_set, range_start, range_end, example_not_denoised_trace
+    if denoising_method_id == 2:
+        filtered_set, range_start, range_end = moving_average_filter_n5(
+            trace_set
+        )
+        return filtered_set, range_start, range_end, example_not_denoised_trace
+    else:
+        raise f"Denoising method id {denoising_method_id} is not correct."
 
 
 def get_training_model_file_save_path(
@@ -296,7 +327,7 @@ def get_training_model_file_save_path(
     :param denoising_method_id:
     :param training_model_id:
     :param trace_process_id:
-    :return:
+    :return: Path to training model is save-path.
     """
     database = get_db_file_path()
     project_dir = os.getenv("MASTER_THESIS_RESULTS")
@@ -401,16 +432,19 @@ def training_cnn_110(
 
     # Apply additive noise
     if additive_noise_method_id is not None:
-        training_trace_set = additive_noise_to_trace_set(
+        training_trace_set, additive_noise_trace = additive_noise_to_trace_set(
             trace_set=training_trace_set,
             additive_noise_method_id=additive_noise_method_id
         )
 
     # Denoise the trace set.
     if denoising_method_id is not None:
-        training_trace_set = additive_noise_to_trace_set(
+        training_trace_set, \
+        sbox_range_start, \
+        sbox_range_end, \
+        clean_trace = denoising_of_trace_set(
             trace_set=training_trace_set,
-            additive_noise_method_id=additive_noise_method_id
+            denoising_method_id=denoising_method_id,
         )
 
     # Cut trace set to the sbox output range
@@ -431,7 +465,11 @@ def training_cnn_110(
         # TODO: make additive and denoising functions
         # return 1 clean, 1 noise trace to plot here
         pass
-        plt.plot(training_trace_set[0])
+        plt.plot(training_trace_set[0], color="b")
+        if additive_noise_method_id is not None:
+            plt.plot(additive_noise_trace, color="g")
+        if denoising_method_id:
+            plt.plot(clean_trace, color="orange")
         plt.show()
 
     # Train the model

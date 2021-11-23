@@ -1,9 +1,11 @@
 """
 Denoising functions.
 """
+from typing import Tuple
 
 import numpy as np
 import scipy.signal as signal
+
 
 def moving_average_filter(test_trace, n):
     """
@@ -16,11 +18,13 @@ def moving_average_filter(test_trace, n):
     return (cumsum[n:] - cumsum[:-n]) / float(n)
 
 
-def moving_average_filter_n3(test_trace_set):
+def moving_average_filter_n3(
+        test_trace_set
+) -> Tuple[np.array, int, int]:
     """
 
     :param test_trace_set: The trace set to filter.
-    :return: Filtered trace set.
+    :return: Filtered trace set and ranges.
     """
     filtered_trace_set = np.empty_like(test_trace_set)
     n = 3
@@ -28,16 +32,22 @@ def moving_average_filter_n3(test_trace_set):
     range_end = 313
 
     for i in range(len(test_trace_set)):
-        filtered_trace_set[i] = np.pad(moving_average_filter(test_trace_set[i], n), (0, 2), 'constant')
+        filtered_trace_set[i] = np.pad(
+            moving_average_filter(test_trace_set[i], n),
+            (0, 2),
+            'constant'
+        )
 
     return filtered_trace_set, range_start, range_end
 
 
-def moving_average_filter_n5(test_trace_set):
+def moving_average_filter_n5(
+        test_trace_set
+) -> Tuple[np.array, int, int]:
     """
 
     :param test_trace_set: The trace set to filter.
-    :return: Filtered trace set.
+    :return: Filtered trace set and ranges.
     """
     filtered_trace_set = np.empty_like(test_trace_set)
     n = 5
@@ -45,7 +55,11 @@ def moving_average_filter_n5(test_trace_set):
     range_end = 312
 
     for i in range(len(test_trace_set)):
-        filtered_trace_set[i] = np.pad(moving_average_filter(test_trace_set[i], n), (0, 4), 'constant')
+        filtered_trace_set[i] = np.pad(
+            moving_average_filter(test_trace_set[i], n),
+            (0, 4),
+            'constant'
+        )
 
     return filtered_trace_set, range_start, range_end
 
