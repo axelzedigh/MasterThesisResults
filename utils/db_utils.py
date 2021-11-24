@@ -621,7 +621,7 @@ def insert_data_and_date_to_db__rank_test(
         additive_noise_method_id: Optional[int],
         denoising_method_id: Optional[int],
         termination_point: int,
-        average_rank: Optional[int],
+        trace_process_id: Optional[int],
         date: int,
 ) -> None:
     """
@@ -638,7 +638,7 @@ def insert_data_and_date_to_db__rank_test(
     :param additive_noise_method_id: Foreign key id.
     :param denoising_method_id: Foreign key id.
     :param termination_point: Termination point from rank unittests.
-    :param average_rank:
+    :param trace_process_id:
     :param date: THIS PARAM DIFFERS FROM insert_data_to_db()
     """
     database = get_db_file_path(database)
@@ -657,7 +657,7 @@ def insert_data_and_date_to_db__rank_test(
             additive_noise_method_id,
             denoising_method_id,
             termination_point,
-            average_rank,
+            trace_process_id,
             date,
         ),
     )

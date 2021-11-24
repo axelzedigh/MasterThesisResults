@@ -19,6 +19,6 @@ VIEW_RANK_TEST_INDEX = {
     "denoising_param_2": 17,
     "denoising_param_2_value": 18,
     "termination_point": 19,
-    "average_rank": 20,
+    "trace_process_id": 20,
     "date_added": 21,
 }

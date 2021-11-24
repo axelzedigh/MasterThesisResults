@@ -62,7 +62,7 @@ QUERY_CREATE_TABLE_RANK_TEST = """
         additive_noise_method_id INTEGER,
         denoising_method_id INTEGER,
         termination_point INT NOT NULL,
-        average_rank INT,
+        trace_process_id INT,
         date_added REAL NOT NULL,
 
         FOREIGN KEY(test_dataset_id) 
@@ -113,7 +113,7 @@ QUERY_CREATE_VIEW_FULL_RANK_TEST = """
             Denoising_Methods.denoising_method_parameter_2_value 
                 AS denoising_method_parameter_2_value,
             Rank_Test.termination_point,
-            Rank_Test.average_rank,
+            Rank_Test.trace_process_id,
             Rank_Test.date_added
         FROM
             Rank_Test
