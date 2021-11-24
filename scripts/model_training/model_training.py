@@ -5,8 +5,8 @@ if __name__ == "__main__":
     keybyte = 0
     epochs = 100
     batch_size = 256
-    additive_noise_method_id = None
-    denoising_method_id = 1
+    additive_noise_method_id = 4
+    denoising_method_id = None
     training_model_id = 1
     trace_process_id = 5
 

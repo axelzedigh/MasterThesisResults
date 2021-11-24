@@ -12,6 +12,7 @@ from keras.optimizers import RMSprop
 from keras.utils import to_categorical
 from numba import jit
 
+from plots.plot_functions import plot_history_log
 from utils.db_utils import get_training_trace_path__raw_200k_data
 from utils.denoising_utils import moving_average_filter_n3, \
     moving_average_filter_n5
@@ -443,7 +444,12 @@ def training_cnn_110(
             plt.plot(additive_noise_trace[start:end], color="lightcoral")
         if denoising_method_id is not None:
             plt.plot(clean_trace[start:end], color="orange")
-        plt.show()
+        trace_fig_save_path_dir = os.path.dirname(model_save_file_path)
+        trace_fig_file_path = os.path.join(
+            trace_fig_save_path_dir,
+            "training_trace_and_processing_attribute.png"
+        )
+        plt.savefig(fname=trace_fig_file_path)
 
     # Train the model
     history_log = train_model(
@@ -459,5 +465,13 @@ def training_cnn_110(
     model_save_path_dir = os.path.dirname(model_save_file_path)
     history_log_file_path = os.path.join(model_save_path_dir, "history_log.npy")
     np.save(history_log_file_path, history_log.history)
+
+    if verbose:
+        plot_history_log(
+            trace_process_id=trace_process_id,
+            keybyte=keybyte,
+            additive_noise_method_id=additive_noise_method_id,
+            denoising_method_id=denoising_method_id,
+        )
 
     return

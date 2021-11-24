@@ -4,7 +4,7 @@ import numpy as np
 
 from matplotlib import pyplot as plt
 
-from plot_functions.plots import plot_history_log
+from plots.plot_functions import plot_history_log
 from utils.db_utils import get_training_trace_path__raw_200k_data, \
     get_test_trace_path
 from utils.denoising_utils import wiener_filter
@@ -23,7 +23,6 @@ def wiener_filter__1():
         trace_process_id=3,
     )
     trace_set = cut_trace_set__column_range(trace)
-    #plt.ioff()
     plt.figure(figsize=(15, 10))
     plt.plot(trace_set[1])
     filtered_trace = wiener_filter(trace_set[1], 0.001)
@@ -72,7 +71,7 @@ if __name__ == "__main__":
     # training_maxmin_sbox_range()
     # test_maxmin_sbox_range()
     plot_history_log(
-        trace_process_id=5,
+        trace_process_id=4,
         keybyte=0,
         additive_noise_method_id=6,
         denoising_method_id=None,

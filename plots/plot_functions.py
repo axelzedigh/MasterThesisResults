@@ -17,7 +17,8 @@ database = get_db_absolute_path("main.db")
 con = lite.connect(database)
 
 
-def plot_trace_metadata_depth__one(test_dataset_id, distance, device, trace_process_id):
+def plot_trace_metadata_depth__one(test_dataset_id, distance, device,
+                                   trace_process_id):
     """
     Legacy...
 
@@ -55,7 +56,7 @@ def plot_trace_metadata_depth__one(test_dataset_id, distance, device, trace_proc
     plt.title(
         f"""
         Dataset {test_dataset_id}, Distance {distance}m, Device {device}, Processing_id: {trace_process_id}\n
-        Mean: {round(mean_mean, 4)}, RMS: {round(mean_rms, 4)}, Std: {round(mean_std, 5)}, SNR: {round(mean_snr,2)}
+        Mean: {round(mean_mean, 4)}, RMS: {round(mean_rms, 4)}, Std: {round(mean_std, 5)}, SNR: {round(mean_snr, 2)}
         """
     )
     plt.axhline(mean_mean, c="r")
@@ -78,6 +79,7 @@ def plot_trace_metadata_depth__big_plots():
             distance = subset[2]
             plot_trace_metadata_depth__one(test_dataset_id, distance, device, 2)
 
+
 def plot_test_trace_metadata_depth__several(sets, trace_process_id):
     database = get_db_absolute_path("main.db")
     con2 = lite.connect(database)
@@ -85,10 +87,10 @@ def plot_test_trace_metadata_depth__several(sets, trace_process_id):
     raw_data = pd.read_sql_query(query, con2)
 
     for subset in sets:
-        plt.figure(figsize=(20,5))
+        plt.figure(figsize=(20, 5))
         plt.subplots_adjust(hspace=0.5)
-        #plt.suptitle("Daily closing prices", fontsize=18, y=0.95)
-        i=1
+        # plt.suptitle("Daily closing prices", fontsize=18, y=0.95)
+        i = 1
         for device in subset[1]:
             ax = plt.subplot(1, 5, i)
             if trace_process_id == 2:
@@ -105,7 +107,7 @@ def plot_test_trace_metadata_depth__several(sets, trace_process_id):
             top_value = np.max(data[204:314]["mean_val"], axis=0)
             bottom_value = np.min(data[204:314]["mean_val"], axis=0)
             dyn_range = top_value - bottom_value
-            scaling_factor = 1/(max(data["mean_val"]) - min(data["mean_val"]))
+            scaling_factor = 1 / (max(data["mean_val"]) - min(data["mean_val"]))
             mean_mean = np.mean(data[204:314]["mean_val"], axis=0)
             mean_rms = np.mean(data[204:314]["rms_val"], axis=0)
             mean_std = round(np.mean(data[204:314]["std_val"], axis=0), 5)
@@ -114,10 +116,10 @@ def plot_test_trace_metadata_depth__several(sets, trace_process_id):
             ax.axhline(bottom_value, c="b")
             ax.axhline(mean_mean, c="r")
             ax.axhline(mean_rms, c="g")
-            if round(top_value,5) < 0.012:
+            if round(top_value, 5) < 0.012:
                 ax.text(
                     0.02, 0.97,
-                    f'Range: {round(dyn_range,4)}\nScaling: {round(scaling_factor)}',
+                    f'Range: {round(dyn_range, 4)}\nScaling: {round(scaling_factor)}',
                     horizontalalignment='left',
                     verticalalignment='top',
                     transform=ax.transAxes
@@ -125,12 +127,12 @@ def plot_test_trace_metadata_depth__several(sets, trace_process_id):
             else:
                 ax.text(
                     0.05, 0.1,
-                    f'Range: {round(dyn_range,4)}\nScaling: {round(scaling_factor)}',
+                    f'Range: {round(dyn_range, 4)}\nScaling: {round(scaling_factor)}',
                     horizontalalignment='left',
                     verticalalignment='top',
                     transform=ax.transAxes
                 )
-            i+=1
+            i += 1
             ax.set_title(
                 f"""Distance: {subset[2]}m, Device: {device}\nStd: {mean_std}, SNR: {mean_snr}"""
             )
@@ -170,7 +172,8 @@ def plot_training_trace_metadata_depth__several(range_start=204, range_end=314):
         data = data[data["device"] == device]
         data = data[data["trace_process_id"] == trace_process_id]
         data = data[data["training_dataset_id"] == 1]
-        data[range_start:range_end].plot(x="data_point_index", y="mean_val", ax=ax)
+        data[range_start:range_end].plot(x="data_point_index", y="mean_val",
+                                         ax=ax)
 
         top_value = np.max(data[range_start:range_end]["mean_val"], axis=0)
         bottom_value = np.min(data[range_start:range_end]["mean_val"], axis=0)
@@ -178,8 +181,10 @@ def plot_training_trace_metadata_depth__several(range_start=204, range_end=314):
         scaling_factor = 1 / (max(data["mean_val"]) - min(data["mean_val"]))
         mean_mean = np.mean(data[range_start:range_end]["mean_val"], axis=0)
         mean_rms = np.mean(data[range_start:range_end]["rms_val"], axis=0)
-        mean_std = round(np.mean(data[range_start:range_end]["std_val"], axis=0), 5)
-        mean_snr = round(np.mean(data[range_start:range_end]["snr_val"], axis=0), 1)
+        mean_std = round(
+            np.mean(data[range_start:range_end]["std_val"], axis=0), 5)
+        mean_snr = round(
+            np.mean(data[range_start:range_end]["snr_val"], axis=0), 1)
 
         ax.axhline(top_value, c="b")
         ax.axhline(bottom_value, c="b")
@@ -218,9 +223,9 @@ def plot_training_trace_metadata_depth__training_set_used():
     query = "select * from trace_metadata_depth;"
     raw_data = pd.read_sql_query(query, con2)
     trace_process_id = 3
-    plt.figure(figsize=(20,5))
+    plt.figure(figsize=(20, 5))
     plt.subplots_adjust(hspace=0.5)
-    #plt.suptitle("Daily closing prices", fontsize=18, y=0.95)
+    # plt.suptitle("Daily closing prices", fontsize=18, y=0.95)
     ax = plt.subplot(1, 5, 1)
     if trace_process_id == 2:
         ax.set_ylim(0, 0.1)
@@ -235,7 +240,7 @@ def plot_training_trace_metadata_depth__training_set_used():
     top_value = np.max(data[204:314]["mean_val"], axis=0)
     bottom_value = np.min(data[204:314]["mean_val"], axis=0)
     dyn_range = top_value - bottom_value
-    scaling_factor = 1/(max(data["mean_val"]) - min(data["mean_val"]))
+    scaling_factor = 1 / (max(data["mean_val"]) - min(data["mean_val"]))
     mean_mean = np.mean(data[204:314]["mean_val"], axis=0)
     mean_rms = np.mean(data[204:314]["rms_val"], axis=0)
     mean_std = round(np.mean(data[204:314]["std_val"], axis=0), 5)
@@ -246,10 +251,10 @@ def plot_training_trace_metadata_depth__training_set_used():
     ax.axhline(mean_mean, c="r")
     ax.axhline(mean_rms, c="g")
 
-    if round(top_value,5) < 0.012:
+    if round(top_value, 5) < 0.012:
         ax.text(
             0.02, 0.97,
-            f'Range: {round(dyn_range,4)}\nScaling: {round(scaling_factor)}',
+            f'Range: {round(dyn_range, 4)}\nScaling: {round(scaling_factor)}',
             horizontalalignment='left',
             verticalalignment='top',
             transform=ax.transAxes
@@ -257,7 +262,7 @@ def plot_training_trace_metadata_depth__training_set_used():
     else:
         ax.text(
             0.05, 0.1,
-            f'Range: {round(dyn_range,4)}\nScaling: {round(scaling_factor)}',
+            f'Range: {round(dyn_range, 4)}\nScaling: {round(scaling_factor)}',
             horizontalalignment='left',
             verticalalignment='top',
             transform=ax.transAxes
@@ -305,6 +310,7 @@ def plot_history_log(
     )
     training_path = os.path.dirname(training_file_path)
     history_log_file_path = os.path.join(training_path, "history_log.npy")
+    history_log_fig_file_path = os.path.join(training_path, "history_log.png")
     history_log_npy = np.load(history_log_file_path, allow_pickle=True)
     history_log = history_log_npy.tolist()
     plt.subplot(1, 2, 1)
@@ -313,5 +319,5 @@ def plot_history_log(
     plt.subplot(1, 2, 2)
     plt.plot(history_log["loss"])
     plt.plot(history_log["val_loss"])
+    plt.savefig(fname=history_log_fig_file_path)
     plt.show()
-
