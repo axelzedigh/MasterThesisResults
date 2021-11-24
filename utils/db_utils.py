@@ -14,10 +14,13 @@ from database.queries import (
     QUERY_CREATE_TABLE_DENOISING_METHODS,
     QUERY_CREATE_TABLE_RANK_TEST,
     QUERY_CREATE_VIEW_FULL_RANK_TEST,
-    QUERY_SELECT_ADDITIVE_NOISE_METHOD_ID, QUERY_SELECT_DENOISING_METHOD_ID,
-    QUERY_LIST_INITIALIZE_DB, QUERY_FULL_RANK_TEST_GROUPED_A,
+    QUERY_SELECT_ADDITIVE_NOISE_METHOD_ID,
+    QUERY_SELECT_DENOISING_METHOD_ID,
+    QUERY_LIST_INITIALIZE_DB,
+    QUERY_FULL_RANK_TEST_GROUPED_A,
     QUERY_CREATE_TABLE_TRACE_PROCESSES,
-    QUERY_CREATE_TABLE_TRACE_METADATA_DEPTH, QUERY_CREATE_TABLE_TRACE_METADATA_WIDTH,
+    QUERY_CREATE_TABLE_TRACE_METADATA_DEPTH,
+    QUERY_CREATE_TABLE_TRACE_METADATA_WIDTH,
 )
 
 
@@ -299,7 +302,7 @@ def insert_legacy_rank_test_numpy_file_to_db(
                           additive_noise_method_id=additive_noise_method_id,
                           denoising_method_id=denoising_method_id,
                           termination_point=int(termination_point),
-                          average_rank=None)
+                          trace_process_id=3)
 
 
 def create_md__option_tables(database="main.db", path="docs"):
@@ -564,7 +567,8 @@ def get_training_model_file_path(
         additive_noise_method_id,
         denoising_method_id,
         epoch,
-        keybyte
+        keybyte,
+        trace_process_id,
 ) -> str:
     """
 
@@ -595,6 +599,7 @@ def get_training_model_file_path(
     training_model_file_path = os.path.join(
         project_dir,
         path,
+        f"trace_process_{trace_process_id}",
         f"keybyte_{keybyte}",
         f"{additive_noise_method_id}_{denoising_method_id}",
         f"{training_model}-{epoch}.h5"

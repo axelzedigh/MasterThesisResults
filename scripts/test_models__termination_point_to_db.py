@@ -22,6 +22,7 @@ def termination_point_test_and_insert_to_db(
         epoch,
         additive_noise_method_id,
         denoising_method_id,
+        trace_process_id,
 ):
     """
 
@@ -37,14 +38,13 @@ def termination_point_test_and_insert_to_db(
     :param epoch:
     :param additive_noise_method_id:
     :param denoising_method_id:
+    :param trace_process_id:
     """
     filter_function = None
     if denoising_method_id == 1:
         filter_function = moving_average_filter_n3
     if denoising_method_id == 2:
         filter_function = moving_average_filter_n5
-    # TODO: fix the trace process id thing (pass as argument to shell-script?
-    trace_process_id = 3
     for _ in tqdm(range(0, runs)):
         termination_point = termination_point_test(
             database,
@@ -58,6 +58,7 @@ def termination_point_test_and_insert_to_db(
             epoch,
             additive_noise_method_id,
             denoising_method_id,
+            trace_process_id=trace_process_id,
         )
         print(termination_point)
         if termination_point is not None:
@@ -101,5 +102,6 @@ if __name__ == "__main__":
         keybyte=int(sys.argv[9]),
         epoch=int(sys.argv[10]),
         additive_noise_method_id=additive_id,
-        denoising_method_id=denoising_id
+        denoising_method_id=denoising_id,
+        trace_process_id=int(sys.argv[13]),
     )

@@ -1,7 +1,7 @@
 import os.path
 import random
 import sys
-from typing import Tuple, Optional, Callable
+from typing import Optional, Callable
 import matplotlib.pyplot as plt
 
 import numpy as np
@@ -58,15 +58,13 @@ Inv_SBox = np.array([
 
 def load_sca_model(model_file):
     """
-
-    :param model_file:
-    :return:
+    :param model_file: Path to the model.
+    :return: The Keras model.
     """
     try:
         model = tf.keras.models.load_model(model_file)
-    except:
-        print("Error: can't load Keras model file '%s'" % model_file)
-        sys.exit(-1)
+    except OSError:
+        raise f"Error: can't load Keras model file {model_file}."
     return model
 
 
@@ -185,7 +183,8 @@ def termination_point_test(
         keybyte: int,
         epoch: int,
         additive_noise_method_id: int,
-        denoising_method_id: int
+        denoising_method_id: int,
+        trace_process_id: int,
 ) -> Optional[int]:
     """
 
@@ -200,6 +199,7 @@ def termination_point_test(
     :param epoch:
     :param additive_noise_method_id:
     :param denoising_method_id:
+    :param trace_process_id:
     :return:
     """
     database = get_db_file_path(database)
@@ -213,7 +213,12 @@ def termination_point_test(
         device=device
     )
 
-    nor_traces_maxmin = "nor_traces_maxmin.npy"
+    if trace_process_id == 3:
+        nor_traces_maxmin = "nor_traces_maxmin.npy"
+    elif trace_process_id == 4:
+        nor_traces_maxmin = "nor_traces_maxmin__sbox_range_204_314.npy"
+    else:
+        raise "Choose a correct trace_process_id (3 or 4)"
     tenth_roundkey = "10th_roundkey.npy"
     ct = "ct.npy"
     testing_traces_path = os.path.join(test_path, nor_traces_maxmin)
@@ -242,8 +247,7 @@ def termination_point_test(
     cts = np.load(ciphertexts_path)
     cts = cts[:number_total_trace]
 
-    # choose interest key byte and pt byte
-    # interest_byte = 0
+    # choose interest keybyte and pt byte
     key_interest = key[keybyte]
     cts_interest = cts[:, keybyte]
 
@@ -254,7 +258,8 @@ def termination_point_test(
         additive_noise_method_id=additive_noise_method_id,
         denoising_method_id=denoising_method_id,
         epoch=epoch,
-        keybyte=keybyte
+        keybyte=keybyte,
+        trace_process_id=trace_process_id,
     )
     training_model = load_sca_model(training_model_path)
 

@@ -105,13 +105,13 @@ class AddToDatabaseTestCase(unittest.TestCase):
                           device=8, training_model_id=1, keybyte=0, epoch=100,
                           additive_noise_method_id=None,
                           denoising_method_id=None, termination_point=9999,
-                          average_rank=9999)
+                          trace_process_id=3)
         insert_data_to_db(database=self.database, test_dataset_id=1,
                           training_dataset_id=1, environment_id=1, distance=15,
                           device=7, training_model_id=1, keybyte=0, epoch=100,
                           additive_noise_method_id=None,
                           denoising_method_id=None, termination_point=101,
-                          average_rank=102)
+                          trace_process_id=3)
         fetchall = self.con.execute("SELECT * FROM Rank_Test;").fetchall()
         self.assertIsNotNone(fetchall)
         device = fetchall[0][5]
@@ -123,17 +123,17 @@ class AddToDatabaseTestCase(unittest.TestCase):
                           device=7, training_model_id=1, keybyte=0, epoch=100,
                           additive_noise_method_id=None,
                           denoising_method_id=None, termination_point=101,
-                          average_rank=102)
+                          trace_process_id=3)
         insert_data_to_db(database=self.database, test_dataset_id=1,
                           training_dataset_id=1, environment_id=1, distance=15,
                           device=8, training_model_id=1, keybyte=0, epoch=100,
                           additive_noise_method_id=1, denoising_method_id=None,
-                          termination_point=101, average_rank=102)
+                          termination_point=101, trace_process_id=3)
         insert_data_to_db(database=self.database, test_dataset_id=1,
                           training_dataset_id=1, environment_id=1, distance=15,
                           device=9, training_model_id=1, keybyte=0, epoch=100,
                           additive_noise_method_id=None, denoising_method_id=1,
-                          termination_point=101, average_rank=102)
+                          termination_point=101, trace_process_id=3)
         query = "SELECT * FROM full_rank_test;"
         data = fetchall_query(self.database, query)
         self.assertNotEqual(data, [])
@@ -281,12 +281,12 @@ class AddToDatabaseTestCase(unittest.TestCase):
                           training_dataset_id=1, environment_id=1, distance=15,
                           device=9, training_model_id=1, keybyte=0, epoch=100,
                           additive_noise_method_id=None, denoising_method_id=1,
-                          termination_point=101, average_rank=102)
+                          termination_point=101, trace_process_id=3)
         insert_data_to_db(database=self.database, test_dataset_id=1,
                           training_dataset_id=1, environment_id=1, distance=15,
                           device=8, training_model_id=1, keybyte=0, epoch=100,
                           additive_noise_method_id=1, denoising_method_id=None,
-                          termination_point=101, average_rank=102)
+                          termination_point=101, trace_process_id=3)
         data = fetchall_query(self.database, "SELECT Count(*) FROM Rank_Test;")
         self.assertNotEqual(data, [])
         self.assertEqual(data[0][0], 2)
@@ -300,22 +300,22 @@ class AddToDatabaseTestCase(unittest.TestCase):
                           training_dataset_id=1, environment_id=1, distance=15,
                           device=9, training_model_id=1, keybyte=0, epoch=100,
                           additive_noise_method_id=None, denoising_method_id=1,
-                          termination_point=101, average_rank=102)
+                          termination_point=101, trace_process_id=102)
         insert_data_to_db(database=self.database, test_dataset_id=1,
                           training_dataset_id=1, environment_id=1, distance=15,
                           device=9, training_model_id=1, keybyte=0, epoch=100,
                           additive_noise_method_id=None, denoising_method_id=1,
-                          termination_point=101, average_rank=102)
+                          termination_point=101, trace_process_id=3)
         insert_data_to_db(database=self.database, test_dataset_id=1,
                           training_dataset_id=1, environment_id=1, distance=15,
                           device=8, training_model_id=1, keybyte=0, epoch=100,
                           additive_noise_method_id=1, denoising_method_id=None,
-                          termination_point=101, average_rank=102)
+                          termination_point=101, trace_process_id=3)
         insert_data_to_db(database=self.database, test_dataset_id=1,
                           training_dataset_id=1, environment_id=1, distance=15,
                           device=8, training_model_id=1, keybyte=0, epoch=100,
                           additive_noise_method_id=1, denoising_method_id=None,
-                          termination_point=101, average_rank=102)
+                          termination_point=101, trace_process_id=3)
         data = fetchall_query(self.database, QUERY_RANK_TEST_GROUPED_A)
         self.assertIsNotNone(data)
         self.assertNotEqual(data, [])
@@ -325,22 +325,22 @@ class AddToDatabaseTestCase(unittest.TestCase):
                           training_dataset_id=1, environment_id=1, distance=15,
                           device=9, training_model_id=1, keybyte=0, epoch=100,
                           additive_noise_method_id=None, denoising_method_id=1,
-                          termination_point=101, average_rank=102)
+                          termination_point=101, trace_process_id=3)
         insert_data_to_db(database=self.database, test_dataset_id=1,
                           training_dataset_id=1, environment_id=1, distance=15,
                           device=9, training_model_id=1, keybyte=0, epoch=100,
                           additive_noise_method_id=None, denoising_method_id=1,
-                          termination_point=101, average_rank=102)
+                          termination_point=101, trace_process_id=3)
         insert_data_to_db(database=self.database, test_dataset_id=1,
                           training_dataset_id=1, environment_id=1, distance=15,
                           device=8, training_model_id=1, keybyte=0, epoch=100,
                           additive_noise_method_id=1, denoising_method_id=None,
-                          termination_point=101, average_rank=102)
+                          termination_point=101, trace_process_id=3)
         insert_data_to_db(database=self.database, test_dataset_id=1,
                           training_dataset_id=1, environment_id=1, distance=15,
                           device=8, training_model_id=1, keybyte=0, epoch=100,
                           additive_noise_method_id=1, denoising_method_id=None,
-                          termination_point=101, average_rank=102)
+                          termination_point=101, trace_process_id=3)
         data = fetchall_query(self.database, QUERY_FULL_RANK_TEST_GROUPED_A)
         self.assertIsNotNone(data)
         self.assertNotEqual(data, [])
@@ -391,12 +391,12 @@ class AddToDatabaseTestCase(unittest.TestCase):
                           training_dataset_id=1, environment_id=1, distance=15,
                           device=9, training_model_id=1, keybyte=0, epoch=100,
                           additive_noise_method_id=None, denoising_method_id=1,
-                          termination_point=101, average_rank=102)
+                          termination_point=101, trace_process_id=3)
         insert_data_to_db(database=database_from, test_dataset_id=1,
                           training_dataset_id=1, environment_id=1, distance=15,
                           device=10, training_model_id=1, keybyte=0, epoch=100,
                           additive_noise_method_id=None, denoising_method_id=1,
-                          termination_point=101, average_rank=102)
+                          termination_point=101, trace_process_id=3)
 
         copy_rank_test_from_db1_to_db2(
             database_from=database_from,
