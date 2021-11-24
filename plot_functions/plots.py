@@ -1,4 +1,6 @@
 """Functions for plotting things."""
+from typing import Optional
+
 import numpy as np
 import sqlite3 as lite
 import pandas as pd
@@ -8,7 +10,7 @@ import seaborn as sns
 import os
 
 # Setup sqlite connection
-from utils.db_utils import get_db_absolute_path
+from utils.db_utils import get_db_absolute_path, get_training_model_file_path
 from utils.statistic_utils import root_mean_square
 
 database = get_db_absolute_path("main.db")
@@ -284,3 +286,32 @@ def plot_all_trace_metadata_depth():
     plot_test_trace_metadata_depth__several(sets, 3)
     plot_training_trace_metadata_depth__training_set_used()
     plot_training_trace_metadata_depth__several(130, 240)
+
+
+def plot_history_log(
+        trace_process_id: int,
+        keybyte: int,
+        additive_noise_method_id: Optional[int],
+        denoising_method_id: Optional[int],
+) -> None:
+    training_file_path = get_training_model_file_path(
+        database="main.db",
+        training_model_id=1,
+        additive_noise_method_id=additive_noise_method_id,
+        denoising_method_id=denoising_method_id,
+        epoch=1,
+        keybyte=keybyte,
+        trace_process_id=trace_process_id,
+    )
+    training_path = os.path.dirname(training_file_path)
+    history_log_file_path = os.path.join(training_path, "history_log.npy")
+    history_log_npy = np.load(history_log_file_path, allow_pickle=True)
+    history_log = history_log_npy.tolist()
+    plt.subplot(1, 2, 1)
+    plt.plot(history_log["accuracy"])
+    plt.plot(history_log["val_accuracy"])
+    plt.subplot(1, 2, 2)
+    plt.plot(history_log["loss"])
+    plt.plot(history_log["val_loss"])
+    plt.show()
+
