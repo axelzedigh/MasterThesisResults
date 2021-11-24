@@ -15,7 +15,8 @@ from utils.statistic_utils import maxmin_scaling_of_trace_set__per_trace_fit
 def normalize_training_traces_200k():
     training_set_path = get_training_trace_path__raw_200k_data()
     trace_set_file_path = os.path.join(
-        training_set_path, "traces.npy"
+        # training_set_path, "traces.npy"
+        training_set_path, "nor_traces_maxmin.npy"
     )
     trace_set = np.load(trace_set_file_path)
 
@@ -66,15 +67,15 @@ def normalize_test_traces__trace_process_4(
 
 
 if __name__ == "__main__":
-    # normalize_training_traces_200k()
-    test_dataset_id = 1
-    environment_id = 1
-    distance = 15
-    device = 10
-
-    normalize_test_traces__trace_process_4(
-        test_dataset_id=test_dataset_id,
-        environment_id=environment_id,
-        distance=distance,
-        device=device,
-    )
+    normalize_training_traces_200k()
+    # test_dataset_id = 1
+    # environment_id = 1
+    # distance = 15
+    # device = 10
+    #
+    # normalize_test_traces__trace_process_4(
+    #     test_dataset_id=test_dataset_id,
+    #     environment_id=environment_id,
+    #     distance=distance,
+    #     device=device,
+    # )

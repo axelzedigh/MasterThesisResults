@@ -347,6 +347,8 @@ def training_cnn_110(
     training_model_id = 1
     start = 204
     end = 314
+    additive_noise_trace = None
+    clean_trace = None
 
     # Get training traces numpy array.
     training_set_path = get_training_trace_path__raw_200k_data()
@@ -355,7 +357,7 @@ def training_cnn_110(
             training_set_path, "nor_traces_maxmin.npy"
         )
         training_trace_set = np.load(trace_set_file_path)
-    elif trace_process_id == 4:
+    elif trace_process_id == 4 or trace_process_id == 5:
         trace_set_file_path = os.path.join(
             training_set_path, "nor_traces_maxmin__sbox_range_204_314.npy"
         )
@@ -428,11 +430,13 @@ def training_cnn_110(
 
     # Plot the traces as a final check
     if verbose:
-        plt.plot(training_trace_set[0], color="b")
+        plt.plot(training_trace_set[0], color="deepskyblue")
+        plt.plot(training_trace_set[1], color="seagreen")
+        plt.plot(training_trace_set[2], color="blueviolet")
         if additive_noise_method_id is not None:
-            plt.plot(additive_noise_trace, color="g")
+            plt.plot(additive_noise_trace[start:end], color="lightcoral")
         if denoising_method_id is not None:
-            plt.plot(clean_trace, color="orange")
+            plt.plot(clean_trace[start:end], color="orange")
         plt.show()
 
     # Train the model

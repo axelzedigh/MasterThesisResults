@@ -215,10 +215,10 @@ def termination_point_test(
 
     if trace_process_id == 3:
         nor_traces_maxmin = "nor_traces_maxmin.npy"
-    elif trace_process_id == 4:
+    elif trace_process_id == 4 or 5:
         nor_traces_maxmin = "nor_traces_maxmin__sbox_range_204_314.npy"
     else:
-        raise "Choose a correct trace_process_id (3 or 4)"
+        raise "Choose a correct trace_process_id (3, 4 or 5)"
     tenth_roundkey = "10th_roundkey.npy"
     ct = "ct.npy"
     testing_traces_path = os.path.join(test_path, nor_traces_maxmin)
