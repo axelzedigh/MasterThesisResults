@@ -206,7 +206,10 @@ QUERY_LIST_INITIALIZE_DB = [
     "INSERT INTO trace_processes VALUES (1, 'Raw');",
     "INSERT INTO trace_processes VALUES (2, 'Randomized order');",
     "INSERT INTO trace_processes VALUES (3, 'Normalized - MaxMin');",
-    "INSERT INTO trace_processes VALUES (4, 'Normalized - MaxMin S-Box Range');"
+    ("INSERT INTO trace_processes VALUES (4, 'Normalized - "
+     "MaxMin S-Box Range - Normalization after additive noise');"),
+    ("INSERT INTO trace_processes VALUES (5, 'Normalized - "
+     "MaxMin S-Box Range - No normalization after additive noise');")
 ]
 
 QUERY_RANK_TEST_GROUPED_A = """
