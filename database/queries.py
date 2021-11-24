@@ -411,3 +411,12 @@ QUERY_CREATE_VIEW_TRACE_METADATA_DEPTH__GROUPED = """
         device,
         trace_process_id
 """
+
+QUERY_CREATE_TABLE_NOISE_INFO = """
+CREATE TABLE IF NOT EXISTS Noise_info(
+    id INTEGER PRIMARY KEY,
+    environment_id INT,
+    RMS FLOAT,
+    device_during_capturing INT
+);
+"""

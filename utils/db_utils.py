@@ -1,5 +1,6 @@
 """Util functions for interacting with the databases."""
 import sqlite3 as lite
+
 import os
 import numpy as np
 import re
@@ -21,6 +22,7 @@ from database.queries import (
     QUERY_CREATE_TABLE_TRACE_PROCESSES,
     QUERY_CREATE_TABLE_TRACE_METADATA_DEPTH,
     QUERY_CREATE_TABLE_TRACE_METADATA_WIDTH,
+    QUERY_CREATE_TABLE_NOISE_INFO,
 )
 
 
@@ -71,6 +73,8 @@ def create_db_with_tables(database="main.db") -> None:
         cur.execute(QUERY_CREATE_TABLE_TRACE_PROCESSES)
         cur.execute(QUERY_CREATE_TABLE_TRACE_METADATA_DEPTH)
         cur.execute(QUERY_CREATE_TABLE_TRACE_METADATA_WIDTH)
+        cur.execute(QUERY_CREATE_TABLE_NOISE_INFO)
+
 
         # Create views
         con.execute(QUERY_CREATE_VIEW_FULL_RANK_TEST)

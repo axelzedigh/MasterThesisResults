@@ -1,5 +1,5 @@
-# Run to create database (if no previous exists)
-import sys
+""""Run to create database (if no previous exists)"""
+
 from utils.db_utils import create_db_with_tables, initialize_table_data
 
 
