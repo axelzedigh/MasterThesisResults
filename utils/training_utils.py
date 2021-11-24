@@ -345,10 +345,16 @@ def training_cnn_110(
     """
     # Initialise variables
     training_model_id = 1
-    start = 204
-    end = 314
     additive_noise_trace = None
     clean_trace = None
+    start = 204
+    end = 314
+    if trace_process_id in [6]:
+        # start = 200
+        # end = 320
+        start = 209
+        end = 329
+
 
     # Get training traces numpy array.
     training_set_path = get_training_trace_path__raw_200k_data()
