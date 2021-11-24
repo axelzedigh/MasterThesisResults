@@ -1,8 +1,7 @@
 # Todos
 ## Now
-- Drop avg_rank column in rank_test, replace with trace_processing_id
-  - Assign trace_process_id 3 to all previous analyses
-  - Assign trace_process_id 4 to maxmin traces
+- trace_process 4 for all test traces
+  - write function for that
 
 ---
 
