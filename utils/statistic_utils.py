@@ -10,7 +10,6 @@ from sklearn import preprocessing
 
 def hamming_weight__single(value: int) -> int:
     """
-
     :param value: The value to count the hamming-weight.
     :return: Hamming weight int.
     """
@@ -21,7 +20,6 @@ def hamming_weight__single(value: int) -> int:
 @jit
 def hamming_weight__vector(vector) -> np.array:
     """
-
     :param vector: The vector with values to calculate.
     :return: np.array with hamming-weights.
     """
@@ -42,7 +40,6 @@ def cross_correlation_matrix(trace_1, trace_2) -> np.array:
 
 def pearson_correlation_coefficient(a, b) -> Tuple:
     """
-
     :param a: Dataset A.
     :param b: Dataset B.
     :return: Pearson's correlation coefficients, tuple.

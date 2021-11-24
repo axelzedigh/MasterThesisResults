@@ -381,7 +381,7 @@ def training_cnn_110(
     labels = last_round_sbox_output
 
     # Get path to store model
-    model_save_path = get_training_model_file_save_path(
+    model_save_file_path = get_training_model_file_save_path(
         keybyte=keybyte,
         additive_noise_method_id=additive_noise_method_id,
         denoising_method_id=denoising_method_id,
@@ -440,13 +440,14 @@ def training_cnn_110(
         x_profiling=training_trace_set,
         y_profiling=labels,
         deep_learning_model=deep_learning_model,
-        model_save_path=model_save_path,
+        model_save_path=model_save_file_path,
         epochs=epochs,
         batch_size=batch_size
     )
 
     # Store the accuracy and loss data
-    history_log_file_path = os.path.join(model_save_path, "history_log.npy")
+    model_save_path_dir = os.path.dirname(model_save_file_path)
+    history_log_file_path = os.path.join(model_save_path_dir, "history_log.npy")
     np.save(history_log_file_path, history_log.history)
 
     return
