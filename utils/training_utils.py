@@ -345,6 +345,7 @@ def training_cnn_110(
     :return: None.
     """
     # Initialise variables
+    raw_data_path = os.getenv("MASTER_THESIS_RESULTS_RAW_DATA")
     training_model_id = 1
     additive_noise_trace = None
     clean_trace = None
@@ -353,9 +354,10 @@ def training_cnn_110(
     if trace_process_id in [6]:
         # start = 200
         # end = 320
-        start = 209
-        end = 329
-
+        # start = 209
+        # end = 329
+        start = 130
+        end = 240
 
     # Get training traces numpy array.
     training_set_path = get_training_trace_path__raw_200k_data()
@@ -369,25 +371,40 @@ def training_cnn_110(
             training_set_path, "nor_traces_maxmin__sbox_range_204_314.npy"
         )
         training_trace_set = np.load(trace_set_file_path)
+    elif trace_process_id == 6:
+        trace_set_file_path = os.path.join(
+            raw_data_path,
+            "datasets/training_traces/Zedigh_2021/Cable/100k_5devices_joined",
+            "nor_maxmin_traces__130_240.npy"
+        )
+        training_trace_set = np.load(trace_set_file_path)
     else:
         raise "Trace process id is not correct."
 
-    # Get cipher-text numpy array..
-    cipher_text_file_path = os.path.join(
-        training_set_path, "ct.npy"
-    )
-    cipher_text = np.load(cipher_text_file_path)
+    if trace_process_id == 6:
+        labels_path = os.path.join(
+            raw_data_path,
+            "datasets/training_traces/Zedigh_2021/Cable/100k_5devices_joined",
+            "labels.npy"
+        )
+        labels = np.load(labels_path)
+    else:
+        # Get cipher-text numpy array..
+        cipher_text_file_path = os.path.join(
+            training_set_path, "ct.npy"
+        )
+        cipher_text = np.load(cipher_text_file_path)
 
-    # Get last round key numpy array, transform to labels array.
-    last_roundkey_file_path = os.path.join(
-        training_set_path, "lastroundkey.npy"
-    )
-    last_roundkey = np.load(last_roundkey_file_path)
-    last_roundkey = last_roundkey.astype(int)
-    last_round_sbox_output = np.bitwise_xor(
-        cipher_text[:, keybyte], last_roundkey[:, keybyte]
-    )
-    labels = last_round_sbox_output
+        # Get last round key numpy array, transform to labels array.
+        last_roundkey_file_path = os.path.join(
+            training_set_path, "lastroundkey.npy"
+        )
+        last_roundkey = np.load(last_roundkey_file_path)
+        last_roundkey = last_roundkey.astype(int)
+        last_round_sbox_output = np.bitwise_xor(
+            cipher_text[:, keybyte], last_roundkey[:, keybyte]
+        )
+        labels = last_round_sbox_output
 
     # Get path to store model
     model_save_file_path = get_training_model_file_save_path(
