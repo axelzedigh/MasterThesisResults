@@ -1,13 +1,13 @@
 # Todos
 ## Now
-- trace_process 4 for all test traces
-  - write function for that
+- Create maxmin normalized traces for all test traces
+- Refactor trace conversion (label_lastround) into more generalizeable
+- Test if trace process 6 works.
 
 ---
 
 ## Database
 - Create queries/views for trace-metrics vs avg(termination_points)
-- Create table with noise_data (additive_noise_id, scale, rms)
 - SNR-table (test_trace_id, SNR)
 
 ## Storage
