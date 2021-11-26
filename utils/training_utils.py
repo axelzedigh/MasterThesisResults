@@ -99,6 +99,7 @@ def train_model(
         model_save_path,
         epochs,
         batch_size,
+        mode,
 ) -> Callable:
     """
 
@@ -108,13 +109,22 @@ def train_model(
     :param model_save_path:
     :param epochs:
     :param batch_size:
+    :param mode:
     :return: History-function.
     """
     # Check if file-path exists
     check_if_file_exists(os.path.dirname(model_save_path))
 
     # Save model every epoch
-    save_model = ModelCheckpoint(model_save_path)
+    if mode == 1:
+        save_model = ModelCheckpoint(model_save_path)
+    elif mode == 2:
+        save_model = ModelCheckpoint(
+            model_save_path,
+            monitor='val_loss',
+            mode='min',
+            save_best_only=True
+        )
     callbacks = [save_model]
 
     # Get the input layer shape
@@ -329,6 +339,7 @@ def training_cnn_110(
         denoising_method_id: Optional[int] = None,
         trace_process_id: int = 3,
         verbose: bool = False,
+        mode: int = 1,
 ) -> None:
     """
     The main function for training the CNN 110 classifier.
@@ -342,6 +353,7 @@ def training_cnn_110(
     :param denoising_method_id: Id to denoising method.
     :param trace_process_id: The trace pre-process done.
     :param verbose: Show plot and extra information if true.
+    :param mode:
     :return: None.
     """
     # Initialise variables
@@ -351,7 +363,7 @@ def training_cnn_110(
     clean_trace = None
     start = 204
     end = 314
-    if trace_process_id in [6]:
+    if trace_process_id in [6, 7]:
         # start = 200
         # end = 320
         # start = 209
@@ -378,6 +390,13 @@ def training_cnn_110(
             "nor_maxmin_traces__130_240.npy"
         )
         training_trace_set = np.load(trace_set_file_path)
+    elif trace_process_id == 7:
+        trace_set_file_path = os.path.join(
+            raw_data_path,
+            "datasets/training_traces/Zedigh_2021/Cable/500k_5devices_joined",
+            "nor_maxmin_traces__130_240.npy"
+        )
+        training_trace_set = np.load(trace_set_file_path)
     else:
         raise "Trace process id is not correct."
 
@@ -385,6 +404,13 @@ def training_cnn_110(
         labels_path = os.path.join(
             raw_data_path,
             "datasets/training_traces/Zedigh_2021/Cable/100k_5devices_joined",
+            "labels.npy"
+        )
+        labels = np.load(labels_path)
+    if trace_process_id == 7:
+        labels_path = os.path.join(
+            raw_data_path,
+            "datasets/training_traces/Zedigh_2021/Cable/500k_5devices_joined",
             "labels.npy"
         )
         labels = np.load(labels_path)
@@ -475,7 +501,8 @@ def training_cnn_110(
         deep_learning_model=deep_learning_model,
         model_save_path=model_save_file_path,
         epochs=epochs,
-        batch_size=batch_size
+        batch_size=batch_size,
+        mode=mode,
     )
 
     # Store the accuracy and loss data

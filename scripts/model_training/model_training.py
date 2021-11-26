@@ -5,10 +5,10 @@ if __name__ == "__main__":
     keybyte = 0
     epochs = 100
     batch_size = 256
-    additive_noise_method_id = None
+    additive_noise_method_id = 3
     denoising_method_id = None
     training_model_id = 1
-    trace_process_id = 6
+    trace_process_id = 5
 
     training_cnn_110(
         keybyte=keybyte,
@@ -18,4 +18,5 @@ if __name__ == "__main__":
         denoising_method_id=denoising_method_id,
         trace_process_id=trace_process_id,
         verbose=True,
+        mode=1,
     )

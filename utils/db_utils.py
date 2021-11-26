@@ -549,6 +549,25 @@ def get_training_trace_path__raw_20k_data(
     return training_traces_path
 
 
+def get_training_trace_path__raw_100k_data(
+        device
+) -> str:
+    """
+
+    :param device:
+    :return:
+    """
+    project_dir = os.getenv("MASTER_THESIS_RESULTS_RAW_DATA")
+    path = f"datasets/training_traces/Wang_2021/Cable/original_data/100k_d{device}/100avg"
+
+    training_traces_path = os.path.join(
+        project_dir,
+        path,
+    )
+
+    return training_traces_path
+
+
 def get_training_trace_path__raw_200k_data() -> str:
     """
 
