@@ -206,10 +206,14 @@ QUERY_LIST_INITIALIZE_DB = [
     "INSERT INTO trace_processes VALUES (1, 'Raw');",
     "INSERT INTO trace_processes VALUES (2, 'Randomized order');",
     "INSERT INTO trace_processes VALUES (3, 'Normalized - MaxMin');",
-    ("INSERT INTO trace_processes VALUES (4, 'Normalized - "
-     "MaxMin S-Box Range - Normalization after additive noise');"),
-    ("INSERT INTO trace_processes VALUES (5, 'Normalized - "
-     "MaxMin S-Box Range - No normalization after additive noise');")
+    ("INSERT INTO trace_processes VALUES (4, 'Normalized - MaxMin SBox Range - "
+     "Normalization after additive noise');"),
+    ("INSERT INTO trace_processes VALUES (5, 'Normalized - MaxMin SBox Range - "
+     "No re-normalization after additive noise');"),
+    ("INSERT INTO trace_processes VALUES (6, 'Normalized - MaxMin Sbox Range - "
+     "No re-normalization - 100k training traces')"),
+    ("INSERT INTO trace_processes VALUES (7, 'Normalized - MaxMin Sbox Range - "
+     "No re-normalization - 500k training traces')"),
 ]
 
 QUERY_RANK_TEST_GROUPED_A = """
