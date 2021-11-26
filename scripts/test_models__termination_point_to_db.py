@@ -105,3 +105,19 @@ if __name__ == "__main__":
         denoising_method_id=denoising_id,
         trace_process_id=int(sys.argv[13]),
     )
+
+    # termination_point_test_and_insert_to_db(
+    #     database="tmp_1.db",
+    #     runs=100,
+    #     test_dataset_id=1,
+    #     training_dataset_id=1,
+    #     environment_id=1,
+    #     distance=15,
+    #     device=6,
+    #     training_model_id=1,
+    #     keybyte=0,
+    #     epoch=65,
+    #     additive_noise_method_id=None,
+    #     denoising_method_id=None,
+    #     trace_process_id=3
+    # )

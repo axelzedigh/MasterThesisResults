@@ -215,7 +215,7 @@ def termination_point_test(
 
     if trace_process_id == 3:
         nor_traces_maxmin = "nor_traces_maxmin.npy"
-    elif trace_process_id == 4 or 5:
+    elif trace_process_id == 4 or 5 or 6:
         nor_traces_maxmin = "nor_traces_maxmin__sbox_range_204_314.npy"
     else:
         raise "Choose a correct trace_process_id (3, 4 or 5)"
@@ -225,7 +225,7 @@ def termination_point_test(
     keys_path = os.path.join(test_path, tenth_roundkey)
     ciphertexts_path = os.path.join(test_path, ct)
 
-    number_total_trace = 5000
+    number_total_trace = 4900
     testing_traces = np.load(testing_traces_path)
     testing_traces = testing_traces[:number_total_trace]
 
@@ -268,7 +268,7 @@ def termination_point_test(
 
     # randomly select trace for testing
     number = 1500
-    average = 50
+    average = 100   # 50
     ranks_array = []
 
     for i in range(average):
