@@ -4,7 +4,9 @@ import numpy as np
 
 from matplotlib import pyplot as plt
 
-from plots.plot_functions import plot_history_log
+from plots.plot_functions import plot_history_log, \
+    plot_best_additive_noise_methods, \
+    plot_all_of_an_additive_noise
 from utils.db_utils import get_training_trace_path__raw_200k_data, \
     get_test_trace_path
 from utils.denoising_utils import wiener_filter
@@ -70,9 +72,13 @@ if __name__ == "__main__":
     # wiener_filter__1()
     # training_maxmin_sbox_range()
     # test_maxmin_sbox_range()
-    plot_history_log(
-        trace_process_id=4,
-        keybyte=0,
-        additive_noise_method_id=6,
-        denoising_method_id=None,
+    # plot_history_log(
+    #     trace_process_id=4,
+    #     keybyte=0,
+    #     additive_noise_method_id=6,
+    #     denoising_method_id=None,
+    # )
+    # plot_best_additive_noise_methods()
+    plot_all_of_an_additive_noise(
+        additive_noise_method="Collected"
     )
