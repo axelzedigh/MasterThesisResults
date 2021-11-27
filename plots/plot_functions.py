@@ -467,6 +467,7 @@ def plot_all_of_an_additive_noise(
         trace_process_id: int = 3,
         epoch: int = 65,
         distance: float = 15,
+        save: bool = False
 ):
     query_wang = f"""
     select
@@ -559,5 +560,6 @@ def plot_all_of_an_additive_noise(
     axs[1].text(x=-0.2, y=(ylim_top-100), s="Zedigh 2021", fontsize=16)
     plt.tight_layout()
     plt.tight_layout()
-    plt.savefig(f"../docs/figs/{additive_noise_method}_comparison.png")
+    if save:
+        plt.savefig(f"../docs/figs/{additive_noise_method}_comparison.png")
     plt.show()
