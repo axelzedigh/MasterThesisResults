@@ -1,5 +1,5 @@
 """Functions for plotting things."""
-from typing import Optional
+from typing import Optional, Tuple
 import numpy as np
 import sqlite3 as lite
 import pandas as pd
@@ -296,6 +296,7 @@ def plot_history_log(
         keybyte: int,
         additive_noise_method_id: Optional[int],
         denoising_method_id: Optional[int],
+        save: bool = False,
 ) -> None:
     """
     Plot the history function. Accuracy on the left, loss on the right.
@@ -330,7 +331,8 @@ def plot_history_log(
     ax2.plot(history_log["val_loss"])
     ax2.set_xlabel("Epoch")
     ax2.set_ylabel("Loss")
-    plt.savefig(fname=history_log_fig_file_path)
+    if save:
+        plt.savefig(fname=history_log_fig_file_path)
     plt.show()
 
 
@@ -339,12 +341,14 @@ def plot_best_additive_noise_methods(
         gaussian_value: float = 0.04,
         collected_value: float = 25,
         rayleigh_value: float = 0.0138,
-):
+        save: bool = False,
+) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """
     :param trace_process_id: The parameter 1 value.
     :param gaussian_value:  The parameter 1 value.
     :param collected_value: The parameter 1 value.
     :param rayleigh_value:  The parameter 1 value.
+    :param save: To save figure or not.
     """
     custom_lines = [Line2D([0], [0], color='b', lw=4),
                     Line2D([0], [0], color='orange', lw=4),
@@ -458,8 +462,10 @@ def plot_best_additive_noise_methods(
     plt.tight_layout()
     axs[0].legend(custom_lines, labels)
     axs[1].legend(custom_lines, labels)
-    plt.savefig("../docs/figs/Additive_noise_comparison_Wang_Zedigh.png")
+    if save:
+        plt.savefig("../docs/figs/Additive_noise_comparison_Wang_Zedigh.png")
     plt.show()
+    return full_rank_test__wang, full_rank_test__zedigh
 
 
 def plot_all_of_an_additive_noise(
@@ -468,7 +474,14 @@ def plot_all_of_an_additive_noise(
         epoch: int = 65,
         distance: float = 15,
         save: bool = False
-):
+) -> Tuple[pd.DataFrame, pd.DataFrame]:
+    """
+    :param additive_noise_method:
+    :param trace_process_id:
+    :param epoch:
+    :param distance:
+    :param save:
+    """
     query_wang = f"""
     select
         environment,
@@ -525,9 +538,10 @@ def plot_all_of_an_additive_noise(
     database = get_db_absolute_path("main.db")
     con = lite.connect(database)
     full_rank_test__wang = pd.read_sql_query(query_wang, con)
-    full_rank_test__wang.fillna("None", inplace=True)
     full_rank_test__zedigh = pd.read_sql_query(query_zedigh, con)
+    full_rank_test__wang.fillna("None", inplace=True)
     full_rank_test__zedigh.fillna("None", inplace=True)
+    con.close()
     ylim_bottom = 0
     ylim_top = 1600
     sns.set(rc={"figure.figsize": (15, 7)})
@@ -563,6 +577,7 @@ def plot_all_of_an_additive_noise(
     if save:
         plt.savefig(f"../docs/figs/{additive_noise_method.replace(' ', '_')}_comparison.png")
     plt.show()
+    return full_rank_test__wang, full_rank_test__zedigh
 
 
 def plot_all_of_denoising(
@@ -571,7 +586,7 @@ def plot_all_of_denoising(
         epoch: int = 65,
         distance: float = 15,
         save: bool = False
-):
+) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """
     :param denoising_method:
     :param trace_process_id:
@@ -627,9 +642,10 @@ def plot_all_of_denoising(
     database = get_db_absolute_path("main.db")
     con = lite.connect(database)
     full_rank_test__wang = pd.read_sql_query(query_wang, con)
-    full_rank_test__wang.fillna("None", inplace=True)
     full_rank_test__zedigh = pd.read_sql_query(query_zedigh, con)
+    full_rank_test__wang.fillna("None", inplace=True)
     full_rank_test__zedigh.fillna("None", inplace=True)
+    con.close()
     ylim_bottom = 0
     ylim_top = 1600
     sns.set(rc={"figure.figsize": (15, 7)})
@@ -664,3 +680,81 @@ def plot_all_of_denoising(
     if save:
         plt.savefig(f"../docs/figs/{denoising_method.replace(' ', '_')}_comparison.png")
     plt.show()
+    return full_rank_test__wang, full_rank_test__zedigh
+
+
+def plot_epoch_comparison(
+        test_dataset: str = "Wang_2021",
+        device: int = 6,
+        distance: float = 15,
+        additive_noise_method: str = "Gaussian",
+        additive_noise_method_parameter_1_value: float = 0.04,
+        save: bool = False,
+) -> pd.DataFrame:
+    """
+    :param test_dataset:
+    :param device:
+    :param distance:
+    :param additive_noise_method:
+    :param additive_noise_method_parameter_1_value:
+    :param save:
+    :return: Pandas DataFrame
+    """
+
+    query = f"""
+    select
+        device, 
+        epoch, 
+        additive_noise_method,
+        additive_noise_method_parameter_1, 
+        additive_noise_method_parameter_1_value, 
+        additive_noise_method_parameter_2, 
+        additive_noise_method_parameter_2_value, 
+        termination_point
+    from
+        full_rank_test
+    where
+        test_dataset = '{test_dataset}'
+        AND device = {device}
+        AND distance = {distance}
+        AND denoising_method IS NULL
+        AND additive_noise_method_parameter_1_value 
+        = {additive_noise_method_parameter_1_value}
+        AND additive_noise_method = '{additive_noise_method}'
+    order by 
+        epoch;
+    """
+
+    database = get_db_absolute_path("main.db")
+    con = lite.connect(database)
+    full_rank_test = pd.read_sql_query(query, con)
+    full_rank_test.fillna("None", inplace=True)
+    ylim_bottom = 100
+    ylim_top = 800
+    sns.set(rc={"figure.figsize": (15, 7)})
+    sns.set_style("whitegrid")
+    sns.barplot(x=full_rank_test["epoch"],
+                y=full_rank_test["termination_point"],
+                hue=full_rank_test["additive_noise_method_parameter_1_value"],
+                capsize=0.3,)
+    plt.ylim(ylim_bottom, ylim_top)
+    plt.tight_layout()
+    if save:
+        plt.savefig(
+            f"../docs/figs/Epoch_{additive_noise_method}_"
+            f"{additive_noise_method_parameter_1_value}_comparison_"
+            f"{test_dataset}.png"
+        )
+    plt.show()
+    return full_rank_test
+
+
+def plot_histogram():
+    query = """
+    TODO: 
+    """
+    database = get_db_absolute_path("main.db")
+    con = lite.connect(database)
+    full_rank_test = pd.read_sql_query(query, con)
+    full_rank_test.fillna("None", inplace=True)
+    pass
