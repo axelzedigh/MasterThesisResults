@@ -561,5 +561,106 @@ def plot_all_of_an_additive_noise(
     plt.tight_layout()
     plt.tight_layout()
     if save:
-        plt.savefig(f"../docs/figs/{additive_noise_method}_comparison.png")
+        plt.savefig(f"../docs/figs/{additive_noise_method.replace(' ', '_')}_comparison.png")
+    plt.show()
+
+
+def plot_all_of_denoising(
+        denoising_method: str = "Moving Average Filter",
+        trace_process_id: int = 3,
+        epoch: int = 65,
+        distance: float = 15,
+        save: bool = False
+):
+    """
+    :param denoising_method:
+    :param trace_process_id:
+    :param epoch:
+    :param distance:
+    :param save:
+    """
+    query_wang = f"""
+    select
+        device, 
+        epoch, 
+        denoising_method,
+        denoising_method_parameter_1, 
+        denoising_method_parameter_1_value, 
+        denoising_method_parameter_2, 
+        denoising_method_parameter_2_value, 
+        termination_point
+    from
+        full_rank_test
+    where
+        test_dataset = 'Wang_2021'
+        AND epoch = {epoch}
+        AND distance = {distance}
+        AND additive_noise_method IS NULL
+        AND (denoising_method IS NULL 
+        OR denoising_method = '{denoising_method}')
+    order by 
+        denoising_method_parameter_1_value;
+    """
+
+    query_zedigh = f"""
+    select
+        device, 
+        epoch, 
+        denoising_method,
+        denoising_method_parameter_1, 
+        denoising_method_parameter_1_value, 
+        denoising_method_parameter_2, 
+        denoising_method_parameter_2_value, 
+        termination_point
+    from
+        full_rank_test
+    where
+        test_dataset = 'Zedigh_2021'
+        AND epoch = {epoch}
+        AND distance = {distance}
+        AND additive_noise_method IS NULL
+        AND (denoising_method IS NULL 
+        OR denoising_method = '{denoising_method}')
+    order by 
+        denoising_method_parameter_1_value;
+    """
+    database = get_db_absolute_path("main.db")
+    con = lite.connect(database)
+    full_rank_test__wang = pd.read_sql_query(query_wang, con)
+    full_rank_test__wang.fillna("None", inplace=True)
+    full_rank_test__zedigh = pd.read_sql_query(query_zedigh, con)
+    full_rank_test__zedigh.fillna("None", inplace=True)
+    ylim_bottom = 0
+    ylim_top = 1600
+    sns.set(rc={"figure.figsize": (15, 7)})
+    sns.set_style("whitegrid")
+    fig, axs = plt.subplots(1, 2)
+    sns.barplot(
+        x=full_rank_test__wang["device"],
+        y=full_rank_test__wang["termination_point"],
+        hue=full_rank_test__wang["denoising_method_parameter_1_value"],
+        ax=axs[0]
+    )
+    sns.barplot(
+        x=full_rank_test__zedigh["device"],
+        y=full_rank_test__zedigh["termination_point"],
+        hue=full_rank_test__zedigh["denoising_method_parameter_1_value"],
+        ax=axs[1]
+    )
+    plt.suptitle(
+        f"{denoising_method.capitalize()}, {distance}m, trace process {trace_process_id}",
+        fontsize=18,
+        y=0.95
+    )
+    axs[0].set_ylim(ylim_bottom, ylim_top)
+    axs[0].set_ylabel("Termination point")
+    axs[0].set_xlabel("Device")
+    axs[0].text(x=-0.2, y=(ylim_top-100), s="Wang 2021", fontsize=16)
+    axs[1].set_ylim(ylim_bottom, ylim_top)
+    axs[1].set_ylabel("Termination point")
+    axs[1].set_xlabel("Device")
+    axs[1].text(x=-0.2, y=(ylim_top-100), s="Zedigh 2021", fontsize=16)
+    plt.tight_layout()
+    if save:
+        plt.savefig(f"../docs/figs/{denoising_method.replace(' ', '_')}_comparison.png")
     plt.show()
