@@ -66,11 +66,15 @@ def plot_trace_metadata_depth__one(test_dataset_id, distance, device,
 
 
 def plot_trace_metadata_depth__big_plots():
+    """
+    Plot all trace metadata depths.
+    """
     set1 = (1, [6, 7, 8, 9, 10], 15)
     set2 = (2, [9, 10], 2)
     set3 = (2, [8, 9, 10], 5)
     set4 = (2, [8, 9, 10], 10)
-    sets = [set1, set2, set3, set4]
+    set5 = (2, [8, 9, 10], 15)
+    sets = [set1, set2, set3, set4, set5]
     for subset in sets:
         for device in subset[1]:
             test_dataset_id = subset[0]
@@ -78,16 +82,26 @@ def plot_trace_metadata_depth__big_plots():
             plot_trace_metadata_depth__one(test_dataset_id, distance, device, 2)
 
 
-def plot_test_trace_metadata_depth__several(sets, trace_process_id):
+def plot_test_trace_metadata_depth__several(
+        sets,
+        trace_process_id,
+        environment_id,
+):
+    """
+    :param sets:
+    :param trace_process_id:
+    :param environment_id:
+    """
     database = get_db_absolute_path("main.db")
     con2 = lite.connect(database)
     query = "select * from trace_metadata_depth;"
     raw_data = pd.read_sql_query(query, con2)
+    con2.close()
 
     for subset in sets:
         plt.figure(figsize=(20, 5))
         plt.subplots_adjust(hspace=0.5)
-        # plt.suptitle("Daily closing prices", fontsize=18, y=0.95)
+        # plt.suptitle(f"Environment id {environment_id}", fontsize=18, y=0.95)
         i = 1
         for device in subset[1]:
             ax = plt.subplot(1, 5, i)
@@ -98,6 +112,7 @@ def plot_test_trace_metadata_depth__several(sets, trace_process_id):
             data = raw_data.copy()
             data = data[data["distance"] == subset[2]]
             data = data[data["device"] == device]
+            data = data[data["environment_id"] == environment_id]
             data = data[data["trace_process_id"] == trace_process_id]
             data = data[data["test_dataset_id"] == subset[0]]
             data[204:314].plot(x="data_point_index", y="mean_val", ax=ax)
@@ -137,8 +152,6 @@ def plot_test_trace_metadata_depth__several(sets, trace_process_id):
             ax.get_legend().remove()
             ax.set_xlabel("")
         plt.show()
-
-    con2.close()
 
 
 def plot_training_trace_metadata_depth__several(range_start=204, range_end=314):
@@ -422,7 +435,13 @@ def plot_best_additive_noise_methods(
     full_rank_test__zedigh = pd.read_sql_query(query2, con)
     con.close()
     full_rank_test__wang.fillna("None", inplace=True)
+    full_rank_test__wang.rename(columns={
+        "additive_noise_method_parameter_1_value": "Additive parameter 1"},
+            inplace=True)
     full_rank_test__zedigh.fillna("None", inplace=True)
+    full_rank_test__zedigh.rename(columns={
+        "additive_noise_method_parameter_1_value": "Additive parameter 1"},
+        inplace=True)
     ylim_bottom = 0
     ylim_top = 1600
     labels = [
@@ -450,15 +469,15 @@ def plot_best_additive_noise_methods(
         f"Best additive noise, 15m, trace process {trace_process_id}",
         fontsize=18,
         y=0.95
-        )
+    )
     axs[0].set_ylim(ylim_bottom, ylim_top)
     axs[0].set_ylabel("Termination point")
     axs[0].set_xlabel("Device")
-    axs[0].text(x=-0.2, y=(ylim_top-100), s="Wang 2021", fontsize=16)
+    axs[0].text(x=-0.2, y=(ylim_top - 100), s="Wang 2021", fontsize=16)
     axs[1].set_ylim(ylim_bottom, ylim_top)
     axs[1].set_ylabel("Termination point")
     axs[1].set_xlabel("Device")
-    axs[1].text(x=-0.2, y=(ylim_top-100), s="Zedigh 2021", fontsize=16)
+    axs[1].text(x=-0.2, y=(ylim_top - 100), s="Zedigh 2021", fontsize=16)
     plt.tight_layout()
     axs[0].legend(custom_lines, labels)
     axs[1].legend(custom_lines, labels)
@@ -473,6 +492,7 @@ def plot_all_of_an_additive_noise(
         trace_process_id: int = 3,
         epoch: int = 65,
         distance: float = 15,
+        environment: str = "office_corridor",
         save: bool = False
 ) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """
@@ -480,6 +500,7 @@ def plot_all_of_an_additive_noise(
     :param trace_process_id:
     :param epoch:
     :param distance:
+    :param environment:
     :param save:
     """
     query_wang = f"""
@@ -525,7 +546,7 @@ def plot_all_of_an_additive_noise(
     where
         trace_process_id = {trace_process_id}
         AND test_dataset = 'Zedigh_2021'
-        AND environment = 'office_corridor'
+        AND environment = '{environment}'
         AND epoch = {epoch} 
         AND distance = {distance}
         AND denoising_method IS NULL
@@ -540,7 +561,13 @@ def plot_all_of_an_additive_noise(
     full_rank_test__wang = pd.read_sql_query(query_wang, con)
     full_rank_test__zedigh = pd.read_sql_query(query_zedigh, con)
     full_rank_test__wang.fillna("None", inplace=True)
+    full_rank_test__wang.rename(columns={
+        "additive_noise_method_parameter_1_value": "Additive parameter 1"},
+        inplace=True)
     full_rank_test__zedigh.fillna("None", inplace=True)
+    full_rank_test__zedigh.rename(columns={
+        "additive_noise_method_parameter_1_value": "Additive parameter 1"},
+        inplace=True)
     con.close()
     ylim_bottom = 0
     ylim_top = 1600
@@ -550,32 +577,43 @@ def plot_all_of_an_additive_noise(
     sns.barplot(
         x=full_rank_test__wang["device"],
         y=full_rank_test__wang["termination_point"],
-        hue=full_rank_test__wang["additive_noise_method_parameter_1_value"],
+        hue=full_rank_test__wang["Additive parameter 1"],
         ax=axs[0]
     )
     sns.barplot(
         x=full_rank_test__zedigh["device"],
         y=full_rank_test__zedigh["termination_point"],
-        hue=full_rank_test__zedigh["additive_noise_method_parameter_1_value"],
+        hue=full_rank_test__zedigh["Additive parameter 1"],
         ax=axs[1]
     )
     plt.suptitle(
-        f"{additive_noise_method.capitalize()} additive noise, {distance}m, trace process {trace_process_id}",
+        f"""{additive_noise_method.capitalize()} additive noise, {distance}m, trace process {trace_process_id}""",
         fontsize=18,
         y=0.95
     )
     axs[0].set_ylim(ylim_bottom, ylim_top)
     axs[0].set_ylabel("Termination point")
     axs[0].set_xlabel("Device")
-    axs[0].text(x=-0.2, y=(ylim_top-100), s="Wang 2021", fontsize=16)
+    axs[0].text(
+        x=-0.2,
+        y=(ylim_top - 200),
+        s=f"Wang 2021\n{environment.replace('_', ' ').capitalize()}",
+        fontsize=16
+    )
     axs[1].set_ylim(ylim_bottom, ylim_top)
     axs[1].set_ylabel("Termination point")
     axs[1].set_xlabel("Device")
-    axs[1].text(x=-0.2, y=(ylim_top-100), s="Zedigh 2021", fontsize=16)
+    axs[1].text(
+        x=-0.2,
+        y=(ylim_top - 200),
+        s=f"Zedigh 2021\n{environment.replace('_', ' ').capitalize()}",
+        fontsize=16
+    )
     plt.tight_layout()
     plt.tight_layout()
     if save:
-        plt.savefig(f"../docs/figs/{additive_noise_method.replace(' ', '_')}_comparison.png")
+        plt.savefig(
+            f"../docs/figs/{additive_noise_method.replace(' ', '_')}_comparison.png")
     plt.show()
     return full_rank_test__wang, full_rank_test__zedigh
 
@@ -644,7 +682,13 @@ def plot_all_of_denoising(
     full_rank_test__wang = pd.read_sql_query(query_wang, con)
     full_rank_test__zedigh = pd.read_sql_query(query_zedigh, con)
     full_rank_test__wang.fillna("None", inplace=True)
+    full_rank_test__wang.rename(columns={
+        "denoising_method_parameter_1_value": "Denoising parameter 1"},
+        inplace=True)
     full_rank_test__zedigh.fillna("None", inplace=True)
+    full_rank_test__zedigh.rename(columns={
+        "denoising_method_parameter_1_value": "Denoising parameter 1"},
+        inplace=True)
     con.close()
     ylim_bottom = 0
     ylim_top = 1600
@@ -654,13 +698,13 @@ def plot_all_of_denoising(
     sns.barplot(
         x=full_rank_test__wang["device"],
         y=full_rank_test__wang["termination_point"],
-        hue=full_rank_test__wang["denoising_method_parameter_1_value"],
+        hue=full_rank_test__wang["Denoising parameter 1"],
         ax=axs[0]
     )
     sns.barplot(
         x=full_rank_test__zedigh["device"],
         y=full_rank_test__zedigh["termination_point"],
-        hue=full_rank_test__zedigh["denoising_method_parameter_1_value"],
+        hue=full_rank_test__zedigh["Denoising parameter 1"],
         ax=axs[1]
     )
     plt.suptitle(
@@ -671,14 +715,15 @@ def plot_all_of_denoising(
     axs[0].set_ylim(ylim_bottom, ylim_top)
     axs[0].set_ylabel("Termination point")
     axs[0].set_xlabel("Device")
-    axs[0].text(x=-0.2, y=(ylim_top-100), s="Wang 2021", fontsize=16)
+    axs[0].text(x=-0.2, y=(ylim_top - 100), s="Wang 2021", fontsize=16)
     axs[1].set_ylim(ylim_bottom, ylim_top)
     axs[1].set_ylabel("Termination point")
     axs[1].set_xlabel("Device")
-    axs[1].text(x=-0.2, y=(ylim_top-100), s="Zedigh 2021", fontsize=16)
+    axs[1].text(x=-0.2, y=(ylim_top - 100), s="Zedigh 2021", fontsize=16)
     plt.tight_layout()
     if save:
-        plt.savefig(f"../docs/figs/{denoising_method.replace(' ', '_')}_comparison.png")
+        plt.savefig(
+            f"../docs/figs/{denoising_method.replace(' ', '_')}_comparison.png")
     plt.show()
     return full_rank_test__wang, full_rank_test__zedigh
 
@@ -729,14 +774,18 @@ def plot_epoch_comparison(
     con = lite.connect(database)
     full_rank_test = pd.read_sql_query(query, con)
     full_rank_test.fillna("None", inplace=True)
+    full_rank_test.rename(columns={
+        "additive_noise_method_parameter_1_value": "Additive parameter 1"},
+        inplace=True)
+    con.close()
     ylim_bottom = 100
     ylim_top = 800
     sns.set(rc={"figure.figsize": (15, 7)})
     sns.set_style("whitegrid")
     sns.barplot(x=full_rank_test["epoch"],
                 y=full_rank_test["termination_point"],
-                hue=full_rank_test["additive_noise_method_parameter_1_value"],
-                capsize=0.3,)
+                hue=full_rank_test["Additive parameter 1"],
+                capsize=0.3, )
     plt.ylim(ylim_bottom, ylim_top)
     plt.tight_layout()
     if save:
@@ -757,4 +806,91 @@ def plot_histogram():
     con = lite.connect(database)
     full_rank_test = pd.read_sql_query(query, con)
     full_rank_test.fillna("None", inplace=True)
+    con.close()
     pass
+
+
+def plot_additive_noise_comparison_all(
+        trace_process_id: int = 3,
+        environment: str = "office_corridor",
+        gaussian_value: float = 0.04,
+        collected_value: float = 25,
+        rayleigh_value: float = 0.0138,
+        save: bool = False,
+) -> pd.DataFrame:
+    """
+    :param trace_process_id:
+    :param environment:
+    :param gaussian_value:
+    :param collected_value:
+    :param rayleigh_value:
+    :param save:
+    :return: Pandas DataFrame.
+    """
+    custom_lines = [Line2D([0], [0], color='b', lw=4),
+                    Line2D([0], [0], color='orange', lw=4),
+                    Line2D([0], [0], color='g', lw=4),
+                    Line2D([0], [0], color='r', lw=4)]
+
+    query = f"""
+    select
+        environment,
+        device, 
+        epoch, 
+        additive_noise_method,
+        additive_noise_method_parameter_1, 
+        additive_noise_method_parameter_1_value, 
+        additive_noise_method_parameter_2, 
+        additive_noise_method_parameter_2_value, 
+        termination_point
+    from
+        full_rank_test
+    where
+        trace_process_id = {trace_process_id}
+        AND environment = '{environment}'
+        AND epoch = 65 
+        AND denoising_method IS NULL
+        AND (
+            additive_noise_method_parameter_1_value = {gaussian_value}
+            OR additive_noise_method_parameter_1_value IS NULL
+            OR additive_noise_method_parameter_1_value = {collected_value}
+            OR additive_noise_method_parameter_1_value = {rayleigh_value}
+        )
+    order by
+        additive_noise_method
+        ;
+    """
+    database = get_db_absolute_path("main.db")
+    con = lite.connect(database)
+    full_rank_test = pd.read_sql_query(query, con)
+    full_rank_test.fillna("None", inplace=True)
+    full_rank_test.rename(columns={
+        "additive_noise_method_parameter_1_value": "Additive parameter 1"},
+        inplace=True)
+    ylim_bottom = 100
+    ylim_top = 800
+    labels = [
+        "None",
+        f"Collected - factor={collected_value}",
+        f"Gaussian - ∂={gaussian_value}",
+        f"Rayleigh - mode={rayleigh_value}"
+    ]
+    sns.set(rc={"figure.figsize": (15, 7)})
+    sns.set_style("whitegrid")
+    sns.barplot(x=full_rank_test["additive_noise_method"],
+                y=full_rank_test["termination_point"])
+    plt.ylim(ylim_bottom, ylim_top)
+    plt.suptitle(
+        f"""
+        Additive noise comparison (trace process {trace_process_id}), 
+        {environment.replace('_', ' ').capitalize()}.
+        """,
+        fontsize=18,
+        y=0.95
+    )
+    plt.tight_layout()
+    plt.legend(custom_lines, labels)
+    if save:
+        plt.savefig("../docs/figs/Additive_noise_comparison_ALL.png")
+    plt.show()
+    return full_rank_test
