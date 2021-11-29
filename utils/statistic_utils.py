@@ -92,7 +92,6 @@ def signal_to_noise_ratio__sqrt_mean_std(mean, std):
     return (mean ** 2) / (std ** 2)
 
 
-@jit
 def root_mean_square(vector):
     """
 
