@@ -268,7 +268,7 @@ def termination_point_test(
 
     # randomly select trace for testing
     number = 1500
-    average = 100   # 50
+    average = 50   # 50
     ranks_array = []
 
     for i in range(average):
