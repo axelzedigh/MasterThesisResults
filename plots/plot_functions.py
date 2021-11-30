@@ -1,6 +1,5 @@
 """Functions for plotting things."""
 from typing import Optional, Tuple, List
-from math import floor
 import numpy as np
 import sqlite3 as lite
 import pandas as pd
@@ -84,7 +83,7 @@ def plot_trace_metadata_depth__big_plots():
             plot_trace_metadata_depth__one(test_dataset_id, distance, device, 2)
 
 
-def plot_test_trace_metadata_depth__several(
+def plot_test_trace_metadata_depth__mean(
         test_dataset_id: int = 1,
         distance: float = 15,
         devices: List[int] = (6, 7, 8, 9, 10),
@@ -111,7 +110,7 @@ def plot_test_trace_metadata_depth__several(
         ax = plt.subplot(1, 5, i)
         if trace_process_id == 2:
             ax.set_ylim(0.0015, 0.014)
-        elif trace_process_id == 3:
+        elif trace_process_id == 3 or 4:
             ax.set_ylim(0, 1)
         data = raw_data.copy()
         data = data[data["distance"] == distance]
@@ -125,12 +124,83 @@ def plot_test_trace_metadata_depth__several(
         dyn_range = top_value - bottom_value
         scaling_factor = 1 / (max(data["mean_val"]) - min(data["mean_val"]))
         mean_mean = np.mean(data[204:314]["mean_val"], axis=0)
-        mean_rms = root_mean_square(data[204:314]["rms_val"])
+        # mean_rms = root_mean_square(data[204:314]["rms_val"])
         mean_std = round(root_mean_square(data[204:314]["std_val"]), 5)
         mean_snr = round(np.mean(data[204:314]["snr_val"], axis=0), 1)
         ax.axhline(top_value, c="b")
         ax.axhline(bottom_value, c="b")
         ax.axhline(mean_mean, c="r")
+        if round(top_value, 5) < 0.012:
+            ax.text(
+                0.02, 0.97,
+                f'Range: {round(dyn_range, 4)}\nScaling: {round(scaling_factor)}',
+                horizontalalignment='left',
+                verticalalignment='top',
+                transform=ax.transAxes
+            )
+        else:
+            ax.text(
+                0.05, 0.1,
+                f'Range: {round(dyn_range, 4)}\nScaling: {round(scaling_factor)}',
+                horizontalalignment='left',
+                verticalalignment='top',
+                transform=ax.transAxes
+            )
+        i += 1
+        ax.set_title(
+            f"""Distance: {distance}m, Device: {device}\nStd: {mean_std}, SNR: {mean_snr}"""
+        )
+        ax.get_legend().remove()
+        ax.set_xlabel("")
+    plt.show()
+
+
+def plot_test_trace_metadata_depth__rms(
+        test_dataset_id: int = 1,
+        distance: float = 15,
+        devices: List[int] = (6, 7, 8, 9, 10),
+        trace_process_id: int = 2,
+        environment_id: int = 1,
+):
+    """
+    :param test_dataset_id:
+    :param distance:
+    :param devices:
+    :param trace_process_id:
+    :param environment_id:
+    """
+    database = get_db_absolute_path("main.db")
+    con2 = lite.connect(database)
+    query = "select * from trace_metadata_depth;"
+    raw_data = pd.read_sql_query(query, con2)
+    con2.close()
+
+    plt.figure(figsize=(20, 5))
+    plt.subplots_adjust(hspace=0.5)
+    i = 1
+    for device in devices:
+        ax = plt.subplot(1, 5, i)
+        if trace_process_id == 2:
+            ax.set_ylim(0.0015, 0.014)
+        elif trace_process_id == 3 or 4:
+            ax.set_ylim(0, 1)
+        data = raw_data.copy()
+        data = data[data["distance"] == distance]
+        data = data[data["device"] == device]
+        data = data[data["environment_id"] == environment_id]
+        data = data[data["trace_process_id"] == trace_process_id]
+        data = data[data["test_dataset_id"] == test_dataset_id]
+        data[204:314].plot(x="data_point_index", y="rms_val", ax=ax)
+        top_value = np.max(data[204:314]["rms_val"], axis=0)
+        bottom_value = np.min(data[204:314]["rms_val"], axis=0)
+        dyn_range = top_value - bottom_value
+        scaling_factor = 1 / (max(data["mean_val"]) - min(data["mean_val"]))
+        # mean_mean = np.mean(data[204:314]["mean_val"], axis=0)
+        mean_rms = root_mean_square(data[204:314]["rms_val"])
+        mean_std = round(root_mean_square(data[204:314]["std_val"]), 5)
+        mean_snr = round(np.mean(data[204:314]["snr_val"], axis=0), 1)
+        ax.axhline(top_value, c="b")
+        ax.axhline(bottom_value, c="b")
         ax.axhline(mean_rms, c="g")
         if round(top_value, 5) < 0.012:
             ax.text(
@@ -154,6 +224,298 @@ def plot_test_trace_metadata_depth__several(
         )
         ax.get_legend().remove()
         ax.set_xlabel("")
+    plt.show()
+
+
+def plot_test_trace_metadata_depth__std(
+        test_dataset_id: int = 1,
+        distance: float = 15,
+        devices: List[int] = (6, 7, 8, 9, 10),
+        trace_process_id: int = 2,
+        environment_id: int = 1,
+):
+    """
+    :param test_dataset_id:
+    :param distance:
+    :param devices:
+    :param trace_process_id:
+    :param environment_id:
+    """
+    database = get_db_absolute_path("main.db")
+    con2 = lite.connect(database)
+    query = "select * from trace_metadata_depth;"
+    raw_data = pd.read_sql_query(query, con2)
+    con2.close()
+
+    plt.figure(figsize=(20, 5))
+    plt.subplots_adjust(hspace=0.5)
+    i = 1
+    for device in devices:
+        ax = plt.subplot(1, 5, i)
+        # if trace_process_id == 2:
+        #     ax.set_ylim(0.0015, 0.014)
+        # elif trace_process_id == 3 or 4:
+        #     ax.set_ylim(0, 1)
+        data = raw_data.copy()
+        data = data[data["distance"] == distance]
+        data = data[data["device"] == device]
+        data = data[data["environment_id"] == environment_id]
+        data = data[data["trace_process_id"] == trace_process_id]
+        data = data[data["test_dataset_id"] == test_dataset_id]
+        data[204:314].plot(x="data_point_index", y="std_val", ax=ax)
+        top_value = np.max(data[204:314]["std_val"], axis=0)
+        bottom_value = np.min(data[204:314]["std_val"], axis=0)
+        dyn_range = top_value - bottom_value
+        scaling_factor = 1 / (max(data["mean_val"]) - min(data["mean_val"]))
+        # mean_mean = np.mean(data[204:314]["mean_val"], axis=0)
+        # mean_rms = root_mean_square(data[204:314]["rms_val"])
+        mean_std = round(root_mean_square(data[204:314]["std_val"]), 5)
+        mean_snr = round(np.mean(data[204:314]["snr_val"], axis=0), 1)
+        ax.axhline(top_value, c="b")
+        ax.axhline(bottom_value, c="b")
+        # ax.axhline(mean_mean, c="r")
+        # ax.axhline(mean_rms, c="g")
+        ax.axhline(mean_std, c="g")
+        if round(top_value, 5) < 0.012:
+            ax.text(
+                0.02, 0.97,
+                f'Range: {round(dyn_range, 4)}\nScaling: {round(scaling_factor)}',
+                horizontalalignment='left',
+                verticalalignment='top',
+                transform=ax.transAxes
+            )
+        else:
+            ax.text(
+                0.05, 0.1,
+                f'Range: {round(dyn_range, 4)}\nScaling: {round(scaling_factor)}',
+                horizontalalignment='left',
+                verticalalignment='top',
+                transform=ax.transAxes
+            )
+        i += 1
+        ax.set_title(
+            f"""Distance: {distance}m, Device: {device}\nStd: {mean_std}, SNR: {mean_snr}"""
+        )
+        ax.get_legend().remove()
+        ax.set_xlabel("")
+    plt.show()
+
+
+def plot_test_trace_metadata_depth__snr(
+        test_dataset_id: int = 1,
+        distance: float = 15,
+        devices: List[int] = (6, 7, 8, 9, 10),
+        trace_process_id: int = 2,
+        environment_id: int = 1,
+):
+    """
+    :param test_dataset_id:
+    :param distance:
+    :param devices:
+    :param trace_process_id:
+    :param environment_id:
+    """
+    database = get_db_absolute_path("main.db")
+    con2 = lite.connect(database)
+    query = "select * from trace_metadata_depth;"
+    raw_data = pd.read_sql_query(query, con2)
+    con2.close()
+
+    plt.figure(figsize=(20, 5))
+    plt.subplots_adjust(hspace=0.5)
+    i = 1
+    for device in devices:
+        ax = plt.subplot(1, 5, i)
+        # if trace_process_id == 2:
+        #     ax.set_ylim(0.0015, 0.014)
+        # elif trace_process_id == 3 or 4:
+        #     ax.set_ylim(0, 1)
+        data = raw_data.copy()
+        data = data[data["distance"] == distance]
+        data = data[data["device"] == device]
+        data = data[data["environment_id"] == environment_id]
+        data = data[data["trace_process_id"] == trace_process_id]
+        data = data[data["test_dataset_id"] == test_dataset_id]
+        data[204:314].plot(x="data_point_index", y="snr_val", ax=ax)
+        top_value = np.max(data[204:314]["snr_val"], axis=0)
+        bottom_value = np.min(data[204:314]["snr_val"], axis=0)
+        dyn_range = top_value - bottom_value
+        scaling_factor = 1 / (max(data["mean_val"]) - min(data["mean_val"]))
+        # mean_mean = np.mean(data[204:314]["mean_val"], axis=0)
+        # mean_rms = root_mean_square(data[204:314]["rms_val"])
+        mean_std = round(root_mean_square(data[204:314]["std_val"]), 5)
+        mean_snr = round(np.mean(data[204:314]["snr_val"], axis=0), 1)
+        ax.axhline(top_value, c="b")
+        ax.axhline(bottom_value, c="b")
+        # ax.axhline(mean_mean, c="r")
+        # ax.axhline(mean_rms, c="g")
+        ax.axhline(mean_snr, c="g")
+        if round(top_value, 5) < 0.012:
+            ax.text(
+                0.02, 0.97,
+                f'Range: {round(dyn_range, 4)}\nScaling: {round(scaling_factor)}',
+                horizontalalignment='left',
+                verticalalignment='top',
+                transform=ax.transAxes
+            )
+        else:
+            ax.text(
+                0.05, 0.1,
+                f'Range: {round(dyn_range, 4)}\nScaling: {round(scaling_factor)}',
+                horizontalalignment='left',
+                verticalalignment='top',
+                transform=ax.transAxes
+            )
+        i += 1
+        ax.set_title(
+            f"""Distance: {distance}m, Device: {device}\nStd: {mean_std}, SNR: {mean_snr}"""
+        )
+        ax.get_legend().remove()
+        ax.set_xlabel("")
+    plt.show()
+
+
+def plot_test_trace_metadata_depth__std__full_trace(
+        test_dataset_id: int = 1,
+        distance: float = 15,
+        device: int = 6,
+        trace_process_id: int = 2,
+        environment_id: int = 1,
+):
+    """
+    :param test_dataset_id:
+    :param distance:
+    :param device:
+    :param trace_process_id:
+    :param environment_id:
+    """
+    database = get_db_absolute_path("main.db")
+    con2 = lite.connect(database)
+    query = "select * from trace_metadata_depth;"
+    raw_data = pd.read_sql_query(query, con2)
+    con2.close()
+
+    fig = plt.figure(figsize=(20, 5))
+    ax = fig.gca()
+    # if trace_process_id == 2:
+    #     ax.set_ylim(0.0015, 0.014)
+    # elif trace_process_id == 3 or 4:
+    #     ax.set_ylim(0, 1)
+    data = raw_data.copy()
+    data = data[data["distance"] == distance]
+    data = data[data["device"] == device]
+    data = data[data["environment_id"] == environment_id]
+    data = data[data["trace_process_id"] == trace_process_id]
+    data = data[data["test_dataset_id"] == test_dataset_id]
+    data.plot(x="data_point_index", y="std_val", ax=ax)
+    top_value = np.max(data["std_val"], axis=0)
+    bottom_value = np.min(data["std_val"], axis=0)
+    dyn_range = top_value - bottom_value
+    scaling_factor = 1 / (max(data["mean_val"]) - min(data["mean_val"]))
+    # mean_mean = np.mean(data[204:314]["mean_val"], axis=0)
+    # mean_rms = root_mean_square(data[204:314]["rms_val"])
+    mean_std = round(root_mean_square(data["std_val"]), 5)
+    mean_snr = round(np.mean(data["snr_val"], axis=0), 1)
+    ax.axhline(top_value, c="b")
+    ax.axhline(bottom_value, c="b")
+    # ax.axhline(mean_mean, c="r")
+    # ax.axhline(mean_rms, c="g")
+    ax.axvline(x=204, color="b", linestyle="--")
+    ax.axvline(x=314, color="b", linestyle="--")
+    ax.axhline(mean_std, c="r")
+    if round(top_value, 5) < 0.012:
+        ax.text(
+            0.02, 0.97,
+            f'Range: {round(dyn_range, 4)}\nScaling: {round(scaling_factor)}',
+            horizontalalignment='left',
+            verticalalignment='top',
+            transform=ax.transAxes
+        )
+    else:
+        ax.text(
+            0.05, 0.1,
+            f'Range: {round(dyn_range, 4)}\nScaling: {round(scaling_factor)}',
+            horizontalalignment='left',
+            verticalalignment='top',
+            transform=ax.transAxes
+        )
+    ax.set_title(
+        f"""Distance: {distance}m, Device: {device}\nStd: {mean_std}, SNR: {mean_snr}"""
+    )
+    ax.get_legend().remove()
+    ax.set_xlabel("")
+    plt.show()
+
+
+def plot_test_trace_metadata_depth__snr__full_trace(
+        test_dataset_id: int = 1,
+        distance: float = 15,
+        device: int = 6,
+        trace_process_id: int = 2,
+        environment_id: int = 1,
+):
+    """
+    :param test_dataset_id:
+    :param distance:
+    :param device:
+    :param trace_process_id:
+    :param environment_id:
+    """
+    database = get_db_absolute_path("main.db")
+    con2 = lite.connect(database)
+    query = "select * from trace_metadata_depth;"
+    raw_data = pd.read_sql_query(query, con2)
+    con2.close()
+
+    fig = plt.figure(figsize=(20, 5))
+    ax = fig.gca()
+    # if trace_process_id == 2:
+    #     ax.set_ylim(0.0015, 0.014)
+    # elif trace_process_id == 3 or 4:
+    #     ax.set_ylim(0, 1)
+    data = raw_data.copy()
+    data = data[data["distance"] == distance]
+    data = data[data["device"] == device]
+    data = data[data["environment_id"] == environment_id]
+    data = data[data["trace_process_id"] == trace_process_id]
+    data = data[data["test_dataset_id"] == test_dataset_id]
+    data.plot(x="data_point_index", y="snr_val", ax=ax)
+    top_value = np.max(data["snr_val"], axis=0)
+    bottom_value = np.min(data["snr_val"], axis=0)
+    dyn_range = top_value - bottom_value
+    scaling_factor = 1 / (max(data["mean_val"]) - min(data["mean_val"]))
+    # mean_mean = np.mean(data[204:314]["mean_val"], axis=0)
+    # mean_rms = root_mean_square(data[204:314]["rms_val"])
+    mean_std = round(root_mean_square(data["std_val"]), 5)
+    mean_snr = round(np.mean(data["snr_val"], axis=0), 1)
+    ax.axhline(top_value, c="b")
+    ax.axhline(bottom_value, c="b")
+    # ax.axhline(mean_mean, c="r")
+    # ax.axhline(mean_rms, c="g")
+    ax.axvline(x=204, color="b", linestyle="--")
+    ax.axvline(x=314, color="b", linestyle="--")
+    ax.axhline(mean_snr, c="r")
+    if round(top_value, 5) < 0.012:
+        ax.text(
+            0.02, 0.97,
+            f'Range: {round(dyn_range, 4)}\nScaling: {round(scaling_factor)}',
+            horizontalalignment='left',
+            verticalalignment='top',
+            transform=ax.transAxes
+        )
+    else:
+        ax.text(
+            0.05, 0.1,
+            f'Range: {round(dyn_range, 4)}\nScaling: {round(scaling_factor)}',
+            horizontalalignment='left',
+            verticalalignment='top',
+            transform=ax.transAxes
+        )
+    ax.set_title(
+        f"""Distance: {distance}m, Device: {device}\nStd: {mean_std}, SNR: {mean_snr}"""
+    )
+    ax.get_legend().remove()
+    ax.set_xlabel("")
     plt.show()
 
 
@@ -295,16 +657,8 @@ def plot_training_trace_metadata_depth__training_set_used():
 
 def plot_all_trace_metadata_depth():
     """
-    Plots all depth metadata.
+    Plots all training depth metadata.
     """
-    set1 = (1, [6, 7, 8, 9, 10], 15)
-    set2 = (2, [9, 10], 2)
-    set3 = (2, [8, 9, 10], 5)
-    set4 = (2, [8, 9, 10], 10)
-    sets = [set1, set2, set3, set4]
-
-    plot_test_trace_metadata_depth__several(sets, 2)
-    plot_test_trace_metadata_depth__several(sets, 3)
     plot_training_trace_metadata_depth__training_set_used()
     plot_training_trace_metadata_depth__several(130, 240)
 
