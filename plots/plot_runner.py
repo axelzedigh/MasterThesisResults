@@ -4,9 +4,9 @@ import numpy as np
 
 from matplotlib import pyplot as plt
 
-from plots.plot_functions import plot_history_log, \
-    plot_best_additive_noise_methods, \
+from plots.plot_functions import plot_best_additive_noise_methods, \
     plot_all_of_an_additive_noise
+from plots.history_log_plots import plot_history_log
 from utils.db_utils import get_training_trace_path__raw_200k_data, \
     get_test_trace_path
 from utils.denoising_utils import wiener_filter

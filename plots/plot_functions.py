@@ -1,5 +1,5 @@
 """Functions for plotting things."""
-from typing import Optional, Tuple, List
+from typing import Tuple, List
 import numpy as np
 import sqlite3 as lite
 import pandas as pd
@@ -8,9 +8,10 @@ from matplotlib.lines import Line2D
 import seaborn as sns
 import os
 
-from utils.db_utils import get_db_absolute_path, get_training_model_file_path, \
-    get_test_trace_path
+from utils.db_utils import get_db_absolute_path, get_test_trace_path
 from utils.statistic_utils import root_mean_square
+from utils.training_utils import additive_noise__gaussian, \
+    additive_noise__collected_noise__office_corridor, additive_noise__rayleigh
 
 
 def plot_trace_metadata_depth__one(test_dataset_id, distance, device,
@@ -663,51 +664,6 @@ def plot_all_trace_metadata_depth():
     plot_training_trace_metadata_depth__several(130, 240)
 
 
-def plot_history_log(
-        trace_process_id: int,
-        keybyte: int,
-        additive_noise_method_id: Optional[int],
-        denoising_method_id: Optional[int],
-        save: bool = False,
-) -> None:
-    """
-    Plot the history function. Accuracy on the left, loss on the right.
-    """
-    training_file_path = get_training_model_file_path(
-        database="main.db",
-        training_model_id=1,
-        additive_noise_method_id=additive_noise_method_id,
-        denoising_method_id=denoising_method_id,
-        epoch=1,
-        keybyte=keybyte,
-        trace_process_id=trace_process_id,
-    )
-    training_path = os.path.dirname(training_file_path)
-    history_log_file_path = os.path.join(training_path, "history_log.npy")
-    history_log_fig_file_path = os.path.join(training_path, "history_log.png")
-    history_log_npy = np.load(history_log_file_path, allow_pickle=True)
-    history_log = history_log_npy.tolist()
-    fig = plt.figure(figsize=(12, 8))
-    plt.suptitle("Accuracy & Loss", fontsize=18, y=0.95)
-
-    # Subplot 1 - Accuracy
-    ax1 = fig.add_axes((0.1, 0.1, 0.35, 0.8))
-    ax1.plot(history_log["accuracy"], solid_capstyle="round", linewidth=2)
-    ax1.plot(history_log["val_accuracy"], solid_capstyle="round")
-    ax1.set_xlabel("Epoch")
-    ax1.set_ylabel("Accuracy")
-
-    # Subplot 2 - Loss
-    ax2 = fig.add_axes((0.55, 0.1, 0.35, 0.8))
-    ax2.plot(history_log["loss"], linewidth=2)
-    ax2.plot(history_log["val_loss"])
-    ax2.set_xlabel("Epoch")
-    ax2.set_ylabel("Loss")
-    if save:
-        plt.savefig(fname=history_log_fig_file_path)
-    plt.show()
-
-
 def plot_best_additive_noise_methods(
         trace_process_id: int = 3,
         gaussian_value: float = 0.04,
@@ -796,7 +752,7 @@ def plot_best_additive_noise_methods(
     full_rank_test__wang.fillna("None", inplace=True)
     full_rank_test__wang.rename(columns={
         "additive_noise_method_parameter_1_value": "Additive parameter 1"},
-            inplace=True)
+        inplace=True)
     full_rank_test__zedigh.fillna("None", inplace=True)
     full_rank_test__zedigh.rename(columns={
         "additive_noise_method_parameter_1_value": "Additive parameter 1"},
@@ -1297,14 +1253,14 @@ def plot_example_test_traces_with_max_min(
         ex_trace = trace_set[trace_index]
         ex_max = float(max(ex_trace))
         ex_min = float(min(ex_trace))
-        ex_scaling = round(float(1/(ex_max - ex_min)), 2)
+        ex_scaling = round(float(1 / (ex_max - ex_min)), 2)
         arg_max = np.argmax(ex_trace)
         arg_min = np.argmin(ex_trace)
     elif trace_processing_id == 4 or 5:
         ex_trace = trace_set[trace_index]
         ex_max = float(max(ex_trace[204:314]))
         ex_min = float(min(ex_trace[204:314]))
-        ex_scaling = round(float(1/(ex_max - ex_min)), 2)
+        ex_scaling = round(float(1 / (ex_max - ex_min)), 2)
         arg_max = np.argmax(ex_trace)
         arg_min = np.argmin(ex_trace)
     else:
@@ -1327,4 +1283,85 @@ def plot_example_test_traces_with_max_min(
         fontsize=14,
         y=0.95
     )
+    plt.show()
+
+
+def plot_additive_noises_examples():
+    """
+    Plots the additive noises.
+    """
+    test_dataset_id = 1
+    environment_id = 1
+    distance = 15
+    device = 6
+    trace_processing_id = 3
+
+    fig, axs = plt.subplots(1, 3, figsize=(22, 7))
+
+    # Load a trace set
+    trace_set_path = get_test_trace_path(
+        database="main.db",
+        test_dataset_id=test_dataset_id,
+        environment_id=environment_id,
+        distance=distance,
+        device=device,
+    )
+    if trace_processing_id == 2:
+        file_path = os.path.join(trace_set_path, "traces.npy")
+    elif trace_processing_id == 3:
+        file_path = os.path.join(trace_set_path, "nor_traces_maxmin.npy")
+    elif trace_processing_id == 4 or 5:
+        file_path = os.path.join(
+            trace_set_path,
+            "nor_traces_maxmin__sbox_range_204_314.npy"
+        )
+    else:
+        raise "Incorrect trace_processing_id"
+    trace_set = np.load(file_path)
+
+    # Gaussian
+    _, noise = additive_noise__gaussian(trace_set=trace_set, mean=0, std=0.01)
+    axs[0].plot(noise[204:314], label="∂=0.01", alpha=0.75)
+    # _, noise = additive_noise__gaussian(trace_set=trace_set, mean=0, std=0.02)
+    # axs[0].plot(noise[204:314], label="∂=0.02", alpha=0.75)
+    # _, noise = additive_noise__gaussian(trace_set=trace_set, mean=0, std=0.03)
+    # axs[0].plot(noise[204:314], label="∂=0.03", alpha=0.75)
+    _, noise = additive_noise__gaussian(trace_set=trace_set, mean=0, std=0.04)
+    axs[0].plot(noise[204:314], label="∂=0.04", alpha=0.75)
+    # _, noise = additive_noise__gaussian(trace_set=trace_set, mean=0, std=0.05)
+    # axs[0].plot(noise[204:314], label="∂=0.05", alpha=0.75)
+
+    # Collected
+    _, noise = additive_noise__collected_noise__office_corridor(
+        trace_set=trace_set, scaling_factor=25, mean_adjust=False
+    )
+    axs[1].plot(noise[204:314], label="scaling=25", alpha=0.75)
+    _, noise = additive_noise__collected_noise__office_corridor(
+        trace_set=trace_set, scaling_factor=50, mean_adjust=False
+    )
+    axs[1].plot(noise[204:314], label="scaling=50", alpha=0.75)
+    _, noise = additive_noise__collected_noise__office_corridor(
+        trace_set=trace_set, scaling_factor=75, mean_adjust=False
+    )
+    axs[1].plot(noise[204:314], label="scaling=75", alpha=0.75)
+    _, noise = additive_noise__collected_noise__office_corridor(
+        trace_set=trace_set, scaling_factor=105, mean_adjust=False
+    )
+    axs[1].plot(noise[204:314], label="scaling=105", alpha=0.75)
+
+    # Rayleigh
+    _, noise = additive_noise__rayleigh(trace_set=trace_set, mode=0.0138)
+    axs[2].plot(noise[204:314], label="mode=0.0138", alpha=0.75)
+    _, noise = additive_noise__rayleigh(trace_set=trace_set, mode=0.0276)
+    axs[2].plot(noise[204:314], label="mode=0.0276", alpha=0.75)
+
+    axs[0].legend()
+    axs[1].legend()
+    axs[2].legend()
+    axs[0].set_ylim(-0.15, 0.15)
+    axs[1].set_ylim(-0.15, 0.15)
+    axs[2].set_ylim(-0.15, 0.15)
+    axs[0].set_title("Gaussian Noise")
+    axs[1].set_title("Recorded Noise")
+    axs[2].set_title("Rayleigh")
     plt.show()

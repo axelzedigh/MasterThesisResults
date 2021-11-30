@@ -12,7 +12,7 @@ from keras.optimizers import RMSprop
 from keras.utils import to_categorical
 from numba import jit
 
-from plots.plot_functions import plot_history_log
+from plots.history_log_plots import plot_history_log
 from utils.db_utils import get_training_trace_path__raw_200k_data
 from utils.denoising_utils import moving_average_filter_n3, \
     moving_average_filter_n5
@@ -261,6 +261,7 @@ def additive_noise__collected_noise__office_corridor(
 ) -> Tuple[np.array, np.array]:
     """
     Applies collected noise to the trace set.
+
     :param trace_set: Needs to have column-size 400 atm! TODO: fix?
     :param scaling_factor: Scaling factor of the noise.
     :param mean_adjust:
@@ -298,7 +299,9 @@ def additive_noise__collected_noise__office_corridor(
     noise_set *= scaling_factor
 
     # Get example additive noise trace
-    example_additive_noise_trace = noise_set[1]
+    # rand_index = np.random.random_integers(low=0, high=100)
+    # example_additive_noise_trace = noise_set[rand_index]
+    example_additive_noise_trace = noise_set[100]
 
     # Apply the noise to trace set
     for i in range(len(trace_set)):
