@@ -2,6 +2,7 @@
 
 import sys
 
+import numpy as np
 from tqdm import tqdm
 from scripts.RankTestScriptToDatabase import termination_point_test
 from utils.db_utils import insert_data_to_db
@@ -41,13 +42,16 @@ def termination_point_test_and_insert_to_db(
     :param trace_process_id:
     """
     filter_function = None
+    termination_point = None
+    tp_list = []
     if denoising_method_id == 1:
         filter_function = moving_average_filter_n3
     elif denoising_method_id == 2:
         filter_function = moving_average_filter_n5
     elif denoising_method_id == 3:
         filter_function = wiener_filter_trace_set
-    for _ in tqdm(range(0, runs)):
+    tqdm_iterator = tqdm(range(0, runs), desc=f"T.P {termination_point}")
+    for _ in tqdm_iterator:
         termination_point = termination_point_test(
             database=database,
             filter_function=filter_function,
@@ -63,7 +67,11 @@ def termination_point_test_and_insert_to_db(
             denoising_method_id=denoising_method_id,
             trace_process_id=trace_process_id,
         )
-        print(termination_point)
+        if termination_point is not None:
+            tp_list.append(termination_point)
+            tqdm_iterator.set_description(
+                f"TP Mean = {round(np.mean(tp_list), 1)}"
+            )
         if termination_point is not None:
             insert_data_to_db(
                 database=database,
@@ -121,8 +129,8 @@ if __name__ == "__main__":
             device=10,
             training_model_id=1,
             keybyte=0,
-            epoch=12,
-            additive_noise_method_id=None,
+            epoch=65,
+            additive_noise_method_id=6,
             denoising_method_id=None,
-            trace_process_id=8
+            trace_process_id=4
         )

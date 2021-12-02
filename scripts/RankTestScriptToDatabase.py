@@ -7,8 +7,10 @@ import matplotlib.pyplot as plt
 import numpy as np
 import tensorflow as tf
 
+from utils.trace_utils import get_normalized_test_traces
 from utils.db_utils import get_test_trace_path, get_training_model_file_path, \
     get_db_file_path
+from utils.statistic_utils import maxmin_scaling_of_trace_set__per_trace_fit
 
 AES_Sbox = np.array([
     0x63, 0x7C, 0x77, 0x7B, 0xF2, 0x6B, 0x6F, 0xC5, 0x30, 0x01, 0x67, 0x2B, 0xFE, 0xD7, 0xAB, 0x76,
@@ -185,6 +187,7 @@ def termination_point_test(
         additive_noise_method_id: int,
         denoising_method_id: int,
         trace_process_id: int,
+        training_dataset_id: int,
 ) -> Optional[int]:
     """
 
@@ -200,11 +203,17 @@ def termination_point_test(
     :param additive_noise_method_id:
     :param denoising_method_id:
     :param trace_process_id:
+    :param training_dataset_id:
     :return:
     """
+
+    # Range in traces to test.
+    range_start = 204
+    range_end = 314
+
     database = get_db_file_path(database)
 
-    # load test traces
+    # Test trace set path
     test_path = get_test_trace_path(
         database=database,
         test_dataset_id=test_dataset_id,
@@ -213,32 +222,45 @@ def termination_point_test(
         device=device
     )
 
-    if trace_process_id == 3:
-        nor_traces_maxmin = "nor_traces_maxmin.npy"
-    elif trace_process_id == 4 or 5 or 6:
-        nor_traces_maxmin = "nor_traces_maxmin__sbox_range_204_314.npy"
-    else:
-        raise "Choose a correct trace_process_id (3, 4 or 5)"
+    number_total_trace = 4900
+    # testing_traces_path = os.path.join(test_path, trace_set_file_name)
+    # testing_traces = np.load(testing_traces_path)
+    testing_traces = get_normalized_test_traces(
+        trace_process_id=trace_process_id,
+        test_dataset_id=test_dataset_id,
+        environment_id=environment_id,
+        distance=distance,
+        device=device,
+        save=False
+    )
+    testing_traces = testing_traces[:number_total_trace]
+
     tenth_roundkey = "10th_roundkey.npy"
     ct = "ct.npy"
-    testing_traces_path = os.path.join(test_path, nor_traces_maxmin)
     keys_path = os.path.join(test_path, tenth_roundkey)
     ciphertexts_path = os.path.join(test_path, ct)
 
-    number_total_trace = 4900
-    testing_traces = np.load(testing_traces_path)
-    testing_traces = testing_traces[:number_total_trace]
-
-    # Range in traces to test.
-    range_start = 204
-    range_end = 314
-
     # Filter traces
     if filter_function is not None:
-        testing_traces, range_start, range_end = filter_function(testing_traces)
+        if denoising_method_id == 3:
+            testing_traces, _, __ = filter_function(testing_traces, 2e-7)
+            # Scale traces
+            testing_traces = maxmin_scaling_of_trace_set__per_trace_fit(
+                trace_set=testing_traces,
+                range_start=range_start,
+                range_end=range_end,
+            )
+            testing_traces = testing_traces[:number_total_trace]
+        else:
+            testing_traces, range_start, range_end = filter_function(testing_traces)
 
     # Select range in traces to test.
     testing_traces = testing_traces[:, [i for i in range(range_start, range_end)]]
+
+    # plt.plot(testing_traces[0])
+    # plt.plot(testing_traces[1])
+    # plt.plot(testing_traces[2])
+    # plt.show()
 
     # load key
     key = np.load(keys_path)
@@ -260,6 +282,7 @@ def termination_point_test(
         epoch=epoch,
         keybyte=keybyte,
         trace_process_id=trace_process_id,
+        training_dataset_id=training_dataset_id,
     )
     training_model = load_sca_model(training_model_path)
 
