@@ -171,7 +171,12 @@ QUERY_LIST_INITIALIZE_DB = [
     "INSERT INTO test_datasets VALUES (1,'Wang_2021');",
     "INSERT INTO test_datasets VALUES (2,'Zedigh_2021');",
 
-    "INSERT INTO training_datasets VALUES (1,'Wang_2021-Cable');",
+    ("INSERT INTO training_datasets VALUES (1,'Wang_2021 - Cable, 5 devices, "
+     "200k traces');"),
+    ("INSERT INTO training_datasets VALUES (2,'Wang_2021 - Cable, 5 devices, "
+     "100k traces');"),
+    ("INSERT INTO training_datasets VALUES (3,'Wang_2021 - Cable, 5 devices, "
+     "500k traces');"),
 
     "INSERT INTO training_models VALUES (1,'cnn_110');",
 
@@ -197,23 +202,34 @@ QUERY_LIST_INITIALIZE_DB = [
     "0.0138, NULL, NULL); ",
     "INSERT INTO additive_noise_methods VALUES (11,'Rayleigh', 'Mode', "
     "0.0276, NULL, NULL); ",
+    "INSERT INTO additive_noise_methods VALUES (12,'Rayleigh', 'Mode', "
+    "0.0069, NULL, NULL); ",
 
     "INSERT INTO denoising_methods VALUES (1,'Moving Average Filter', 'N', "
     "3, NULL, NULL); ",
     "INSERT INTO denoising_methods VALUES (2,'Moving Average Filter', 'N', "
     "5, NULL, NULL); ",
+    "INSERT INTO denoising_methods VALUES (3,'Wiener Filter', 'Noise Power', "
+    "2e-7, NULL, NULL); ",
 
-    "INSERT INTO trace_processes VALUES (1, 'Raw');",
-    "INSERT INTO trace_processes VALUES (2, 'Randomized order');",
-    "INSERT INTO trace_processes VALUES (3, 'Normalized - MaxMin');",
-    ("INSERT INTO trace_processes VALUES (4, 'Normalized - MaxMin SBox Range - "
-     "Normalization after additive noise');"),
-    ("INSERT INTO trace_processes VALUES (5, 'Normalized - MaxMin SBox Range - "
-     "No re-normalization after additive noise');"),
-    ("INSERT INTO trace_processes VALUES (6, 'Normalized - MaxMin Sbox Range - "
-     "No re-normalization - 100k training traces')"),
-    ("INSERT INTO trace_processes VALUES (7, 'Normalized - MaxMin Sbox Range - "
-     "No re-normalization - 500k training traces')"),
+    "INSERT INTO trace_processes VALUES (1, 'Raw (all__.npy');",
+    "INSERT INTO trace_processes VALUES (2, 'Randomized order (traces.npy)');",
+    ("INSERT INTO trace_processes VALUES (3, 'MaxMin - "
+     "Whole trace [0:400]');"),
+    ("INSERT INTO trace_processes VALUES (4, 'MaxMin - "
+     "SBox Range [204:314]');"),
+    ("INSERT INTO trace_processes VALUES (5, 'MaxMin - "
+     "SBox Range [204:314] - Normalization after additive noise');"),
+    ("INSERT INTO trace_processes VALUES (6, 'MaxMin - "
+     "Min in SBox Range [204:314] - Max: Avg([74:174]) * 2.2');"),
+    ("INSERT INTO trace_processes VALUES (7, 'MaxMin - "
+     "Min in SBox Range [204:314] - Max: Avg([204:314]) * 2.2');"),
+    ("INSERT INTO trace_processes VALUES (8, 'Standardization - "
+     "SBox Range [204:314]');"),
+    ("INSERT INTO trace_processes VALUES (9, 'MaxMin [-1, 1] - "
+     "Whole trace [0:400]');"),
+    ("INSERT INTO trace_processes VALUES (10, 'MaxMin [-1, 1] - "
+     "Sbox Range [204:314]');"),
 ]
 
 QUERY_RANK_TEST_GROUPED_A = """
