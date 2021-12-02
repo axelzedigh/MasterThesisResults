@@ -1,5 +1,6 @@
 import os
 import sqlite3 as lite
+import sys
 from typing import Optional
 from tqdm import tqdm
 
@@ -11,7 +12,10 @@ from utils.db_utils import get_test_trace_path, \
     get_training_trace_path__raw_20k_data, \
     insert_data_to_db__trace_metadata__width, fetchall_query
 from utils.statistic_utils import root_mean_square, \
-    signal_to_noise_ratio__sqrt_mean_std
+    signal_to_noise_ratio__sqrt_mean_std, \
+    maxmin_scaling_of_trace_set__per_trace_fit, \
+    maxmin_scaling_of_trace_set__per_trace_fit__max_avg, \
+    standardization_of_trace_set__per_trace_fit
 
 
 def get_trace_set_metadata__depth(
@@ -822,3 +826,99 @@ def get_training_model_file_save_path(
         (f"{training_model}-" + "{epoch:01d}.h5")
     )
     return training_model_file_save_path
+
+
+def get_normalized_test_traces(
+        trace_process_id: int,
+        test_dataset_id: int,
+        environment_id: int,
+        distance: float,
+        device: int,
+        save: bool = False,
+) -> Optional[np.array]:
+    """
+    :param trace_process_id:
+    :param test_dataset_id:
+    :param environment_id:
+    :param distance:
+    :param device:
+    :param save:
+    """
+    assert trace_process_id in range(1, 11)
+
+    test_trace_set_path = get_test_trace_path(
+        database="main.db",
+        test_dataset_id=test_dataset_id,
+        environment_id=environment_id,
+        distance=distance,
+        device=device,
+    )
+    if trace_process_id == 3 and not save:
+        test_trace_set_file_path = os.path.join(
+            test_trace_set_path, "nor_traces_maxmin.npy"
+        )
+    else:
+        test_trace_set_file_path = os.path.join(
+            test_trace_set_path, "traces.npy"
+        )
+    test_trace_set = np.load(test_trace_set_file_path)
+
+    # Normalize trace set
+    if trace_process_id == 3:
+        pass
+    elif trace_process_id in [4, 5]:
+        test_trace_set = maxmin_scaling_of_trace_set__per_trace_fit(
+            trace_set=test_trace_set, range_start=204, range_end=314,
+            scaling_range=(0, 1)
+        )
+        save_path = os.path.join(
+            test_trace_set_path, "nor_traces_maxmin__sbox_range_204_314.npy"
+        )
+    elif trace_process_id == 6:
+        test_trace_set = maxmin_scaling_of_trace_set__per_trace_fit__max_avg(
+            trace_set=test_trace_set, range_start=204, range_end=314,
+            avg_start=74, avg_end=174, scale=2.2
+        )
+        save_path = os.path.join(
+            test_trace_set_path, "trace_process_6-max_avg(before_sbox).npy"
+        )
+    elif trace_process_id == 7:
+        test_trace_set = maxmin_scaling_of_trace_set__per_trace_fit__max_avg(
+            trace_set=test_trace_set, range_start=204, range_end=314,
+            avg_start=204, avg_end=314, scale=1.8
+        )
+        save_path = os.path.join(
+            test_trace_set_path, "trace_process_7-max_avg(sbox).npy"
+        )
+    elif trace_process_id == 8:
+        test_trace_set = standardization_of_trace_set__per_trace_fit(
+            trace_set=test_trace_set, range_start=204, range_end=314
+        )
+        save_path = os.path.join(
+            test_trace_set_path, "trace_process_8-standardization_sbox.npy"
+        )
+    elif trace_process_id == 9:
+        test_trace_set = maxmin_scaling_of_trace_set__per_trace_fit(
+            trace_set=test_trace_set, range_start=0, range_end=-1,
+            scaling_range=(-1, 1)
+        )
+        save_path = os.path.join(
+            test_trace_set_path, "trace_process_9-maxmin_[-1_1]_[0_400].npy"
+        )
+    elif trace_process_id == 10:
+        test_trace_set = maxmin_scaling_of_trace_set__per_trace_fit(
+            trace_set=test_trace_set, range_start=204, range_end=314,
+            scaling_range=(-1, 1)
+        )
+        save_path = os.path.join(
+            test_trace_set_path, "trace_process_10-maxmin_[-1_1]_[204_314].npy"
+        )
+    else:
+        print("Wrong trace process id!")
+        sys.exit(-1)
+
+    if save:
+        np.save(save_path, test_trace_set)
+        return
+    else:
+        return test_trace_set
