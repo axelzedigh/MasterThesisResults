@@ -7,9 +7,11 @@ from matplotlib import pyplot as plt
 from plots.plot_functions import plot_best_additive_noise_methods, \
     plot_all_of_an_additive_noise
 from plots.history_log_plots import plot_history_log
-from utils.db_utils import get_training_trace_path__raw_200k_data, \
+from utils.db_utils import get_training_trace_path__combined_200k_data, \
     get_test_trace_path
 from utils.denoising_utils import wiener_filter
+from utils.statistic_utils import \
+    maxmin_scaling_of_trace_set__per_trace_fit__max_avg
 from utils.trace_utils import get_trace_set__processed
 from utils.training_utils import cut_trace_set__column_range
 
@@ -33,7 +35,7 @@ def wiener_filter__1():
 
 
 def training_maxmin_sbox_range():
-    training_set_path = get_training_trace_path__raw_200k_data()
+    training_set_path = get_training_trace_path__combined_200k_data()
     file_path = os.path.join(
         training_set_path, "nor_traces_maxmin__sbox_range_204_314.npy"
     )
@@ -68,6 +70,27 @@ def test_maxmin_sbox_range():
     plt.show()
 
 
+def test_maxmin_scaling_of_trace_set__per_trace_fit__trace_process_8():
+    trace_set = get_trace_set__processed(
+        "main.db",
+        test_dataset_id=1,
+        training_dataset_id=None,
+        environment_id=1,
+        distance=15,
+        device=10,
+        trace_process_id=2,
+    )
+    trace_set = maxmin_scaling_of_trace_set__per_trace_fit__max_avg(
+        trace_set=trace_set, range_start=204, range_end=314
+    )
+    trace_set = cut_trace_set__column_range(trace_set, 204, 314)
+    fig = plt.figure(figsize=(22, 7))
+    ax = fig.gca()
+    ax.plot(trace_set[0])
+    ax.plot(trace_set[1])
+    ax.plot(trace_set[2])
+    plt.show()
+
 if __name__ == "__main__":
     # wiener_filter__1()
     # training_maxmin_sbox_range()
@@ -79,6 +102,7 @@ if __name__ == "__main__":
     #     denoising_method_id=None,
     # )
     # plot_best_additive_noise_methods()
-    plot_all_of_an_additive_noise(
-        additive_noise_method="Collected"
-    )
+    # plot_all_of_an_additive_noise(
+    #     additive_noise_method="Collected"
+    # )
+    test_maxmin_scaling_of_trace_set__per_trace_fit__trace_process_8()

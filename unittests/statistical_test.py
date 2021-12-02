@@ -15,7 +15,8 @@ from utils.statistic_utils import hamming_weight__single, \
     hamming_weight__vector, cross_correlation_matrix, \
     pearson_correlation_coefficient, snr_calculator, \
     root_mean_square, sklearn_normalizing__max, \
-    maxmin_scaling_of_trace_set__per_trace_fit
+    maxmin_scaling_of_trace_set__per_trace_fit, \
+    maxmin_scaling_of_trace_set__per_trace_fit__max_avg
 from utils.trace_utils import get_trace_set_metadata__depth, \
     get_trace_set__processed, \
     get_trace_set_metadata__depth__processed
@@ -159,3 +160,19 @@ class StatisticalFunctionsTestCase(unittest.TestCase):
         self.assertIn(0, scaled_trace[1])
         self.assertIn(1, scaled_trace[10])
         self.assertIn(0, scaled_trace[10])
+
+    def test_maxmin_scaling_of_trace_set__per_trace_fit__trace_process_8(self):
+        trace_set = get_trace_set__processed(
+            self.database,
+            test_dataset_id=1,
+            training_dataset_id=None,
+            environment_id=1,
+            distance=15,
+            device=10,
+            trace_process_id=2,
+        )
+        trace_set = maxmin_scaling_of_trace_set__per_trace_fit__max_avg(
+            trace_set=trace_set, range_start=204, range_end=314
+        )
+        trace_set = cut_trace_set__column_range(trace_set, 204, 314)
+        print(trace_set.shape)
