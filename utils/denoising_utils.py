@@ -71,7 +71,26 @@ def wiener_filter(trace, noise_power=0.0001):
     :param noise_power:
     :return:
     """
-    # TODO: finalize this
     shape = None
     filtered_trace = signal.wiener(trace, noise=noise_power)
     return filtered_trace
+
+
+def wiener_filter_trace_set(
+        test_trace_set: np.array,
+        noise_power: float,
+) -> Tuple[np.array, int, int]:
+    """
+
+    :param noise_power:
+    :param test_trace_set:
+    :return:
+    """
+    range_start = 204
+    range_end = 314
+    filtered_trace_set = np.empty_like(test_trace_set)
+
+    for i in range(len(test_trace_set)):
+        filtered_trace_set[i] = wiener_filter(test_trace_set[i], noise_power)
+
+    return filtered_trace_set, range_start, range_end
