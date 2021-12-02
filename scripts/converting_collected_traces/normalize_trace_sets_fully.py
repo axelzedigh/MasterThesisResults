@@ -85,13 +85,14 @@ def normalize_training_traces__trace_process_6_and_7(
     """
     start = 130
     end = 240
-    scale = 2.2
     if trace_process_id == 6:
         avg_start = 0
         avg_end = 100
+        scale = 2.2
     elif trace_process_id == 7:
         avg_start = 130
         avg_end = 240
+        scale = 1.8
     else:
         print("Wrong choice of trace process id (6 or 7)!")
         sys.exit(-1)
@@ -256,7 +257,7 @@ def normalize_training_traces__trace_process_9_10(
 if __name__ == "__main__":
     # normalize_training_traces_200k()
     training_dataset_ids = [2, 3]
-    trace_process_ids = [6, 7]
+    trace_process_ids = [7]
     # test_dataset_id = 2
     # environment_id = 1
     # distance = 2

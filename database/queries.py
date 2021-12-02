@@ -223,7 +223,7 @@ QUERY_LIST_INITIALIZE_DB = [
     ("INSERT INTO trace_processes VALUES (6, 'MaxMin - "
      "Min in SBox Range [204:314] - Max: Avg([74:174]) * 2.2');"),
     ("INSERT INTO trace_processes VALUES (7, 'MaxMin - "
-     "Min in SBox Range [204:314] - Max: Avg([204:314]) * 2.2');"),
+     "Min in SBox Range [204:314] - Max: Avg([204:314]) * 1.8');"),
     ("INSERT INTO trace_processes VALUES (8, 'Standardization - "
      "SBox Range [204:314]');"),
     ("INSERT INTO trace_processes VALUES (9, 'MaxMin [-1, 1] - "
