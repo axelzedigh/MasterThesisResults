@@ -13,9 +13,11 @@ from keras.utils import to_categorical
 from numba import jit
 
 from plots.history_log_plots import plot_history_log
-from utils.db_utils import get_training_trace_path__raw_200k_data
+from utils.db_utils import get_training_trace_path__combined_200k_data, \
+    get_training_trace_path__combined_100k_data, \
+    get_training_trace_path__combined_500k_data
 from utils.denoising_utils import moving_average_filter_n3, \
-    moving_average_filter_n5
+    moving_average_filter_n5, wiener_filter_trace_set
 from utils.statistic_utils import maxmin_scaling_of_trace_set__per_trace_fit
 from utils.trace_utils import get_training_model_file_save_path
 
@@ -148,6 +150,27 @@ def train_model(
             f"{len(input_layer_shape)} is not expected ...")
         sys.exit(-1)
 
+    # Import validation data
+    # raw_path = os.getenv("MASTER_THESIS_RESULTS_RAW_DATA")
+    # data_path = os.path.join(raw_path, "datasets/training_traces/Wang_2021/8m/20k_d1/100avg")
+    # labels = os.path.join(data_path, "label_0.npy")
+    # labels_val = np.load(labels)
+    # reshaped_labels_val = to_categorical(labels_val, num_classes=256)
+    # trace_set_path = os.path.join(data_path, "traces.npy")
+    # trace_set_val = np.load(trace_set_path)
+    #
+    # trace_set_val = maxmin_scaling_of_trace_set__per_trace_fit__trace_process_8(
+    #     trace_set=trace_set_val, range_start=130, range_end=240
+    # )
+    # trace_set_val = cut_trace_set__column_range(
+    #     trace_set=trace_set_val,
+    #     range_start=130,
+    #     range_end=240,
+    # )
+    # reshaped_trace_set_val = trace_set_val.reshape(
+    #     (trace_set_val.shape[0], trace_set_val.shape[1], 1)
+    # )
+
     history = deep_learning_model.fit(
         x=reshaped_x_profiling,
         y=reshaped_y_profiling,
@@ -156,6 +179,7 @@ def train_model(
         epochs=epochs,
         callbacks=callbacks,
         validation_split=0.1
+        # validation_data=(reshaped_trace_set_val, reshaped_labels_val),
     )
     return history
 
@@ -170,7 +194,7 @@ def cut_trace_set__column_range(
     :param range_end: End column position.
     :return:
     """
-    assert (range_start and range_end) < len(trace_set)
+    assert (range_start and range_end) < len(trace_set[0])
     return trace_set[:, range_start:range_end]
 
 
@@ -325,16 +349,22 @@ def denoising_of_trace_set(
             trace_set
         )
         return filtered_set, range_start, range_end, example_not_denoised_trace
-    if denoising_method_id == 2:
+    elif denoising_method_id == 2:
         filtered_set, range_start, range_end = moving_average_filter_n5(
             trace_set
         )
+        return filtered_set, range_start, range_end, example_not_denoised_trace
+    elif denoising_method_id == 3:
+        range_start = 130
+        range_end = 240
+        filtered_set, _, __ = wiener_filter_trace_set(trace_set, 2e-7)
         return filtered_set, range_start, range_end, example_not_denoised_trace
     else:
         raise f"Denoising method id {denoising_method_id} is not correct."
 
 
 def training_cnn_110(
+        training_dataset_id: int = 1,
         keybyte: int = 0,
         epochs: int = 100,
         batch_size: int = 256,
@@ -343,12 +373,13 @@ def training_cnn_110(
         trace_process_id: int = 3,
         verbose: bool = False,
         mode: int = 1,
-) -> None:
+) -> Optional[str]:
     """
     The main function for training the CNN 110 classifier.
     Uses training traces from Wang_2021 (5 devices).
     Only CNN with input size 110 and output size 256 is used now.
 
+    :param training_dataset_id:
     :param keybyte: The keybyte classifier to train.
     :param epochs: Number of epochs to perform.
     :param batch_size: The batch-size used in training.
@@ -360,13 +391,12 @@ def training_cnn_110(
     :return: None.
     """
     # Initialise variables
-    raw_data_path = os.getenv("MASTER_THESIS_RESULTS_RAW_DATA")
     training_model_id = 1
     additive_noise_trace = None
     clean_trace = None
     start = 204
     end = 314
-    if trace_process_id in [6, 7]:
+    if training_dataset_id in [2, 3]:
         # start = 200
         # end = 320
         # start = 209
@@ -374,50 +404,62 @@ def training_cnn_110(
         start = 130
         end = 240
 
-    # Get training traces numpy array.
-    training_set_path = get_training_trace_path__raw_200k_data()
-    if trace_process_id == 3:
+    # Get training traces path.
+    if training_dataset_id == 1:
+        training_set_path = get_training_trace_path__combined_200k_data()
+    elif training_dataset_id == 2:
+        training_set_path = get_training_trace_path__combined_100k_data()
+    elif training_dataset_id == 3:
+        training_set_path = get_training_trace_path__combined_500k_data()
+    else:
+        return "Invalid training_dataset id!"
+
+    # Get training traces (based on trace process)
+    if trace_process_id == 2:
+        trace_set_file_path = os.path.join(
+            training_set_path, "traces.npy"
+        )
+        training_trace_set = np.load(trace_set_file_path)
+    elif trace_process_id == 3:
         trace_set_file_path = os.path.join(
             training_set_path, "nor_traces_maxmin.npy"
         )
         training_trace_set = np.load(trace_set_file_path)
-    elif trace_process_id == 4 or trace_process_id == 5:
+    elif trace_process_id in [4, 5]:
         trace_set_file_path = os.path.join(
             training_set_path, "nor_traces_maxmin__sbox_range_204_314.npy"
         )
         training_trace_set = np.load(trace_set_file_path)
     elif trace_process_id == 6:
         trace_set_file_path = os.path.join(
-            raw_data_path,
-            "datasets/training_traces/Zedigh_2021/Cable/100k_5devices_joined",
-            "nor_maxmin_traces__130_240.npy"
+            training_set_path, "trace_process_6-max_avg(before_sbox).npy"
         )
         training_trace_set = np.load(trace_set_file_path)
     elif trace_process_id == 7:
         trace_set_file_path = os.path.join(
-            raw_data_path,
-            "datasets/training_traces/Zedigh_2021/Cable/500k_5devices_joined",
-            "nor_maxmin_traces__130_240.npy"
+            training_set_path, "trace_process_7-max_avg(sbox).npy"
+        )
+        training_trace_set = np.load(trace_set_file_path)
+    elif trace_process_id == 8:
+        trace_set_file_path = os.path.join(
+            training_set_path, "trace_process_8-standardization_sbox.npy"
+        )
+        training_trace_set = np.load(trace_set_file_path)
+    elif trace_process_id == 9:
+        trace_set_file_path = os.path.join(
+            training_set_path, "trace_process_8-maxmin_[-1_1]_[0_400].npy"
+        )
+        training_trace_set = np.load(trace_set_file_path)
+    elif trace_process_id == 10:
+        trace_set_file_path = os.path.join(
+            training_set_path, "trace_process_8-maxmin_[-1_1]_[204_314].npy"
         )
         training_trace_set = np.load(trace_set_file_path)
     else:
-        raise "Trace process id is not correct."
+        return "Trace_process_id is wrong!"
 
-    if trace_process_id == 6:
-        labels_path = os.path.join(
-            raw_data_path,
-            "datasets/training_traces/Zedigh_2021/Cable/100k_5devices_joined",
-            "labels.npy"
-        )
-        labels = np.load(labels_path)
-    if trace_process_id == 7:
-        labels_path = os.path.join(
-            raw_data_path,
-            "datasets/training_traces/Zedigh_2021/Cable/500k_5devices_joined",
-            "labels.npy"
-        )
-        labels = np.load(labels_path)
-    else:
+    # Get labels
+    if training_dataset_id == 1:
         # Get cipher-text numpy array..
         cipher_text_file_path = os.path.join(
             training_set_path, "ct.npy"
@@ -434,9 +476,18 @@ def training_cnn_110(
             cipher_text[:, keybyte], last_roundkey[:, keybyte]
         )
         labels = last_round_sbox_output
+    elif training_dataset_id in [2, 3]:
+        labels_path = os.path.join(
+            training_set_path,
+            "labels.npy"
+        )
+        labels = np.load(labels_path)
+    else:
+        return "Something's wrong with the labels."
 
     # Get path to store model
     model_save_file_path = get_training_model_file_save_path(
+        training_dataset_id=training_dataset_id,
         keybyte=keybyte,
         additive_noise_method_id=additive_noise_method_id,
         denoising_method_id=denoising_method_id,
@@ -472,30 +523,67 @@ def training_cnn_110(
         range_start=start,
         range_end=end,
     )
+    # Cut clean trace if denoising
+    if clean_trace is not None:
+        clean_trace = cut_trace_set__column_range(
+            trace_set=np.atleast_2d(clean_trace),
+            range_start=start,
+            range_end=end,
+        )
 
-    # Normalize the trace set in sbox range
-    if trace_process_id == 4:
+    # Re-normalize the trace set in sbox range
+    if trace_process_id == 5:
         training_trace_set = maxmin_scaling_of_trace_set__per_trace_fit(
             trace_set=training_trace_set,
             range_start=0,
             range_end=len(training_trace_set[1])
         )
+    elif denoising_method_id == 3:
+        training_trace_set = maxmin_scaling_of_trace_set__per_trace_fit(
+            trace_set=training_trace_set,
+            range_start=0,
+            range_end=len(training_trace_set[1])
+        )
+        if clean_trace is not None:
+            clean_trace = maxmin_scaling_of_trace_set__per_trace_fit(
+                trace_set=np.atleast_2d(clean_trace),
+                range_start=0,
+                range_end=len(clean_trace[0])
+            )
 
     # Plot the traces as a final check
-    if verbose:
-        plt.plot(training_trace_set[0], color="deepskyblue")
-        plt.plot(training_trace_set[1], color="seagreen")
-        plt.plot(training_trace_set[2], color="blueviolet")
-        if additive_noise_method_id is not None:
-            plt.plot(additive_noise_trace[start:end], color="lightcoral")
-        if denoising_method_id is not None:
-            plt.plot(clean_trace[start:end], color="orange")
-        trace_fig_save_path_dir = os.path.dirname(model_save_file_path)
-        trace_fig_file_path = os.path.join(
-            trace_fig_save_path_dir,
-            "training_trace_and_processing_attribute.png"
+    plt.plot(
+        training_trace_set[0],
+        color="deepskyblue",
+        label="Training trace 1"
+    )
+    plt.plot(
+        training_trace_set[1],
+        color="seagreen",
+        label="Training trace 2"
+    )
+    plt.plot(
+        training_trace_set[2],
+        color="blueviolet",
+        label="Training trace 3"
+    )
+    if additive_noise_method_id is not None:
+        plt.plot(
+            additive_noise_trace[start:end],
+            color="lightcoral",
+            label="Additive noise"
         )
-        plt.savefig(fname=trace_fig_file_path)
+    if denoising_method_id is not None:
+        plt.plot(clean_trace[0], color="orange", label="Clean trace.")
+    trace_fig_save_path_dir = os.path.dirname(model_save_file_path)
+    trace_fig_file_path = os.path.join(
+        trace_fig_save_path_dir,
+        "training_trace_and_processing_attribute.png"
+    )
+    plt.legend()
+    plt.savefig(fname=trace_fig_file_path)
+    if verbose:
+        plt.show()
 
     # Train the model
     history_log = train_model(
@@ -515,10 +603,23 @@ def training_cnn_110(
 
     if verbose:
         plot_history_log(
+            training_dataset_id=training_dataset_id,
             trace_process_id=trace_process_id,
             keybyte=keybyte,
             additive_noise_method_id=additive_noise_method_id,
             denoising_method_id=denoising_method_id,
+            save=True,
+            show=True
+        )
+    else:
+        plot_history_log(
+            training_dataset_id=training_dataset_id,
+            trace_process_id=trace_process_id,
+            keybyte=keybyte,
+            additive_noise_method_id=additive_noise_method_id,
+            denoising_method_id=denoising_method_id,
+            save=True,
+            show=False,
         )
 
     return
