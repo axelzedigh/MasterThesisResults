@@ -1,30 +1,42 @@
 # Todos
 ## Now
-- Create maxmin normalized traces for all test traces
+- Trace process 8: MIN=min(204:314), MAX=avg([0:200])*1.5 ?
+- Trace process 9: standardization
+- Trace process 10: MaxMin (-1, 1)
+- Histogram subplot (1 row for a case, e.g. additive_noise_id=1/distance=15)(column per device)
+  - Shows the approximate normal distribution of the termination points
+- History log subplot (row for each additive noise case, column for each case)
 - Refactor trace conversion (label_lastround) into more generalizeable
-- Test if trace process 6 works.
+- Make a short pdf with the most interesting plots/tables as a presentation
+- Plot all zedigh_2021 traces (both envs)
+  - termination point
+  - width
+  - depth
+- Get trace metadata big hall to database.
+- Hypotheses test functions
+  - Define H0, H1, operator, confidence=0.95, error=0.8
+- Decide more additive noise method ids:
+  - Collected 12.5
+  - Collected 25, mean_adjusted
 
 ---
 
 ## Database
 - Create queries/views for trace-metrics vs avg(termination_points)
 - SNR-table (test_trace_id, SNR)
+- Update rank_test__grouped.md (include trace process id)
 
 ## Storage
 - Backup raw-data:
   - Cloud (google drive)
   - Seagate
 
-## Rank test analysis
-- What termination criterion is currently (0 or 0.5)?
-
 ## Python
 - setuptools
-- numba (jit, to speed up numpy processes)
-  - termination-point analysis?
+- sphinx
 
 ## Additive noise
-- Additive noise functions
+- Plot recorded noise (both environments).
 - UML diagram of processing-flow
 
 ## Denoising
@@ -38,7 +50,6 @@
   - Mean, max, min, RMS, std, var, SNR_{(RMS/RMS)**2}, SNR_{(µ)**2/∂}
   - Scaling-factor, translation
 - Create function for averaging RMS and joining rank_test and trace-metadata tables using pandas
-- How to average std?
 - Find resolution of USRP (dynamic level step (e.g. level-size))
   - connect dynamic range ~ resolution (number of possible features)
 
@@ -53,6 +64,7 @@
 ## Data collecting
 - Collect 2.5m, device 8
 - Collect 2.5m device 10 again (compare difference between measurements)
+- Device 9..
 
 ## Training
 - Refactor training notebook script
@@ -84,5 +96,4 @@
 - Averaging std, snr etc. correctly (update plot functions.)
 
 ## Writing
-- Make a short pdf with the most interesting plots/tables as a presentation
-- Remove all part form the final latex doc.
+- Remove all part from the final latex doc.
