@@ -133,4 +133,5 @@ def create_500k_5device_joined_training_set():
 
 if __name__ == "__main__":
     # create_100k_5device_joined_training_set()
-    create_500k_5device_joined_training_set()
+    # create_500k_5device_joined_training_set()
+    pass

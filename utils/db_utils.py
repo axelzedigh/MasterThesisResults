@@ -568,7 +568,7 @@ def get_training_trace_path__raw_100k_data(
     return training_traces_path
 
 
-def get_training_trace_path__raw_200k_data() -> str:
+def get_training_trace_path__combined_200k_data() -> str:
     """
 
     :return: Path to training data (cable, 5 devices, single file 200k).
@@ -584,6 +584,34 @@ def get_training_trace_path__raw_200k_data() -> str:
     return training_traces_path
 
 
+def get_training_trace_path__combined_100k_data() -> str:
+    """
+
+    :return: Path to training data (cable, 5 devices, single file 100k).
+    """
+    raw_data_path = os.getenv("MASTER_THESIS_RESULTS_RAW_DATA")
+    training_set_path = os.path.join(
+        raw_data_path,
+        "datasets/training_traces/Zedigh_2021/Cable/100k_5devices_joined",
+    )
+
+    return training_set_path
+
+
+def get_training_trace_path__combined_500k_data() -> str:
+    """
+
+    :return: Path to training data (cable, 5 devices, single file 500k).
+    """
+    raw_data_path = os.getenv("MASTER_THESIS_RESULTS_RAW_DATA")
+    training_set_path = os.path.join(
+        raw_data_path,
+        "datasets/training_traces/Zedigh_2021/Cable/500k_5devices_joined",
+    )
+
+    return training_set_path
+
+
 def get_training_model_file_path(
         database,
         training_model_id,
@@ -592,6 +620,7 @@ def get_training_model_file_path(
         epoch,
         keybyte,
         trace_process_id,
+        training_dataset_id
 ) -> str:
     """
 
@@ -601,6 +630,8 @@ def get_training_model_file_path(
     :param denoising_method_id:
     :param epoch:
     :param keybyte:
+    :param trace_process_id:
+    :param training_dataset_id:
     :return:
     """
     database = get_db_file_path(database)
@@ -622,6 +653,7 @@ def get_training_model_file_path(
     training_model_file_path = os.path.join(
         project_dir,
         path,
+        f"training_dataset_{training_dataset_id}",
         f"trace_process_{trace_process_id}",
         f"keybyte_{keybyte}",
         f"{additive_noise_method_id}_{denoising_method_id}",
