@@ -1,9 +1,8 @@
 """Math- and statistical utils."""
 
 import numpy as np
-from numba import jit
 from scipy import stats
-from typing import Tuple
+from typing import Tuple, List
 from numpy.matlib import repmat
 from sklearn import preprocessing
 
@@ -17,7 +16,6 @@ def hamming_weight__single(value: int) -> int:
     return hamming_weight
 
 
-@jit
 def hamming_weight__vector(vector) -> np.array:
     """
     :param vector: The vector with values to calculate.
@@ -27,7 +25,6 @@ def hamming_weight__vector(vector) -> np.array:
     return hamming_weight_function(vector)
 
 
-@jit
 def cross_correlation_matrix(trace_1, trace_2) -> np.array:
     """
 
@@ -47,7 +44,6 @@ def pearson_correlation_coefficient(a, b) -> Tuple:
     return stats.pearsonr(a, b)
 
 
-@jit
 def correlation_matrix(x, y):
     xr, xc = x.shape
     yr, yc = y.shape
@@ -63,7 +59,6 @@ def correlation_matrix(x, y):
     return corr
 
 
-@jit
 def snr_calculator(trace_set, label_set):
     """
 
@@ -81,7 +76,6 @@ def snr_calculator(trace_set, label_set):
     return snr
 
 
-@jit
 def signal_to_noise_ratio__sqrt_mean_std(mean, std):
     """
 
@@ -104,7 +98,6 @@ def root_mean_square(vector):
     return rms
 
 
-@jit
 def signal_to_noise_ratio__amplitude(
         rms_signal: float, rms_noise: float
 ) -> float:
@@ -138,22 +131,82 @@ def maxmin_scaling_of_trace_set__whole_trace_set_fit(trace_set):
     return trace_set
 
 
-@jit
 def maxmin_scaling_of_trace_set__per_trace_fit(
-        trace_set, range_start, range_end
+        trace_set: np.array,
+        range_start: int = 204,
+        range_end: int = 314,
+        scaling_range: Tuple[int, int] = (0, 1),
 ) -> np.array:
     """
-    Scaler that performs normalization based on max and min per trace in the set
+    MaxMin-scaler that performs normalization based on max and min per trace in
+    the set.
+
     :param trace_set:
     :param range_start:
     :param range_end:
+    :param scaling_range: Tuple
+    :return:
+    """
+    scaling_scalar = np.abs(scaling_range[0] - scaling_range[1])
+    scaling_transl = scaling_range[0]
+    scaled_trace_set = np.empty_like(trace_set)
+    for i, trace in enumerate(trace_set):
+        max_value = np.max(trace[range_start:range_end])
+        min_value = np.min(trace[range_start:range_end])
+        unit_scaled_trace = (trace - min_value) / (max_value - min_value)
+        scaled_trace = (unit_scaled_trace * scaling_scalar) + scaling_transl
+        scaled_trace_set[i] = scaled_trace
+
+    return scaled_trace_set
+
+
+def maxmin_scaling_of_trace_set__per_trace_fit__max_avg(
+        trace_set: np.array,
+        range_start: int,
+        range_end: int,
+        avg_start: int = 0,
+        avg_end: int = 100,
+        scale: float = 2.2
+) -> np.array:
+    """
+    Scaler that performs normalization. Max value is derived from
+    avg(avg_start:avg_end). Min is derived from min(range_start:range_end).
+    Used in trace_process_id 6 & 7.
+
+    :param trace_set:
+    :param range_start:
+    :param range_end:
+    :param avg_start:
+    :param avg_end:
+    :param scale:
     :return:
     """
     scaled_trace_set = np.empty_like(trace_set)
     for i, trace in enumerate(trace_set):
-        max_value = np.max(trace[range_start:range_end])
+        max_value = np.mean(trace[avg_start:avg_end]) * scale
         min_value = np.min(trace[range_start:range_end])
         scaled_trace = (trace - min_value) / (max_value - min_value)
         scaled_trace_set[i] = scaled_trace
 
     return scaled_trace_set
+
+
+def standardization_of_trace_set__per_trace_fit(
+        trace_set: np.array,
+        range_start: int = 204,
+        range_end: int = 314,
+) -> np.array:
+    """
+    Standardization of trace_set (centered on mean µ, scaled to 1 std ∂).
+
+    :param trace_set:
+    :param range_start:
+    :param range_end:
+    :return:
+    """
+    standardized_trace_set = np.empty_like(trace_set)
+    for i, trace in enumerate(trace_set):
+        standardized_trace = (trace - np.mean(trace[range_start:range_end])) / np.std(trace[range_start:range_end])
+        standardized_trace_set[i] = standardized_trace
+
+    return standardized_trace_set

@@ -7,7 +7,7 @@ import numpy as np
 
 from utils.db_utils import get_test_trace_path, \
     insert_data_to_db__trace_metadata__depth, get_db_file_path, \
-    get_training_trace_path__raw_200k_data, get_test_trace_path__raw_data, \
+    get_training_trace_path__combined_200k_data, get_test_trace_path__raw_data, \
     get_training_trace_path__raw_20k_data, \
     insert_data_to_db__trace_metadata__width, fetchall_query
 from utils.statistic_utils import root_mean_square, \
@@ -108,7 +108,7 @@ def get_trace_set__processed(
                 device=device
             )
         else:
-            trace_path = get_training_trace_path__raw_200k_data()
+            trace_path = get_training_trace_path__combined_200k_data()
     else:
         raise "Both test_dataset_id and training_dataset_id was passed. Not ok!"
 
@@ -427,7 +427,7 @@ def get_trace_set_metadata__width(
             raise "Not interesting!"
         elif trace_process_id == 3:
             # TODO: Remove cases for 2 & 3? Not interesting data?
-            trace_path = get_training_trace_path__raw_200k_data()
+            trace_path = get_training_trace_path__combined_200k_data()
             traces_set = np.load(
                 os.path.join(trace_path, "nor_traces_maxmin.npy")
             )
@@ -785,6 +785,7 @@ def insert_all_trace_metadata_width_to_db(database):
 
 
 def get_training_model_file_save_path(
+        training_dataset_id: int = 1,
         keybyte: int = 0,
         additive_noise_method_id: Optional[int] = None,
         denoising_method_id: Optional[int] = None,
@@ -792,6 +793,7 @@ def get_training_model_file_save_path(
         trace_process_id: int = 3,
 ) -> str:
     """
+    :param training_dataset_id:
     :param keybyte:
     :param additive_noise_method_id:
     :param denoising_method_id:
@@ -801,7 +803,7 @@ def get_training_model_file_save_path(
     """
     database = get_db_file_path()
     project_dir = os.getenv("MASTER_THESIS_RESULTS")
-    path = f"models/trace_process_{trace_process_id}"
+    path = f"models/training_dataset_{training_dataset_id}/trace_process_{trace_process_id}"
     training_model_query = f"""
     select training_model from training_models
     where id = {training_model_id};"""
