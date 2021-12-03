@@ -20,7 +20,8 @@ from utils.db_utils import get_training_trace_path__combined_200k_data, \
 from utils.denoising_utils import moving_average_filter_n3, \
     moving_average_filter_n5, wiener_filter_trace_set
 from utils.statistic_utils import maxmin_scaling_of_trace_set__per_trace_fit
-from utils.trace_utils import get_training_model_file_save_path
+from utils.trace_utils import get_training_model_file_save_path, \
+    get_training_trace_path
 
 
 def check_if_file_exists(file_path):
@@ -410,14 +411,7 @@ def training_cnn_110(
         end = 240
 
     # Get training traces path.
-    if training_dataset_id == 1:
-        training_set_path = get_training_trace_path__combined_200k_data()
-    elif training_dataset_id == 2:
-        training_set_path = get_training_trace_path__combined_100k_data()
-    elif training_dataset_id == 3:
-        training_set_path = get_training_trace_path__combined_500k_data()
-    else:
-        return "Invalid training_dataset id!"
+    training_set_path = get_training_trace_path(training_dataset_id)
 
     # Get training traces (based on trace process)
     if trace_process_id == 2:
@@ -445,23 +439,26 @@ def training_cnn_110(
             training_set_path, "trace_process_7-max_avg(sbox).npy"
         )
         training_trace_set = np.load(trace_set_file_path)
-    elif trace_process_id == 8:
+    elif trace_process_id in [8, 11]:
         trace_set_file_path = os.path.join(
             training_set_path, "trace_process_8-standardization_sbox.npy"
         )
         training_trace_set = np.load(trace_set_file_path)
     elif trace_process_id == 9:
         trace_set_file_path = os.path.join(
-            training_set_path, "trace_process_8-maxmin_[-1_1]_[0_400].npy"
+            training_set_path, "trace_process_9-maxmin_[-1_1]_[0_400].npy"
         )
         training_trace_set = np.load(trace_set_file_path)
     elif trace_process_id == 10:
         trace_set_file_path = os.path.join(
-            training_set_path, "trace_process_8-maxmin_[-1_1]_[204_314].npy"
+            training_set_path, "trace_process_10-maxmin_[-1_1]_[204_314].npy"
         )
         training_trace_set = np.load(trace_set_file_path)
     else:
         return "Trace_process_id is wrong!"
+
+    if trace_process_id == 11:
+        training_trace_set -= np.mean(training_trace_set, axis=0)
 
     # Get labels
     if training_dataset_id == 1:
@@ -544,18 +541,6 @@ def training_cnn_110(
             range_start=0,
             range_end=len(training_trace_set[1])
         )
-    # elif denoising_method_id == 3:
-    #     training_trace_set = maxmin_scaling_of_trace_set__per_trace_fit(
-    #         trace_set=training_trace_set,
-    #         range_start=0,
-    #         range_end=len(training_trace_set[1])
-    #     )
-    #     if clean_trace is not None:
-    #         clean_trace = maxmin_scaling_of_trace_set__per_trace_fit(
-    #             trace_set=np.atleast_2d(clean_trace),
-    #             range_start=0,
-    #             range_end=len(clean_trace[0])
-    #         )
 
     # Plot the traces as a final check
     plt.plot(

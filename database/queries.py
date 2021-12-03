@@ -230,6 +230,8 @@ QUERY_LIST_INITIALIZE_DB = [
      "Whole trace [0:400]');"),
     ("INSERT INTO trace_processes VALUES (10, 'MaxMin [-1, 1] - "
      "Sbox Range [204:314]');"),
+    ("INSERT INTO trace_processes VALUES (11, 'Standardization - SBox Range - "
+     "Difference with Mean');"),
 ]
 
 QUERY_RANK_TEST_GROUPED_A = """

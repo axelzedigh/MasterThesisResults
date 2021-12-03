@@ -10,7 +10,9 @@ from utils.db_utils import get_test_trace_path, \
     insert_data_to_db__trace_metadata__depth, get_db_file_path, \
     get_training_trace_path__combined_200k_data, get_test_trace_path__raw_data, \
     get_training_trace_path__raw_20k_data, \
-    insert_data_to_db__trace_metadata__width, fetchall_query
+    insert_data_to_db__trace_metadata__width, fetchall_query, \
+    get_training_trace_path__combined_100k_data, \
+    get_training_trace_path__combined_500k_data
 from utils.statistic_utils import root_mean_square, \
     signal_to_noise_ratio__sqrt_mean_std, \
     maxmin_scaling_of_trace_set__per_trace_fit, \
@@ -844,7 +846,7 @@ def get_normalized_test_traces(
     :param device:
     :param save:
     """
-    assert trace_process_id in range(1, 11)
+    assert trace_process_id in range(1, 12)
 
     test_trace_set_path = get_test_trace_path(
         database="main.db",
@@ -913,6 +915,10 @@ def get_normalized_test_traces(
         save_path = os.path.join(
             test_trace_set_path, "trace_process_10-maxmin_[-1_1]_[204_314].npy"
         )
+    elif trace_process_id == 11:
+        test_trace_set = standardization_of_trace_set__per_trace_fit(
+            trace_set=test_trace_set, range_start=204, range_end=314
+        )
     else:
         print("Wrong trace process id!")
         sys.exit(-1)
@@ -922,3 +928,23 @@ def get_normalized_test_traces(
         return
     else:
         return test_trace_set
+
+
+def get_training_trace_path(
+        training_dataset_id: int,
+):
+    """
+
+    :param training_dataset_id:
+    :return:
+    """
+    if training_dataset_id == 1:
+        training_set_path = get_training_trace_path__combined_200k_data()
+    elif training_dataset_id == 2:
+        training_set_path = get_training_trace_path__combined_100k_data()
+    elif training_dataset_id == 3:
+        training_set_path = get_training_trace_path__combined_500k_data()
+    else:
+        return "Invalid training_dataset id!"
+
+    return training_set_path

@@ -1,16 +1,16 @@
 import os.path
 import random
 import sys
-from typing import Optional, Callable
+from typing import Optional, Callable, Tuple
 import matplotlib.pyplot as plt
 
 import numpy as np
 import tensorflow as tf
 
-from utils.trace_utils import get_normalized_test_traces
+from utils.trace_utils import get_normalized_test_traces, \
+    get_training_trace_path
 from utils.db_utils import get_test_trace_path, get_training_model_file_path, \
     get_db_file_path
-from utils.statistic_utils import maxmin_scaling_of_trace_set__per_trace_fit
 
 AES_Sbox = np.array([
     0x63, 0x7C, 0x77, 0x7B, 0xF2, 0x6B, 0x6F, 0xC5, 0x30, 0x01, 0x67, 0x2B, 0xFE, 0xD7, 0xAB, 0x76,
@@ -250,11 +250,6 @@ def termination_point_test(
     # Select range in traces to test.
     testing_traces = testing_traces[:, [i for i in range(range_start, range_end)]]
 
-    # plt.plot(testing_traces[0])
-    # plt.plot(testing_traces[1])
-    # plt.plot(testing_traces[2])
-    # plt.show()
-
     # load key
     key = np.load(keys_path)
 
@@ -265,6 +260,22 @@ def termination_point_test(
     # choose interest keybyte and pt byte
     key_interest = key[keybyte]
     cts_interest = cts[:, keybyte]
+
+    if trace_process_id == 11:
+        training_set_path = get_training_trace_path(training_dataset_id)
+        trace_set_file_path = os.path.join(
+            training_set_path, "trace_process_8-standardization_sbox.npy"
+        )
+        training_trace_set = np.load(trace_set_file_path)
+        training_trace_set = training_trace_set[:, [i for i in range(130, 240)]]
+        cts = cts[testing_traces[:, 0] > 2.1]
+        testing_traces = testing_traces[testing_traces[:, 0] > 2.1]
+        testing_traces -= np.mean(training_trace_set, axis=0)
+
+    # plt.plot(testing_traces[0])
+    # plt.plot(testing_traces[1])
+    # plt.plot(testing_traces[2])
+    # plt.show()
 
     # Load training model
     training_model_path = get_training_model_file_path(
@@ -281,6 +292,170 @@ def termination_point_test(
 
     # get predictions for all traces
     predictions = get_prediction(training_model, testing_traces)
+
+    # randomly select trace for testing
+    number = 1500
+    average = 50   # 50
+    ranks_array = []
+
+    for i in range(average):
+        select = random.sample(range(len(testing_traces)), number)
+        selected_cts_interest = cts_interest[select]
+        selected_predictions = predictions[select]
+
+        # Calculate subkey probability for selected traces
+        probabilities = prediction_to_probability(
+            selected_cts_interest, selected_predictions, number
+        )
+        ranks = rank_cal(probabilities, key_interest, number)
+        ranks_array.append(ranks)
+
+    ranks_array = np.array(ranks_array)
+
+    term_point = None
+    for i in range(ranks_array.shape[1]):
+        if np.count_nonzero(ranks_array[:, i]) < int(average / 2):
+            term_point = i
+            break
+
+    # average_ranks = np.sum(ranks_array, axis=0) / average
+    # plt.plot(average_ranks)
+    # plt.show()
+    return term_point
+
+
+def termination_point_test_setup(
+        database: str,
+        filter_function: Optional[Callable],
+        test_dataset_id: int,
+        environment_id: int,
+        distance: float,
+        device: int,
+        training_model_id: int,
+        keybyte: int,
+        epoch: int,
+        additive_noise_method_id: int,
+        denoising_method_id: int,
+        trace_process_id: int,
+        training_dataset_id: int,
+) -> Tuple[np.array, np.array, np.array, np.array]:
+    """
+
+    :param database:
+    :param filter_function:
+    :param test_dataset_id:
+    :param environment_id:
+    :param distance:
+    :param device:
+    :param training_model_id:
+    :param keybyte:
+    :param epoch:
+    :param additive_noise_method_id:
+    :param denoising_method_id:
+    :param trace_process_id:
+    :param training_dataset_id:
+    :return:
+    """
+
+    # Range in traces to test.
+    range_start = 204
+    range_end = 314
+
+    database = get_db_file_path(database)
+
+    # Test trace set path
+    test_path = get_test_trace_path(
+        database=database,
+        test_dataset_id=test_dataset_id,
+        environment_id=environment_id,
+        distance=distance,
+        device=device
+    )
+
+    number_total_trace = 4900
+    # testing_traces_path = os.path.join(test_path, trace_set_file_name)
+    # testing_traces = np.load(testing_traces_path)
+    testing_traces = get_normalized_test_traces(
+        trace_process_id=trace_process_id,
+        test_dataset_id=test_dataset_id,
+        environment_id=environment_id,
+        distance=distance,
+        device=device,
+        save=False
+    )
+    testing_traces = testing_traces[:number_total_trace]
+
+    tenth_roundkey = "10th_roundkey.npy"
+    ct = "ct.npy"
+    keys_path = os.path.join(test_path, tenth_roundkey)
+    ciphertexts_path = os.path.join(test_path, ct)
+
+    # Filter traces
+    if filter_function is not None:
+        if denoising_method_id == 3:
+            testing_traces, _, __ = filter_function(testing_traces, 2e-2)
+        else:
+            testing_traces, range_start, range_end = filter_function(testing_traces)
+
+    # Select range in traces to test.
+    testing_traces = testing_traces[:, [i for i in range(range_start, range_end)]]
+
+    # load key
+    key = np.load(keys_path)
+
+    # load plaintext (all bytes)
+    cts = np.load(ciphertexts_path)
+    cts = cts[:number_total_trace]
+
+    # choose interest keybyte and pt byte
+    key_interest = key[keybyte]
+    cts_interest = cts[:, keybyte]
+
+    if trace_process_id == 11:
+        training_set_path = get_training_trace_path(training_dataset_id)
+        trace_set_file_path = os.path.join(
+            training_set_path, "trace_process_8-standardization_sbox.npy"
+        )
+        training_trace_set = np.load(trace_set_file_path)
+        training_trace_set = training_trace_set[:, [i for i in range(130, 240)]]
+        cts = cts[testing_traces[:, 0] > 2.1]
+        testing_traces = testing_traces[testing_traces[:, 0] > 2.1]
+        testing_traces -= np.mean(training_trace_set, axis=0)
+
+    # plt.plot(testing_traces[0])
+    # plt.plot(testing_traces[1])
+    # plt.plot(testing_traces[2])
+    # plt.show()
+
+    # Load training model
+    training_model_path = get_training_model_file_path(
+        database=database,
+        training_model_id=training_model_id,
+        additive_noise_method_id=additive_noise_method_id,
+        denoising_method_id=denoising_method_id,
+        epoch=epoch,
+        keybyte=keybyte,
+        trace_process_id=trace_process_id,
+        training_dataset_id=training_dataset_id,
+    )
+    training_model = load_sca_model(training_model_path)
+
+    # get predictions for all traces
+    predictions = get_prediction(training_model, testing_traces)
+
+    return testing_traces, predictions, key_interest, cts_interest
+
+
+def termination_point_test__rank_test(
+        testing_traces,
+        predictions,
+        key_interest,
+        cts_interest,
+) -> Optional[int]:
+    """
+
+    :return:
+    """
 
     # randomly select trace for testing
     number = 1500
