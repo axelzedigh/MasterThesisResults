@@ -7,16 +7,15 @@ import matplotlib.pyplot as plt
 import numpy as np
 from keras import backend as keras_backend
 from keras.callbacks import ModelCheckpoint
-from keras.layers import *
 from keras.models import Sequential
 from keras.optimizers import RMSprop
 from keras.utils import to_categorical
 from numba import jit
+from tensorflow.python.keras.layers import Conv1D, AveragePooling1D, Flatten, \
+    Dense
+from tensorflow.python.keras.losses import CategoricalCrossentropy
 
 from plots.history_log_plots import plot_history_log
-from utils.db_utils import get_training_trace_path__combined_200k_data, \
-    get_training_trace_path__combined_100k_data, \
-    get_training_trace_path__combined_500k_data
 from utils.denoising_utils import moving_average_filter_n3, \
     moving_average_filter_n5, wiener_filter_trace_set
 from utils.statistic_utils import maxmin_scaling_of_trace_set__per_trace_fit
@@ -51,7 +50,7 @@ def mean_squared_error(y_true, y_predicted):
 
 def cnn_110_model(classes=256):
     """
-    CNN with input size 110, batch-size 128.
+    CNN with input size 110.
     :param classes:
     :return: Keras/TF sequential CNN model with input size 110, classes 256.
     """
@@ -89,6 +88,9 @@ def cnn_110_model(classes=256):
     optimizer = RMSprop(lr=0.00005)
     sequential_model.compile(
         loss='categorical_crossentropy',
+        # loss=CategoricalCrossentropy(
+        #     label_smoothing=0.1
+        # ),
         optimizer=optimizer,
         metrics=['accuracy']
     )
@@ -243,7 +245,6 @@ def additive_noise_to_trace_set(
         return additive_noise__rayleigh(trace_set=trace_set, mode=0.0276)
 
 
-@jit
 def additive_noise__gaussian(
         trace_set: np.array, mean: float, std: float
 ) -> Tuple[np.array, np.array]:
@@ -262,7 +263,6 @@ def additive_noise__gaussian(
     return noise_traces, ex_additive_noise_trace
 
 
-@jit
 def additive_noise__rayleigh(
         trace_set: np.array, mode: float
 ) -> Tuple[np.array, np.array]:
@@ -543,35 +543,37 @@ def training_cnn_110(
         )
 
     # Plot the traces as a final check
-    plt.plot(
+    fig = plt.figure(figsize=(14, 14))
+    ax = fig.gca()
+    ax.plot(
         training_trace_set[0],
         color="deepskyblue",
         label="Training trace 1"
     )
-    plt.plot(
+    ax.plot(
         training_trace_set[1],
         color="seagreen",
         label="Training trace 2"
     )
-    plt.plot(
+    ax.plot(
         training_trace_set[2],
         color="blueviolet",
         label="Training trace 3"
     )
     if additive_noise_method_id is not None:
-        plt.plot(
+        ax.plot(
             additive_noise_trace[start:end],
             color="lightcoral",
             label="Additive noise"
         )
     if denoising_method_id is not None:
-        plt.plot(clean_trace[0], color="orange", label="Clean trace.")
+        ax.plot(clean_trace[0], color="orange", label="Clean trace.")
     trace_fig_save_path_dir = os.path.dirname(model_save_file_path)
     trace_fig_file_path = os.path.join(
         trace_fig_save_path_dir,
         "training_trace_and_processing_attribute.png"
     )
-    plt.legend()
+    ax.legend()
     plt.savefig(fname=trace_fig_file_path)
     if verbose:
         plt.show()

@@ -38,7 +38,7 @@ if __name__ == "__main__":
         training_dataset_ids = [3]
         additive_noise_method_ids = [None]
         denoising_method_ids = [None]
-        trace_process_ids = [4, 5, 6, 7, 9]
+        trace_process_ids = [8]
 
         for training_dataset_id in training_dataset_ids:
             for additive_noise_method_id in additive_noise_method_ids:

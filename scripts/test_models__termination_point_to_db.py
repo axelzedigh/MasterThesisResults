@@ -156,16 +156,18 @@ if __name__ == "__main__":
             trace_process_id=trace_process_id,
         )
     elif case == 3:
-        database = "main.db"
+        # database = "main.db"
+        database = "tmp_1.db"
         runs = 5
         test_dataset_ids = [1]
         training_dataset_ids = [3]
         environment_ids = [1]
         distances = [15]
-        devices = [6, 7, 8, 9, 10]
+        devices = [10, 6, 7, 8, 9]
         training_model_id = 1
-        epochs = [x for x in range(7, 9)]
-        additive_noise_method_ids = [None, 4, 6, 7]
+        # epochs = [x for x in range(15, 21)]
+        epochs = [15]
+        additive_noise_method_ids = [None]
         denoising_method_ids = [None]
         trace_process_ids = [8]
 
