@@ -1,6 +1,7 @@
 """
 Denoising functions.
 """
+import sys
 from typing import Tuple
 
 import numpy as np
@@ -19,17 +20,26 @@ def moving_average_filter(test_trace, n):
 
 
 def moving_average_filter_n3(
-        test_trace_set
+        test_trace_set: np.array,
+        training_dataset_id: int = 1,
 ) -> Tuple[np.array, int, int]:
     """
 
     :param test_trace_set: The trace set to filter.
+    :param training_dataset_id:
     :return: Filtered trace set and ranges.
     """
     filtered_trace_set = np.empty_like(test_trace_set)
     n = 3
-    range_start = 203
-    range_end = 313
+    if training_dataset_id == 1:
+        range_start = 203
+        range_end = 313
+    elif training_dataset_id in [2, 3]:
+        range_start = 129
+        range_end = 239
+    else:
+        print("Wrong training dataset id.")
+        sys.exit(-1)
 
     for i in range(len(test_trace_set)):
         filtered_trace_set[i] = np.pad(
@@ -42,17 +52,23 @@ def moving_average_filter_n3(
 
 
 def moving_average_filter_n5(
-        test_trace_set
+        test_trace_set: np.array,
+        training_dataset_id: int = 1,
 ) -> Tuple[np.array, int, int]:
     """
 
     :param test_trace_set: The trace set to filter.
+    :param training_dataset_id:
     :return: Filtered trace set and ranges.
     """
     filtered_trace_set = np.empty_like(test_trace_set)
     n = 5
-    range_start = 202
-    range_end = 312
+    if training_dataset_id == 1:
+        range_start = 202
+        range_end = 312
+    elif training_dataset_id in [2, 3]:
+        range_start = 128
+        range_end = 238
 
     for i in range(len(test_trace_set)):
         filtered_trace_set[i] = np.pad(

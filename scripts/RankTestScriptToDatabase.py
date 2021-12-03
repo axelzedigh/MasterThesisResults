@@ -243,14 +243,7 @@ def termination_point_test(
     # Filter traces
     if filter_function is not None:
         if denoising_method_id == 3:
-            testing_traces, _, __ = filter_function(testing_traces, 2e-7)
-            # Scale traces
-            testing_traces = maxmin_scaling_of_trace_set__per_trace_fit(
-                trace_set=testing_traces,
-                range_start=range_start,
-                range_end=range_end,
-            )
-            testing_traces = testing_traces[:number_total_trace]
+            testing_traces, _, __ = filter_function(testing_traces, 2e-2)
         else:
             testing_traces, range_start, range_end = filter_function(testing_traces)
 

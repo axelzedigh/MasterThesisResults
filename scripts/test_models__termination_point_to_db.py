@@ -123,14 +123,14 @@ if __name__ == "__main__":
             database="tmp_1.db",
             runs=100,
             test_dataset_id=1,
-            training_dataset_id=1,
+            training_dataset_id=3,
             environment_id=1,
             distance=15,
             device=10,
             training_model_id=1,
             keybyte=0,
-            epoch=65,
-            additive_noise_method_id=6,
-            denoising_method_id=None,
-            trace_process_id=4
+            epoch=27,
+            additive_noise_method_id=None,
+            denoising_method_id=3,
+            trace_process_id=8
         )

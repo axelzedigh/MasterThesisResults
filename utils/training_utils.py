@@ -1,3 +1,4 @@
+"""Training utils."""
 import os
 import sys
 from typing import Callable, Optional, Tuple
@@ -335,29 +336,33 @@ def additive_noise__collected_noise__office_corridor(
 
 
 def denoising_of_trace_set(
-        trace_set,
-        denoising_method_id
+        trace_set: np.array,
+        denoising_method_id: int,
+        training_dataset_id: int,
 ) -> Tuple[np.array, int, int, np.array]:
     """
     :param trace_set:
     :param denoising_method_id:
+    :param training_dataset_id:
     :return:
     """
     example_not_denoised_trace = trace_set[1].copy()
     if denoising_method_id == 1:
         filtered_set, range_start, range_end = moving_average_filter_n3(
-            trace_set
+            test_trace_set=trace_set,
+            training_dataset_id=training_dataset_id,
         )
         return filtered_set, range_start, range_end, example_not_denoised_trace
     elif denoising_method_id == 2:
         filtered_set, range_start, range_end = moving_average_filter_n5(
-            trace_set
+            test_trace_set=trace_set,
+            training_dataset_id=training_dataset_id,
         )
         return filtered_set, range_start, range_end, example_not_denoised_trace
     elif denoising_method_id == 3:
         range_start = 130
         range_end = 240
-        filtered_set, _, __ = wiener_filter_trace_set(trace_set, 2e-7)
+        filtered_set, _, __ = wiener_filter_trace_set(trace_set, 2e-2)
         return filtered_set, range_start, range_end, example_not_denoised_trace
     else:
         raise f"Denoising method id {denoising_method_id} is not correct."
@@ -515,6 +520,7 @@ def training_cnn_110(
         training_trace_set, start, end, clean_trace = denoising_of_trace_set(
             trace_set=training_trace_set,
             denoising_method_id=denoising_method_id,
+            training_dataset_id=training_dataset_id,
         )
 
     # Cut trace set to the sbox output range
@@ -538,18 +544,18 @@ def training_cnn_110(
             range_start=0,
             range_end=len(training_trace_set[1])
         )
-    elif denoising_method_id == 3:
-        training_trace_set = maxmin_scaling_of_trace_set__per_trace_fit(
-            trace_set=training_trace_set,
-            range_start=0,
-            range_end=len(training_trace_set[1])
-        )
-        if clean_trace is not None:
-            clean_trace = maxmin_scaling_of_trace_set__per_trace_fit(
-                trace_set=np.atleast_2d(clean_trace),
-                range_start=0,
-                range_end=len(clean_trace[0])
-            )
+    # elif denoising_method_id == 3:
+    #     training_trace_set = maxmin_scaling_of_trace_set__per_trace_fit(
+    #         trace_set=training_trace_set,
+    #         range_start=0,
+    #         range_end=len(training_trace_set[1])
+    #     )
+    #     if clean_trace is not None:
+    #         clean_trace = maxmin_scaling_of_trace_set__per_trace_fit(
+    #             trace_set=np.atleast_2d(clean_trace),
+    #             range_start=0,
+    #             range_end=len(clean_trace[0])
+    #         )
 
     # Plot the traces as a final check
     plt.plot(

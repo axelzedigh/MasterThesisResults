@@ -1,8 +1,5 @@
 # Todos
 ## Now
-- Trace process 8: MIN=min(204:314), MAX=avg([0:200])*1.5 ?
-- Trace process 9: standardization
-- Trace process 10: MaxMin (-1, 1)
 - Histogram subplot (1 row for a case, e.g. additive_noise_id=1/distance=15)(column per device)
   - Shows the approximate normal distribution of the termination points
 - History log subplot (row for each additive noise case, column for each case)
