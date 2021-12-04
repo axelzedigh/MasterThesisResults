@@ -1,13 +1,13 @@
 """ Unit tests concerning retrieval and insertion of data to database."""
-import unittest
-import sqlite3 as lite
 import os
+import sqlite3 as lite
+import unittest
 
 import numpy as np
 
+from configs.variables import PROJECT_DIR, VIEW_RANK_TEST_INDEX
 from database.queries import QUERY_FULL_RANK_TEST_GROUPED_A, \
     QUERY_RANK_TEST_GROUPED_A
-from database.variables import VIEW_RANK_TEST_INDEX
 from scripts.test_models__termination_point_to_db import \
     termination_point_test_and_insert_to_db
 from utils.db_utils import (
@@ -19,10 +19,8 @@ from utils.db_utils import (
     get_denoising_method_id, insert_legacy_rank_test_numpy_file_to_db,
     create_md__option_tables, get_db_absolute_path,
     get_test_trace_path, get_training_model_file_path, get_db_file_path,
-    copy_rank_test_from_db1_to_db2, insert_data_to_db__trace_metadata__depth,
-)
-from utils.trace_utils import get_trace_set_metadata__depth, \
-    get_trace_set__processed, \
+    copy_rank_test_from_db1_to_db2, )
+from utils.trace_utils import get_trace_set__processed, \
     insert_all_trace_metadata_depth_to_db, get_trace_set_metadata__width
 
 
@@ -258,9 +256,8 @@ class AddToDatabaseTestCase(unittest.TestCase):
 
     def test_create_pre_processing_table_info_file(self):
         # Get file path
-        project_dir = os.getenv("MASTER_THESIS_RESULTS")
         path = "unittests"
-        file_path = os.path.join(project_dir, path, "pre_processing_tables.md")
+        file_path = os.path.join(PROJECT_DIR, path, "pre_processing_tables.md")
 
         # Update file
         create_md__option_tables(self.database, path)

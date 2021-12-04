@@ -4,10 +4,12 @@ import numpy as np
 import sqlite3 as lite
 import pandas as pd
 import matplotlib.pyplot as plt
-from matplotlib.lines import Line2D
 import seaborn as sns
 import os
 
+from configs.variables import NORD_LIGHT_MPL_STYLE_PATH, \
+    NORD_LIGHT_4_CUSTOM_LINES, NORD_LIGHT_BLUE, NORD_LIGHT_LIGHT_BLUE, \
+    NORD_LIGHT_RED, NORD_LIGHT_ORANGE
 from utils.db_utils import get_db_absolute_path, get_test_trace_path
 from utils.statistic_utils import root_mean_square
 from utils.training_utils import additive_noise__gaussian, \
@@ -26,10 +28,9 @@ def plot_trace_metadata_depth__one(test_dataset_id, distance, device,
     :return:
     """
 
-    custom_lines = [Line2D([0], [0], color='b', lw=4),
-                    Line2D([0], [0], color='r', lw=4),
-                    Line2D([0], [0], color='g', lw=4),
-                    Line2D([0], [0], color='orange', lw=4)]
+    # MPL styling
+    plt.style.use(NORD_LIGHT_MPL_STYLE_PATH)
+    custom_lines = NORD_LIGHT_4_CUSTOM_LINES
 
     query = f"""
     select
@@ -58,8 +59,8 @@ def plot_trace_metadata_depth__one(test_dataset_id, distance, device,
         Mean: {round(mean_mean, 4)}, RMS: {round(mean_rms, 4)}, Std: {round(mean_std, 5)}, SNR: {round(mean_snr, 2)}
         """
     )
-    plt.axhline(mean_mean, c="r")
-    plt.axhline(mean_rms, c="g")
+    plt.axhline(mean_mean, c=NORD_LIGHT_RED)
+    plt.axhline(mean_rms, c=NORD_LIGHT_ORANGE)
     labels = ["Mean", "Mean Mean", "Mean RMS"]
     plt.legend(custom_lines, labels)
     plt.show()
@@ -98,6 +99,10 @@ def plot_test_trace_metadata_depth__mean(
     :param trace_process_id:
     :param environment_id:
     """
+
+    # MPL styling
+    plt.style.use(NORD_LIGHT_MPL_STYLE_PATH)
+
     database = get_db_absolute_path("main.db")
     con2 = lite.connect(database)
     query = "select * from trace_metadata_depth;"
@@ -128,9 +133,9 @@ def plot_test_trace_metadata_depth__mean(
         # mean_rms = root_mean_square(data[204:314]["rms_val"])
         mean_std = round(root_mean_square(data[204:314]["std_val"]), 5)
         mean_snr = round(np.mean(data[204:314]["snr_val"], axis=0), 1)
-        ax.axhline(top_value, c="b")
-        ax.axhline(bottom_value, c="b")
-        ax.axhline(mean_mean, c="r")
+        ax.axhline(top_value, c=NORD_LIGHT_BLUE)
+        ax.axhline(bottom_value, c=NORD_LIGHT_BLUE)
+        ax.axhline(mean_mean, c=NORD_LIGHT_RED)
         if round(top_value, 5) < 0.012:
             ax.text(
                 0.02, 0.97,
@@ -170,6 +175,10 @@ def plot_test_trace_metadata_depth__rms(
     :param trace_process_id:
     :param environment_id:
     """
+
+    # MPL styling
+    plt.style.use(NORD_LIGHT_MPL_STYLE_PATH)
+
     database = get_db_absolute_path("main.db")
     con2 = lite.connect(database)
     query = "select * from trace_metadata_depth;"
@@ -200,9 +209,9 @@ def plot_test_trace_metadata_depth__rms(
         mean_rms = root_mean_square(data[204:314]["rms_val"])
         mean_std = round(root_mean_square(data[204:314]["std_val"]), 5)
         mean_snr = round(np.mean(data[204:314]["snr_val"], axis=0), 1)
-        ax.axhline(top_value, c="b")
-        ax.axhline(bottom_value, c="b")
-        ax.axhline(mean_rms, c="g")
+        ax.axhline(top_value, c=NORD_LIGHT_BLUE)
+        ax.axhline(bottom_value, c=NORD_LIGHT_BLUE)
+        ax.axhline(mean_rms, c=NORD_LIGHT_ORANGE)
         if round(top_value, 5) < 0.012:
             ax.text(
                 0.02, 0.97,
@@ -242,6 +251,10 @@ def plot_test_trace_metadata_depth__std(
     :param trace_process_id:
     :param environment_id:
     """
+
+    # MPL styling
+    plt.style.use(NORD_LIGHT_MPL_STYLE_PATH)
+
     database = get_db_absolute_path("main.db")
     con2 = lite.connect(database)
     query = "select * from trace_metadata_depth;"
@@ -272,11 +285,11 @@ def plot_test_trace_metadata_depth__std(
         # mean_rms = root_mean_square(data[204:314]["rms_val"])
         mean_std = round(root_mean_square(data[204:314]["std_val"]), 5)
         mean_snr = round(np.mean(data[204:314]["snr_val"], axis=0), 1)
-        ax.axhline(top_value, c="b")
-        ax.axhline(bottom_value, c="b")
+        ax.axhline(top_value, c=NORD_LIGHT_BLUE)
+        ax.axhline(bottom_value, c=NORD_LIGHT_BLUE)
         # ax.axhline(mean_mean, c="r")
         # ax.axhline(mean_rms, c="g")
-        ax.axhline(mean_std, c="g")
+        ax.axhline(mean_std, c=NORD_LIGHT_RED)
         if round(top_value, 5) < 0.012:
             ax.text(
                 0.02, 0.97,
@@ -316,6 +329,10 @@ def plot_test_trace_metadata_depth__snr(
     :param trace_process_id:
     :param environment_id:
     """
+
+    # MPL styling
+    plt.style.use(NORD_LIGHT_MPL_STYLE_PATH)
+
     database = get_db_absolute_path("main.db")
     con2 = lite.connect(database)
     query = "select * from trace_metadata_depth;"
@@ -346,11 +363,11 @@ def plot_test_trace_metadata_depth__snr(
         # mean_rms = root_mean_square(data[204:314]["rms_val"])
         mean_std = round(root_mean_square(data[204:314]["std_val"]), 5)
         mean_snr = round(np.mean(data[204:314]["snr_val"], axis=0), 1)
-        ax.axhline(top_value, c="b")
-        ax.axhline(bottom_value, c="b")
+        ax.axhline(top_value, c=NORD_LIGHT_BLUE)
+        ax.axhline(bottom_value, c=NORD_LIGHT_BLUE)
         # ax.axhline(mean_mean, c="r")
         # ax.axhline(mean_rms, c="g")
-        ax.axhline(mean_snr, c="g")
+        ax.axhline(mean_snr, c=NORD_LIGHT_RED)
         if round(top_value, 5) < 0.012:
             ax.text(
                 0.02, 0.97,
@@ -390,6 +407,10 @@ def plot_test_trace_metadata_depth__std__full_trace(
     :param trace_process_id:
     :param environment_id:
     """
+
+    # MPL styling
+    plt.style.use(NORD_LIGHT_MPL_STYLE_PATH)
+
     database = get_db_absolute_path("main.db")
     con2 = lite.connect(database)
     query = "select * from trace_metadata_depth;"
@@ -417,13 +438,13 @@ def plot_test_trace_metadata_depth__std__full_trace(
     # mean_rms = root_mean_square(data[204:314]["rms_val"])
     mean_std = round(root_mean_square(data["std_val"]), 5)
     mean_snr = round(np.mean(data["snr_val"], axis=0), 1)
-    ax.axhline(top_value, c="b")
-    ax.axhline(bottom_value, c="b")
+    ax.axhline(top_value, c=NORD_LIGHT_BLUE)
+    ax.axhline(bottom_value, c=NORD_LIGHT_BLUE)
     # ax.axhline(mean_mean, c="r")
     # ax.axhline(mean_rms, c="g")
-    ax.axvline(x=204, color="b", linestyle="--")
-    ax.axvline(x=314, color="b", linestyle="--")
-    ax.axhline(mean_std, c="r")
+    ax.axvline(x=204, color=NORD_LIGHT_LIGHT_BLUE, linestyle="--")
+    ax.axvline(x=314, color=NORD_LIGHT_LIGHT_BLUE, linestyle="--")
+    ax.axhline(mean_std, c=NORD_LIGHT_RED)
     if round(top_value, 5) < 0.012:
         ax.text(
             0.02, 0.97,
@@ -462,6 +483,10 @@ def plot_test_trace_metadata_depth__snr__full_trace(
     :param trace_process_id:
     :param environment_id:
     """
+
+    # MPL styling
+    plt.style.use(NORD_LIGHT_MPL_STYLE_PATH)
+
     database = get_db_absolute_path("main.db")
     con2 = lite.connect(database)
     query = "select * from trace_metadata_depth;"
@@ -489,13 +514,13 @@ def plot_test_trace_metadata_depth__snr__full_trace(
     # mean_rms = root_mean_square(data[204:314]["rms_val"])
     mean_std = round(root_mean_square(data["std_val"]), 5)
     mean_snr = round(np.mean(data["snr_val"], axis=0), 1)
-    ax.axhline(top_value, c="b")
-    ax.axhline(bottom_value, c="b")
+    ax.axhline(top_value, c=NORD_LIGHT_BLUE)
+    ax.axhline(bottom_value, c=NORD_LIGHT_BLUE)
     # ax.axhline(mean_mean, c="r")
     # ax.axhline(mean_rms, c="g")
-    ax.axvline(x=204, color="b", linestyle="--")
-    ax.axvline(x=314, color="b", linestyle="--")
-    ax.axhline(mean_snr, c="r")
+    ax.axvline(x=204, color=NORD_LIGHT_LIGHT_BLUE, linestyle="--")
+    ax.axvline(x=314, color=NORD_LIGHT_LIGHT_BLUE, linestyle="--")
+    ax.axhline(mean_snr, c=NORD_LIGHT_RED)
     if round(top_value, 5) < 0.012:
         ax.text(
             0.02, 0.97,
@@ -526,6 +551,10 @@ def plot_training_trace_metadata_depth__several(range_start=204, range_end=314):
     :param range_start:
     :param range_end:
     """
+
+    # MPL styling
+    plt.style.use(NORD_LIGHT_MPL_STYLE_PATH)
+
     # This function is based on legacy data
     database = get_db_absolute_path("main.db")
     con = lite.connect(database)
@@ -563,10 +592,10 @@ def plot_training_trace_metadata_depth__several(range_start=204, range_end=314):
         mean_snr = round(
             np.mean(data[range_start:range_end]["snr_val"], axis=0), 1)
 
-        ax.axhline(top_value, c="b")
-        ax.axhline(bottom_value, c="b")
-        ax.axhline(mean_mean, c="r")
-        ax.axhline(mean_rms, c="g")
+        ax.axhline(top_value, c=NORD_LIGHT_BLUE)
+        ax.axhline(bottom_value, c=NORD_LIGHT_BLUE)
+        ax.axhline(mean_mean, c=NORD_LIGHT_RED)
+        ax.axhline(mean_rms, c=NORD_LIGHT_ORANGE)
         if round(top_value, 5) < 0.012:
             ax.text(
                 0.02, 0.97,
@@ -598,6 +627,10 @@ def plot_training_trace_metadata_depth__training_set_used():
     """
     Plot all training trace metadata depth.
     """
+
+    # MPL styling
+    plt.style.use(NORD_LIGHT_MPL_STYLE_PATH)
+
     database = get_db_absolute_path("main.db")
     con2 = lite.connect(database)
     query = "select * from trace_metadata_depth;"
@@ -627,10 +660,10 @@ def plot_training_trace_metadata_depth__training_set_used():
     mean_std = round(np.mean(data[204:314]["std_val"], axis=0), 5)
     mean_snr = round(np.mean(data[204:314]["snr_val"], axis=0), 1)
 
-    ax.axhline(top_value, c="b")
-    ax.axhline(bottom_value, c="b")
-    ax.axhline(mean_mean, c="r")
-    ax.axhline(mean_rms, c="g")
+    ax.axhline(top_value, c=NORD_LIGHT_BLUE)
+    ax.axhline(bottom_value, c=NORD_LIGHT_BLUE)
+    ax.axhline(mean_mean, c=NORD_LIGHT_RED)
+    ax.axhline(mean_rms, c=NORD_LIGHT_ORANGE)
 
     if round(top_value, 5) < 0.012:
         ax.text(
@@ -665,6 +698,7 @@ def plot_all_trace_metadata_depth():
 
 
 def plot_best_additive_noise_methods(
+        training_dataset: str = 'Wang_2021 - Cable, 5 devices, 200k traces',
         trace_process_id: int = 3,
         gaussian_value: float = 0.04,
         collected_value: float = 25,
@@ -672,16 +706,19 @@ def plot_best_additive_noise_methods(
         save: bool = False,
 ) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """
+    :param training_dataset:
     :param trace_process_id: The parameter 1 value.
     :param gaussian_value:  The parameter 1 value.
     :param collected_value: The parameter 1 value.
     :param rayleigh_value:  The parameter 1 value.
     :param save: To save figure or not.
     """
-    custom_lines = [Line2D([0], [0], color='b', lw=4),
-                    Line2D([0], [0], color='orange', lw=4),
-                    Line2D([0], [0], color='g', lw=4),
-                    Line2D([0], [0], color='r', lw=4)]
+
+    # MPL styling
+    sns.set_theme(rc={"figure.figsize": (15, 7)})
+    plt.style.use(NORD_LIGHT_MPL_STYLE_PATH)
+    custom_lines = NORD_LIGHT_4_CUSTOM_LINES
+    fig, axs = plt.subplots(1, 2)
 
     database = get_db_absolute_path("main.db")
     con = lite.connect(database)
@@ -700,6 +737,7 @@ def plot_best_additive_noise_methods(
         full_rank_test
     where
         trace_process_id = {trace_process_id}
+        AND training_dataset = '{training_dataset}'
         AND environment = 'office_corridor'
         AND test_dataset = 'Wang_2021'
         AND epoch = 65 
@@ -730,6 +768,7 @@ def plot_best_additive_noise_methods(
         full_rank_test
     where
         trace_process_id = {trace_process_id}
+        AND training_dataset = '{training_dataset}'
         AND environment = 'office_corridor'
         AND test_dataset = 'Zedigh_2021'
         AND epoch = 65 
@@ -761,13 +800,10 @@ def plot_best_additive_noise_methods(
     ylim_top = 1600
     labels = [
         "None",
-        f"Collected - factor={collected_value}",
-        f"Gaussian - ∂={gaussian_value}",
-        f"Rayleigh - mode={rayleigh_value}"
+        f"Collected: Scaling factor = {collected_value}",
+        f"Gaussian: ∂ = {gaussian_value}",
+        f"Rayleigh: Mode = {rayleigh_value}"
     ]
-    sns.set_theme(rc={"figure.figsize": (15, 7)})
-    sns.set_style("whitegrid")
-    fig, axs = plt.subplots(1, 2)
     sns.barplot(
         x=full_rank_test__wang["device"],
         y=full_rank_test__wang["termination_point"],
@@ -803,6 +839,7 @@ def plot_best_additive_noise_methods(
 
 
 def plot_all_of_an_additive_noise(
+        training_dataset: str = 'Wang_2021 - Cable, 5 devices, 200k traces',
         additive_noise_method: str = "Gaussian",
         trace_process_id: int = 3,
         epoch: int = 65,
@@ -811,6 +848,7 @@ def plot_all_of_an_additive_noise(
         save: bool = False
 ) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """
+    :param training_dataset:
     :param additive_noise_method:
     :param trace_process_id:
     :param epoch:
@@ -818,6 +856,11 @@ def plot_all_of_an_additive_noise(
     :param environment:
     :param save:
     """
+    # MPL styling
+    sns.set_theme(rc={"figure.figsize": (15, 7)})
+    plt.style.use(NORD_LIGHT_MPL_STYLE_PATH)
+    fig, axs = plt.subplots(1, 2)
+
     query_wang = f"""
     select
         environment,
@@ -833,6 +876,7 @@ def plot_all_of_an_additive_noise(
         full_rank_test
     where
         trace_process_id = {trace_process_id}
+        AND training_dataset = '{training_dataset}'
         AND test_dataset = 'Wang_2021'
         AND environment = 'office_corridor'
         AND epoch = {epoch} 
@@ -860,6 +904,7 @@ def plot_all_of_an_additive_noise(
         full_rank_test
     where
         trace_process_id = {trace_process_id}
+        AND training_dataset = '{training_dataset}'
         AND test_dataset = 'Zedigh_2021'
         AND environment = '{environment}'
         AND epoch = {epoch} 
@@ -886,9 +931,6 @@ def plot_all_of_an_additive_noise(
     con.close()
     ylim_bottom = 0
     ylim_top = 1600
-    sns.set(rc={"figure.figsize": (15, 7)})
-    sns.set_style("whitegrid")
-    fig, axs = plt.subplots(1, 2)
     sns.barplot(
         x=full_rank_test__wang["device"],
         y=full_rank_test__wang["termination_point"],
@@ -934,6 +976,7 @@ def plot_all_of_an_additive_noise(
 
 
 def plot_all_of_denoising(
+        training_dataset: str = 'Wang_2021 - Cable, 5 devices, 200k traces',
         denoising_method: str = "Moving Average Filter",
         trace_process_id: int = 3,
         epoch: int = 65,
@@ -941,12 +984,19 @@ def plot_all_of_denoising(
         save: bool = False
 ) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """
+    :param training_dataset:
     :param denoising_method:
     :param trace_process_id:
     :param epoch:
     :param distance:
     :param save:
     """
+
+    # MPL styling
+    sns.set(rc={"figure.figsize": (15, 7)})
+    plt.style.use(NORD_LIGHT_MPL_STYLE_PATH)
+    fig, axs = plt.subplots(1, 2)
+
     query_wang = f"""
     select
         device, 
@@ -961,6 +1011,7 @@ def plot_all_of_denoising(
         full_rank_test
     where
         test_dataset = 'Wang_2021'
+        AND training_dataset = '{training_dataset}'
         AND epoch = {epoch}
         AND distance = {distance}
         AND additive_noise_method IS NULL
@@ -984,6 +1035,7 @@ def plot_all_of_denoising(
         full_rank_test
     where
         test_dataset = 'Zedigh_2021'
+        AND training_dataset = '{training_dataset}'
         AND epoch = {epoch}
         AND distance = {distance}
         AND additive_noise_method IS NULL
@@ -1007,9 +1059,6 @@ def plot_all_of_denoising(
     con.close()
     ylim_bottom = 0
     ylim_top = 1600
-    sns.set(rc={"figure.figsize": (15, 7)})
-    sns.set_style("whitegrid")
-    fig, axs = plt.subplots(1, 2)
     sns.barplot(
         x=full_rank_test__wang["device"],
         y=full_rank_test__wang["termination_point"],
@@ -1044,6 +1093,7 @@ def plot_all_of_denoising(
 
 
 def plot_epoch_comparison(
+        training_dataset: str = 'Wang_2021 - Cable, 5 devices, 200k traces',
         test_dataset: str = "Wang_2021",
         device: int = 6,
         distance: float = 15,
@@ -1052,6 +1102,7 @@ def plot_epoch_comparison(
         save: bool = False,
 ) -> pd.DataFrame:
     """
+    :param training_dataset:
     :param test_dataset:
     :param device:
     :param distance:
@@ -1060,6 +1111,10 @@ def plot_epoch_comparison(
     :param save:
     :return: Pandas DataFrame
     """
+
+    # MPL styling
+    sns.set(rc={"figure.figsize": (15, 7)})
+    plt.style.use(NORD_LIGHT_MPL_STYLE_PATH)
 
     query = f"""
     select
@@ -1075,6 +1130,7 @@ def plot_epoch_comparison(
         full_rank_test
     where
         test_dataset = '{test_dataset}'
+        AND training_dataset = '{training_dataset}'
         AND device = {device}
         AND distance = {distance}
         AND denoising_method IS NULL
@@ -1095,8 +1151,6 @@ def plot_epoch_comparison(
     con.close()
     ylim_bottom = 100
     ylim_top = 800
-    sns.set(rc={"figure.figsize": (15, 7)})
-    sns.set_style("whitegrid")
     sns.barplot(x=full_rank_test["epoch"],
                 y=full_rank_test["termination_point"],
                 hue=full_rank_test["Additive parameter 1"],
@@ -1126,6 +1180,7 @@ def plot_histogram():
 
 
 def plot_additive_noise_comparison_all(
+        training_dataset: str = 'Wang_2021 - Cable, 5 devices, 200k traces',
         trace_process_id: int = 3,
         environment: str = "office_corridor",
         gaussian_value: float = 0.04,
@@ -1134,6 +1189,7 @@ def plot_additive_noise_comparison_all(
         save: bool = False,
 ) -> pd.DataFrame:
     """
+    :param training_dataset:
     :param trace_process_id:
     :param environment:
     :param gaussian_value:
@@ -1142,10 +1198,11 @@ def plot_additive_noise_comparison_all(
     :param save:
     :return: Pandas DataFrame.
     """
-    custom_lines = [Line2D([0], [0], color='b', lw=4),
-                    Line2D([0], [0], color='orange', lw=4),
-                    Line2D([0], [0], color='g', lw=4),
-                    Line2D([0], [0], color='r', lw=4)]
+
+    # MPL styling
+    sns.set(rc={"figure.figsize": (15, 7)})
+    plt.style.use(NORD_LIGHT_MPL_STYLE_PATH)
+    custom_lines = NORD_LIGHT_4_CUSTOM_LINES
 
     query = f"""
     select
@@ -1162,6 +1219,7 @@ def plot_additive_noise_comparison_all(
         full_rank_test
     where
         trace_process_id = {trace_process_id}
+        AND training_dataset = '{training_dataset}'
         AND environment = '{environment}'
         AND epoch = 65 
         AND denoising_method IS NULL
@@ -1190,8 +1248,6 @@ def plot_additive_noise_comparison_all(
         f"Gaussian - ∂={gaussian_value}",
         f"Rayleigh - mode={rayleigh_value}"
     ]
-    sns.set(rc={"figure.figsize": (15, 7)})
-    sns.set_style("whitegrid")
     sns.barplot(x=full_rank_test["additive_noise_method"],
                 y=full_rank_test["termination_point"])
     plt.ylim(ylim_bottom, ylim_top)
@@ -1227,6 +1283,12 @@ def plot_example_test_traces_with_max_min(
     :param trace_processing_id:
     :param trace_index: The index of the trace in the trace set.
     """
+
+    # MPL styling
+    fig = plt.figure(figsize=(22, 6))
+    ax = fig.gca()
+    plt.style.use(NORD_LIGHT_MPL_STYLE_PATH)
+
     # Load a trace set
     trace_set_path = get_test_trace_path(
         database="main.db",
@@ -1266,13 +1328,11 @@ def plot_example_test_traces_with_max_min(
     else:
         raise "Incorrect trace_process_id."
 
-    fig = plt.figure(figsize=(22, 6))
-    ax = fig.gca()
     ax.plot(ex_trace)
-    ax.axhline(ex_max, color="b")
-    ax.axhline(ex_min, color="b")
-    ax.axvline(x=204, color="r", linestyle="--")
-    ax.axvline(x=314, color="r", linestyle="--")
+    ax.axhline(ex_max)
+    ax.axhline(ex_min)
+    ax.axvline(x=204, color=NORD_LIGHT_LIGHT_BLUE, linestyle="--")
+    ax.axvline(x=314, color=NORD_LIGHT_LIGHT_BLUE, linestyle="--")
     plt.suptitle(
         f"Example trace (index {trace_index}) for trace process id "
         f"{trace_processing_id}. Test dataset id: {test_dataset_id}, "
@@ -1295,6 +1355,9 @@ def plot_additive_noises_examples():
     distance = 15
     device = 6
     trace_processing_id = 3
+
+    # MPL styling
+    plt.style.use(NORD_LIGHT_MPL_STYLE_PATH)
 
     fig, axs = plt.subplots(1, 3, figsize=(22, 7))
 

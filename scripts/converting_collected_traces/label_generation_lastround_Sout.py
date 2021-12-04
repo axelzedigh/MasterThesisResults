@@ -8,14 +8,14 @@ from tqdm import tqdm
 
 import AES as ENCRYPT
 import produce_round_key
+from configs.variables import PROJECT_DIR
 
 from utils.aes_utils import SBOX as AES_Sbox
 
 # HW = [bin(n).count("1") for n in range(256)]
-project_dir = os.getenv("MASTER_THESIS_RESULTS")
 path = "datasets/test_traces/Zedigh_2021/office_corridor/15m/"
 device = "device_8"
-save_folder = os.path.join(project_dir, path, device, "data")
+save_folder = os.path.join(PROJECT_DIR, path, device, "data")
 
 pt_save = os.path.join(save_folder, 'pt.npy')
 ct_save = os.path.join(save_folder, 'ct.npy')

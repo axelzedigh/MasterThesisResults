@@ -4,6 +4,7 @@ from typing import Optional
 import numpy as np
 from matplotlib import pyplot as plt
 
+from configs.variables import NORD_LIGHT_MPL_STYLE_PATH
 from utils.db_utils import get_training_model_file_path
 
 
@@ -34,6 +35,9 @@ def plot_history_log(
     history_log_fig_file_path = os.path.join(training_path, "history_log.png")
     history_log_npy = np.load(history_log_file_path, allow_pickle=True)
     history_log = history_log_npy.tolist()
+
+    # Setup plt
+    plt.style.use(NORD_LIGHT_MPL_STYLE_PATH)
     fig = plt.figure(figsize=(12, 8))
     plt.suptitle("Accuracy & Loss", fontsize=18, y=0.95)
 

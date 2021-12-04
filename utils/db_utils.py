@@ -6,6 +6,8 @@ import numpy as np
 import re
 from datetime import datetime
 from typing import Optional
+
+from configs.variables import PROJECT_DIR, RAW_DATA_DIR
 from database.queries import (
     QUERY_CREATE_TABLE_ENVIRONMENTS,
     QUERY_CREATE_TABLE_TEST_DATASETS,
@@ -32,8 +34,7 @@ def get_db_file_path(database="main.db"):
     :param database: Name of database.
     :return: Path-string to database-file.
     """
-    project_dir = os.getenv("MASTER_THESIS_RESULTS")
-    database_dir = os.path.join(project_dir, "database", database)
+    database_dir = os.path.join(PROJECT_DIR, "database", database)
     return database_dir
 
 
@@ -42,8 +43,7 @@ def get_db_dir_path():
 
     :return: Path-string to database-folder.
     """
-    project_dir = os.getenv("MASTER_THESIS_RESULTS")
-    database_dir = os.path.join(project_dir, "database")
+    database_dir = os.path.join(PROJECT_DIR, "database")
     return database_dir
 
 
@@ -74,7 +74,6 @@ def create_db_with_tables(database="main.db") -> None:
         cur.execute(QUERY_CREATE_TABLE_TRACE_METADATA_DEPTH)
         cur.execute(QUERY_CREATE_TABLE_TRACE_METADATA_WIDTH)
         cur.execute(QUERY_CREATE_TABLE_NOISE_INFO)
-
 
         # Create views
         con.execute(QUERY_CREATE_VIEW_FULL_RANK_TEST)
@@ -316,8 +315,7 @@ def create_md__option_tables(database="main.db", path="docs"):
     :param path: path in project dir to store the doc.
     """
     database = get_db_file_path(database)
-    project_dir = os.getenv("MASTER_THESIS_RESULTS")
-    file_path = os.path.join(project_dir, path, "pre_processing_tables.md")
+    file_path = os.path.join(PROJECT_DIR, path, "pre_processing_tables.md")
     additive_data = fetchall_query(
         database, "SELECT * from Additive_Noise_Methods;"
     )
@@ -363,8 +361,7 @@ def create_md__rank_test_tbl__meta_info(database="main.db", path="docs"):
     :param path: path in project dir to store the doc.
     """
     database = get_db_file_path(database)
-    project_dir = os.getenv("MASTER_THESIS_RESULTS")
-    file_path = os.path.join(project_dir, path, "rank_test_table_info.md")
+    file_path = os.path.join(PROJECT_DIR, path, "rank_test_table_info.md")
     rank_test_rows = fetchall_query(
         database, "SELECT Count(*) from Rank_Test;"
     )
@@ -392,8 +389,7 @@ def create_md__full_rank_test__grouped(database="main.db", path="docs"):
     :param path: path in project dir to store the doc.
     """
     database = get_db_file_path(database)
-    project_dir = os.getenv("MASTER_THESIS_RESULTS")
-    file_path = os.path.join(project_dir, path, "Rank_test__grouped.md")
+    file_path = os.path.join(PROJECT_DIR, path, "Rank_test__grouped.md")
     full_rank_test_rows = fetchall_query(
         database, QUERY_FULL_RANK_TEST_GROUPED_A
     )
@@ -437,8 +433,7 @@ def get_db_absolute_path(database="main.db", path="database"):
     :param path:
     :return:
     """
-    project_dir = os.getenv("MASTER_THESIS_RESULTS")
-    database = os.path.join(project_dir, path, database)
+    database = os.path.join(PROJECT_DIR, path, database)
     return database
 
 
@@ -459,7 +454,6 @@ def get_test_trace_path(
     :return:
     """
     database = get_db_file_path(database)
-    project_dir = os.getenv("MASTER_THESIS_RESULTS")
     path = "datasets/test_traces"
     test_dataset_query = f"""
     select test_dataset from test_datasets
@@ -472,7 +466,7 @@ def get_test_trace_path(
     environment = fetchall_query(database, environment_query)[0][0]
 
     test_traces_path = os.path.join(
-        project_dir,
+        PROJECT_DIR,
         path,
         test_dataset,
         environment,
@@ -501,8 +495,7 @@ def get_test_trace_path__raw_data(
     :return:
     """
     database = get_db_file_path(database)
-    project_dir = os.getenv("MASTER_THESIS_RESULTS_RAW_DATA")
-    if project_dir is None:
+    if RAW_DATA_DIR is None:
         raise """
         Either your computer don't have raw data or you forgot to set the 
         env-variable MASTER_THESIS_RESULTS_RAW_DATA to the raw data directory.
@@ -519,7 +512,7 @@ def get_test_trace_path__raw_data(
     environment = fetchall_query(database, environment_query)[0][0]
 
     test_traces_path = os.path.join(
-        project_dir,
+        RAW_DATA_DIR,
         path,
         test_dataset,
         environment,
@@ -538,14 +531,11 @@ def get_training_trace_path__raw_20k_data(
     :param device:
     :return:
     """
-    project_dir = os.getenv("MASTER_THESIS_RESULTS_RAW_DATA")
     path = f"datasets/training_traces/Wang_2021/Cable/original_data/20k_d{device}/100avg"
-
     training_traces_path = os.path.join(
-        project_dir,
+        RAW_DATA_DIR,
         path,
     )
-
     return training_traces_path
 
 
@@ -557,11 +547,10 @@ def get_training_trace_path__raw_100k_data(
     :param device:
     :return:
     """
-    project_dir = os.getenv("MASTER_THESIS_RESULTS_RAW_DATA")
     path = f"datasets/training_traces/Wang_2021/Cable/original_data/100k_d{device}/100avg"
 
     training_traces_path = os.path.join(
-        project_dir,
+        RAW_DATA_DIR,
         path,
     )
 
@@ -573,11 +562,10 @@ def get_training_trace_path__combined_200k_data() -> str:
 
     :return: Path to training data (cable, 5 devices, single file 200k).
     """
-    project_dir = os.getenv("MASTER_THESIS_RESULTS_RAW_DATA")
     path = f"datasets/training_traces/Wang_2021/Cable/data"
 
     training_traces_path = os.path.join(
-        project_dir,
+        RAW_DATA_DIR,
         path,
     )
 
@@ -589,9 +577,8 @@ def get_training_trace_path__combined_100k_data() -> str:
 
     :return: Path to training data (cable, 5 devices, single file 100k).
     """
-    raw_data_path = os.getenv("MASTER_THESIS_RESULTS_RAW_DATA")
     training_set_path = os.path.join(
-        raw_data_path,
+        RAW_DATA_DIR,
         "datasets/training_traces/Zedigh_2021/Cable/100k_5devices_joined",
     )
 
@@ -603,9 +590,8 @@ def get_training_trace_path__combined_500k_data() -> str:
 
     :return: Path to training data (cable, 5 devices, single file 500k).
     """
-    raw_data_path = os.getenv("MASTER_THESIS_RESULTS_RAW_DATA")
     training_set_path = os.path.join(
-        raw_data_path,
+        RAW_DATA_DIR,
         "datasets/training_traces/Zedigh_2021/Cable/500k_5devices_joined",
     )
 
@@ -635,7 +621,6 @@ def get_training_model_file_path(
     :return:
     """
     database = get_db_file_path(database)
-    project_dir = os.getenv("MASTER_THESIS_RESULTS")
     path = "models"
 
     training_model_query = f"""
@@ -651,7 +636,7 @@ def get_training_model_file_path(
         denoising_method_id = "None"
 
     training_model_file_path = os.path.join(
-        project_dir,
+        PROJECT_DIR,
         path,
         f"training_dataset_{training_dataset_id}",
         f"trace_process_{trace_process_id}",

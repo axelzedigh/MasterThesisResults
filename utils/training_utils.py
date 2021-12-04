@@ -15,6 +15,7 @@ from tensorflow.python.keras.layers import Conv1D, AveragePooling1D, Flatten, \
     Dense
 from tensorflow.python.keras.losses import CategoricalCrossentropy
 
+from configs.variables import PROJECT_DIR
 from plots.history_log_plots import plot_history_log
 from utils.denoising_utils import moving_average_filter_n3, \
     moving_average_filter_n5, wiener_filter_trace_set
@@ -87,10 +88,7 @@ def cnn_110_model(classes=256):
     )
     optimizer = RMSprop(lr=0.00005)
     sequential_model.compile(
-        loss='categorical_crossentropy',
-        # loss=CategoricalCrossentropy(
-        #     label_smoothing=0.1
-        # ),
+        loss=CategoricalCrossentropy(),
         optimizer=optimizer,
         metrics=['accuracy']
     )
@@ -294,9 +292,8 @@ def additive_noise__collected_noise__office_corridor(
     :return: Trace set with additive collected noise and example noise trace.
     """
     # Load the office corridor noise.
-    project_dir = os.getenv("MASTER_THESIS_RESULTS")
     noise_trace_path = os.path.join(
-        project_dir,
+        PROJECT_DIR,
         "datasets/test_traces/Zedigh_2021/office_corridor/Noise",
         "data",
         "traces.npy"

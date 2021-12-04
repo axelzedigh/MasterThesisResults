@@ -6,6 +6,7 @@ from tqdm import tqdm
 
 import numpy as np
 
+from configs.variables import PROJECT_DIR
 from utils.db_utils import get_test_trace_path, \
     insert_data_to_db__trace_metadata__depth, get_db_file_path, \
     get_training_trace_path__combined_200k_data, get_test_trace_path__raw_data, \
@@ -808,7 +809,6 @@ def get_training_model_file_save_path(
     :return: Path to training model is save-path.
     """
     database = get_db_file_path()
-    project_dir = os.getenv("MASTER_THESIS_RESULTS")
     path = f"models/training_dataset_{training_dataset_id}/trace_process_{trace_process_id}"
     training_model_query = f"""
     select training_model from training_models
@@ -821,7 +821,7 @@ def get_training_model_file_save_path(
         denoising_method_id = "None"
 
     training_model_file_save_path = os.path.join(
-        project_dir,
+        PROJECT_DIR,
         path,
         f"keybyte_{keybyte}",
         f"{additive_noise_method_id}_{denoising_method_id}",

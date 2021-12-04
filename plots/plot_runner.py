@@ -96,15 +96,16 @@ if __name__ == "__main__":
     # wiener_filter__1()
     # training_maxmin_sbox_range()
     # test_maxmin_sbox_range()
-    plot_history_log(
-        training_dataset_id=1,
-        trace_process_id=4,
-        keybyte=0,
-        additive_noise_method_id=6,
-        denoising_method_id=None,
-        save=True,
-    )
-    # plot_best_additive_noise_methods()
+    # plot_history_log(
+    #     training_dataset_id=1,
+    #     trace_process_id=4,
+    #     keybyte=0,
+    #     additive_noise_method_id=6,
+    #     denoising_method_id=None,
+    #     save=True,
+    #     show=True,
+    # )
+    plot_best_additive_noise_methods()
     # plot_all_of_an_additive_noise(
     #     additive_noise_method="Collected"
     # )
