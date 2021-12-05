@@ -43,8 +43,26 @@ def plot_history_log(
 
     # Subplot 1 - Accuracy
     ax1 = fig.add_axes((0.1, 0.1, 0.35, 0.8))
-    ax1.plot(history_log["accuracy"], solid_capstyle="round", linewidth=2, label="Accuracy")
-    ax1.plot(history_log["val_accuracy"], solid_capstyle="round", label="Validation Accuracy")
+    try:
+        ax1.plot(history_log["accuracy"], solid_capstyle="round", linewidth=2,
+                 label="Accuracy")
+    except:
+        pass
+    try:
+        ax1.plot(history_log["categorical_accuracy"], solid_capstyle="round",
+                 linewidth=2, label="Accuracy")
+    except:
+        pass
+    try:
+        ax1.plot(history_log["val_accuracy"], solid_capstyle="round",
+                 label="Validation Accuracy")
+    except:
+        pass
+    try:
+        ax1.plot(history_log["val_categorical_accuracy"],
+                 solid_capstyle="round", label="Validation Accuracy")
+    except:
+        pass
     ax1.set_xlabel("Epoch")
     ax1.set_ylabel("Accuracy")
 
