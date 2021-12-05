@@ -390,16 +390,6 @@ def termination_point_test_setup(
     keys_path = os.path.join(test_path, tenth_roundkey)
     ciphertexts_path = os.path.join(test_path, ct)
 
-    # Filter traces
-    if filter_function is not None:
-        if denoising_method_id == 3:
-            testing_traces, _, __ = filter_function(testing_traces, 2e-2)
-        else:
-            testing_traces, range_start, range_end = filter_function(testing_traces)
-
-    # Select range in traces to test.
-    testing_traces = testing_traces[:, [i for i in range(range_start, range_end)]]
-
     # load key
     key = np.load(keys_path)
 
@@ -418,10 +408,25 @@ def termination_point_test_setup(
         )
         training_trace_set = np.load(trace_set_file_path)
         training_trace_set = training_trace_set[:, [i for i in range(130, 240)]]
-        cts = cts[testing_traces[:, 0] > 2.1]
-        testing_traces = testing_traces[testing_traces[:, 0] > 2.1]
-        testing_traces -= np.mean(training_trace_set, axis=0)
+        # cts = cts[testing_traces[:, 0] > 2.1]
+        # testing_traces = testing_traces[testing_traces[:, 0] > 2.1]
 
+    # Filter traces
+    if filter_function is not None:
+        if denoising_method_id == 3:
+            testing_traces, _, __ = filter_function(testing_traces, 2e-2)
+        else:
+            testing_traces, range_start, range_end = filter_function(testing_traces)
+
+    # Select range in traces to test.
+    testing_traces = testing_traces[:, [i for i in range(range_start, range_end)]]
+
+    if trace_process_id == 11:
+        training_trace_set, range_start, range_end = filter_function(training_trace_set)
+        testing_traces -= np.mean(training_trace_set, axis=0)
+        # testing_traces *= 20
+
+    # Plot traces
     # plt.plot(testing_traces[0])
     # plt.plot(testing_traces[1])
     # plt.plot(testing_traces[2])

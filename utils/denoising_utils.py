@@ -80,6 +80,35 @@ def moving_average_filter_n5(
     return filtered_trace_set, range_start, range_end
 
 
+def moving_average_filter_n11(
+        test_trace_set: np.array,
+        training_dataset_id: int = 1,
+) -> Tuple[np.array, int, int]:
+    """
+
+    :param test_trace_set: The trace set to filter.
+    :param training_dataset_id:
+    :return: Filtered trace set and ranges.
+    """
+    filtered_trace_set = np.empty_like(test_trace_set)
+    n = 11
+    if training_dataset_id == 1:
+        range_start = 199
+        range_end = 309
+    elif training_dataset_id in [2, 3]:
+        range_start = 125
+        range_end = 235
+
+    for i in range(len(test_trace_set)):
+        filtered_trace_set[i] = np.pad(
+            moving_average_filter(test_trace_set[i], n),
+            (0, 10),
+            'constant'
+        )
+
+    return filtered_trace_set, range_start, range_end
+
+
 def wiener_filter(trace, noise_power=0.0001):
     """
 

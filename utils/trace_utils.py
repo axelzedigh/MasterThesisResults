@@ -1,12 +1,12 @@
 import os
 import sqlite3 as lite
 import sys
-from typing import Optional
+from typing import Optional, Tuple
 from tqdm import tqdm
 
 import numpy as np
 
-from configs.variables import PROJECT_DIR
+from configs.variables import PROJECT_DIR, RAW_DATA_DIR
 from utils.db_utils import get_test_trace_path, \
     insert_data_to_db__trace_metadata__depth, get_db_file_path, \
     get_training_trace_path__combined_200k_data, get_test_trace_path__raw_data, \
@@ -454,7 +454,8 @@ def get_trace_set_metadata__width(
                 distance=distance,
                 device=device
             )
-            all__traces = [x for x in np.array(os.listdir(trace_path)) if x[0:3] == "all"]
+            all__traces = [x for x in np.array(os.listdir(trace_path)) if
+                           x[0:3] == "all"]
             # Placeholder variable (undecided atm what analysis to be performed)
             trace_or_trace_set = "trace_set"
             for i in all__traces:
@@ -471,12 +472,19 @@ def get_trace_set_metadata__width(
                                 )
                             )
                     elif trace_or_trace_set == "trace_set":
-                        max_value = np.max(trace_set[:, range_start:range_end].flatten())
-                        min_value = np.min(trace_set[:, range_start:range_end].flatten())
-                        mean_value = np.mean(trace_set[:, range_start:range_end].flatten())
-                        std_value = np.std(trace_set[:, range_start:range_end].flatten())
-                        rms_value = root_mean_square(trace_set[:, range_start:range_end].flatten())
-                        meta_data.append([max_value, min_value, mean_value, std_value, rms_value])
+                        max_value = np.max(
+                            trace_set[:, range_start:range_end].flatten())
+                        min_value = np.min(
+                            trace_set[:, range_start:range_end].flatten())
+                        mean_value = np.mean(
+                            trace_set[:, range_start:range_end].flatten())
+                        std_value = np.std(
+                            trace_set[:, range_start:range_end].flatten())
+                        rms_value = root_mean_square(
+                            trace_set[:, range_start:range_end].flatten())
+                        meta_data.append(
+                            [max_value, min_value, mean_value, std_value,
+                             rms_value])
                 except ValueError:
                     print(f"Problem with: {i}")
         elif trace_process_id == 2:
@@ -489,7 +497,8 @@ def get_trace_set_metadata__width(
                 distance=distance,
                 device=device
             )
-            trace_set = np.load(os.path.join(trace_path, "nor_traces_maxmin.npy"))
+            trace_set = np.load(
+                os.path.join(trace_path, "nor_traces_maxmin.npy"))
             for trace in trace_set:
                 meta_data.append(
                     get_trace_metadata__width__metrics(
@@ -948,3 +957,31 @@ def get_training_trace_path(
         return "Invalid training_dataset id!"
 
     return training_set_path
+
+
+def get_validation_data_path__8m() -> str:
+    """
+
+    :return: Path to validation dataset path.
+    """
+    path = "datasets/training_traces/Zedigh_2021/8m/100k_5devices_joined"
+
+    trace_set_path = os.path.join(RAW_DATA_DIR, path)
+
+    return trace_set_path
+
+
+def unison_shuffle_traces_and_labels(
+        trace_set: np.array,
+        labels: np.array
+) -> Tuple[np.array, np.array]:
+    """
+    Shuffle the order of a trace and corresponding label set.
+
+    :param trace_set: (Training) trace set to shuffle.
+    :param labels: Accompanying label set.
+    :return:
+    """
+    assert len(trace_set) == len(labels)
+    p = np.random.permutation(len(trace_set))
+    return trace_set[p], labels[p]

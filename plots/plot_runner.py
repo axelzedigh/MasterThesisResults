@@ -1,12 +1,10 @@
 """Functions to test plot-functions."""
 import os
-import numpy as np
 
+import numpy as np
 from matplotlib import pyplot as plt
 
-from plots.plot_functions import plot_best_additive_noise_methods, \
-    plot_all_of_an_additive_noise
-from plots.history_log_plots import plot_history_log
+from plots.plot_functions import plot_dataset_labels_histogram
 from utils.db_utils import get_training_trace_path__combined_200k_data, \
     get_test_trace_path
 from utils.denoising_utils import wiener_filter
@@ -17,6 +15,9 @@ from utils.training_utils import cut_trace_set__column_range
 
 
 def wiener_filter__1():
+    """
+    Base wiener filter function.
+    """
     trace = get_trace_set__processed(
         database="main.db",
         test_dataset_id=1,
@@ -98,15 +99,18 @@ if __name__ == "__main__":
     # test_maxmin_sbox_range()
     # plot_history_log(
     #     training_dataset_id=1,
-    #     trace_process_id=4,
+    #     trace_process_id=3,
     #     keybyte=0,
-    #     additive_noise_method_id=6,
+    #     additive_noise_method_id=4,
     #     denoising_method_id=None,
     #     save=True,
     #     show=True,
     # )
-    plot_best_additive_noise_methods()
+    # plot_best_additive_noise_methods()
     # plot_all_of_an_additive_noise(
     #     additive_noise_method="Collected"
     # )
     # test_maxmin_scaling_of_trace_set__per_trace_fit__trace_process_8()
+    plot_dataset_labels_histogram(
+        training_dataset_id=3,
+    )

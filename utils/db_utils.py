@@ -598,6 +598,24 @@ def get_training_trace_path__combined_500k_data() -> str:
     return training_set_path
 
 
+def get_training_trace_path__8m_20k_data(
+        device
+) -> str:
+    """
+
+    :param device:
+    :return:
+    """
+    path = f'datasets/training_traces/Wang_2021/8m/20k_d{device}/100avg'
+
+    trace_set_path = os.path.join(
+        RAW_DATA_DIR,
+        path,
+    )
+
+    return trace_set_path
+
+
 def get_training_model_file_path(
         database,
         training_model_id,

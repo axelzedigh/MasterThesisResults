@@ -4,11 +4,12 @@ import sys
 
 import numpy as np
 from tqdm import tqdm
-from scripts.RankTestScriptToDatabase import termination_point_test, \
-    termination_point_test_setup, termination_point_test__rank_test
+
+from scripts.RankTestScriptToDatabase import termination_point_test_setup, \
+    termination_point_test__rank_test
 from utils.db_utils import insert_data_to_db
 from utils.denoising_utils import moving_average_filter_n3, \
-    moving_average_filter_n5, wiener_filter_trace_set
+    moving_average_filter_n5, wiener_filter_trace_set, moving_average_filter_n11
 
 
 def termination_point_test_and_insert_to_db(
@@ -51,7 +52,10 @@ def termination_point_test_and_insert_to_db(
         filter_function = moving_average_filter_n5
     elif denoising_method_id == 3:
         filter_function = wiener_filter_trace_set
-    tqdm_iterator = tqdm(range(0, runs), desc=f"T.P {termination_point}")
+    elif denoising_method_id == 5:
+        filter_function = moving_average_filter_n11
+
+    tqdm_iterator = tqdm(range(0, runs), desc=f"TP Mean =  {termination_point}")
 
     t, p, k, c = termination_point_test_setup(
         database=database,
@@ -158,7 +162,7 @@ if __name__ == "__main__":
     elif case == 3:
         # database = "main.db"
         database = "tmp_1.db"
-        runs = 5
+        runs = 2
         test_dataset_ids = [1]
         training_dataset_ids = [3]
         environment_ids = [1]
@@ -166,7 +170,7 @@ if __name__ == "__main__":
         devices = [10, 6, 7, 8, 9]
         training_model_id = 1
         # epochs = [x for x in range(15, 21)]
-        epochs = [15]
+        epochs = [17]
         additive_noise_method_ids = [None]
         denoising_method_ids = [None]
         trace_process_ids = [8]
@@ -195,4 +199,3 @@ if __name__ == "__main__":
                                                 denoising_method_id=denoising_method_id,
                                                 trace_process_id=trace_process_id,
                                             )
-

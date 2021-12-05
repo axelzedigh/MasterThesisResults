@@ -30,9 +30,12 @@ if __name__ == "__main__":
     elif case == 2:
         keybyte = 0
         epochs = 20
-        batch_size = 256
+        batch_size = 100
         verbose = False
         mode = 1
+        shuffle = True
+        sep_validation_dataset = True
+        balance_dataset = True
 
         training_model_id = 1
         training_dataset_ids = [3]
@@ -54,4 +57,7 @@ if __name__ == "__main__":
                             trace_process_id=trace_process_id,
                             verbose=verbose,
                             mode=mode,
+                            shuffle_trace_and_label_sets=shuffle,
+                            separate_validation_dataset=sep_validation_dataset,
+                            balance_datasets=balance_dataset,
                         )

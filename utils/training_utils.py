@@ -1,10 +1,11 @@
 """Training utils."""
 import os
 import sys
-from typing import Callable, Optional, Tuple
+from typing import Callable, Optional, Tuple, Any
 
 import matplotlib.pyplot as plt
 import numpy as np
+from imblearn.under_sampling import RandomUnderSampler
 from keras import backend as keras_backend
 from keras.callbacks import ModelCheckpoint
 from keras.models import Sequential
@@ -14,14 +15,17 @@ from numba import jit
 from tensorflow.python.keras.layers import Conv1D, AveragePooling1D, Flatten, \
     Dense
 from tensorflow.python.keras.losses import CategoricalCrossentropy
+from tensorflow.python.keras.metrics import CategoricalAccuracy
 
-from configs.variables import PROJECT_DIR
+from configs.variables import PROJECT_DIR, NORD_LIGHT_ORANGE, \
+    NORD_LIGHT_MPL_STYLE_PATH
 from plots.history_log_plots import plot_history_log
 from utils.denoising_utils import moving_average_filter_n3, \
-    moving_average_filter_n5, wiener_filter_trace_set
+    moving_average_filter_n5, wiener_filter_trace_set, moving_average_filter_n11
 from utils.statistic_utils import maxmin_scaling_of_trace_set__per_trace_fit
 from utils.trace_utils import get_training_model_file_save_path, \
-    get_training_trace_path
+    get_training_trace_path, unison_shuffle_traces_and_labels, \
+    get_validation_data_path__8m
 
 
 def check_if_file_exists(file_path):
@@ -88,22 +92,25 @@ def cnn_110_model(classes=256):
     )
     optimizer = RMSprop(lr=0.00005)
     sequential_model.compile(
-        loss=CategoricalCrossentropy(),
+        loss=CategoricalCrossentropy(name="loss"),
         optimizer=optimizer,
-        metrics=['accuracy']
+        # metrics=['accuracy']
+        metrics=[CategoricalAccuracy(name="accuracy")],
     )
 
     return sequential_model
 
 
 def train_model(
-        x_profiling,
-        y_profiling,
-        deep_learning_model,
-        model_save_path,
-        epochs,
-        batch_size,
-        mode,
+        x_profiling: np.array,
+        y_profiling: np.array,
+        deep_learning_model: Any,
+        model_save_path: str,
+        epochs: int,
+        batch_size: int,
+        mode: int,
+        x_validation: Optional[np.array] = None,
+        y_validation: Optional[np.array] = None,
 ) -> Callable:
     """
 
@@ -114,7 +121,10 @@ def train_model(
     :param epochs:
     :param batch_size:
     :param mode:
+    :param x_validation:
+    :param y_validation:
     :return: History-function.
+
     """
     # Check if file-path exists
     check_if_file_exists(os.path.dirname(model_save_path))
@@ -153,37 +163,68 @@ def train_model(
         sys.exit(-1)
 
     # Import validation data
-    # raw_path = os.getenv("MASTER_THESIS_RESULTS_RAW_DATA")
-    # data_path = os.path.join(raw_path, "datasets/training_traces/Wang_2021/8m/20k_d1/100avg")
-    # labels = os.path.join(data_path, "label_0.npy")
-    # labels_val = np.load(labels)
-    # reshaped_labels_val = to_categorical(labels_val, num_classes=256)
-    # trace_set_path = os.path.join(data_path, "traces.npy")
-    # trace_set_val = np.load(trace_set_path)
-    #
-    # trace_set_val = maxmin_scaling_of_trace_set__per_trace_fit__trace_process_8(
-    #     trace_set=trace_set_val, range_start=130, range_end=240
-    # )
-    # trace_set_val = cut_trace_set__column_range(
-    #     trace_set=trace_set_val,
-    #     range_start=130,
-    #     range_end=240,
-    # )
-    # reshaped_trace_set_val = trace_set_val.reshape(
-    #     (trace_set_val.shape[0], trace_set_val.shape[1], 1)
-    # )
+    if x_validation is not None and y_validation is not None:
+        # Shuffle the dataset
+        x_validation, y_validation = unison_shuffle_traces_and_labels(
+            trace_set=x_validation,
+            labels=y_validation,
+        )
 
-    history = deep_learning_model.fit(
-        x=reshaped_x_profiling,
-        y=reshaped_y_profiling,
-        batch_size=batch_size,
-        verbose=1,
-        epochs=epochs,
-        callbacks=callbacks,
-        validation_split=0.1
-        # validation_data=(reshaped_trace_set_val, reshaped_labels_val),
-    )
-    return history
+        # Use 20k for validation
+        x_validation = x_validation[:20000]
+        y_validation = y_validation[:20000]
+
+        # Balance the dataset
+        undersample = RandomUnderSampler(
+            sampling_strategy="all",
+            random_state=101
+        )
+        x_validation, y_validation = undersample.fit_resample(
+            x_validation, y_validation
+        )
+
+        # Shuffle the dataset
+        x_validation, y_validation = unison_shuffle_traces_and_labels(
+            trace_set=x_validation,
+            labels=y_validation,
+        )
+
+        # Reshape y
+        reshaped_y_val = to_categorical(y_validation, num_classes=256)
+
+        # Cut and reshape x
+        x_validation = cut_trace_set__column_range(
+            trace_set=x_validation,
+            range_start=130,
+            range_end=240,
+        )
+        reshaped_x_val = x_validation.reshape(
+            (x_validation.shape[0], x_validation.shape[1], 1)
+        )
+
+        history = deep_learning_model.fit(
+            x=reshaped_x_profiling,
+            y=reshaped_y_profiling,
+            batch_size=batch_size,
+            verbose=1,
+            epochs=epochs,
+            callbacks=callbacks,
+            shuffle=True,
+            validation_data=(reshaped_x_val, reshaped_y_val),
+        )
+        return history
+    else:
+        history = deep_learning_model.fit(
+            x=reshaped_x_profiling,
+            y=reshaped_y_profiling,
+            batch_size=batch_size,
+            verbose=1,
+            epochs=epochs,
+            callbacks=callbacks,
+            validation_split=0.1,
+            shuffle=True,
+        )
+        return history
 
 
 @jit
@@ -362,6 +403,17 @@ def denoising_of_trace_set(
         range_end = 240
         filtered_set, _, __ = wiener_filter_trace_set(trace_set, 2e-2)
         return filtered_set, range_start, range_end, example_not_denoised_trace
+    elif denoising_method_id == 4:
+        range_start = 130
+        range_end = 240
+        filtered_set, _, __ = wiener_filter_trace_set(trace_set, 2e-1)
+        return filtered_set, range_start, range_end, example_not_denoised_trace
+    elif denoising_method_id == 5:
+        filtered_set, range_start, range_end = moving_average_filter_n11(
+            test_trace_set=trace_set,
+            training_dataset_id=training_dataset_id,
+        )
+        return filtered_set, range_start, range_end, example_not_denoised_trace
     else:
         raise f"Denoising method id {denoising_method_id} is not correct."
 
@@ -376,6 +428,9 @@ def training_cnn_110(
         trace_process_id: int = 3,
         verbose: bool = False,
         mode: int = 1,
+        shuffle_trace_and_label_sets: bool = False,
+        separate_validation_dataset: bool = False,
+        balance_datasets: bool = False,
 ) -> Optional[str]:
     """
     The main function for training the CNN 110 classifier.
@@ -390,10 +445,15 @@ def training_cnn_110(
     :param denoising_method_id: Id to denoising method.
     :param trace_process_id: The trace pre-process done.
     :param verbose: Show plot and extra information if true.
-    :param mode:
+    :param mode: If 1: save all epochs. If 2: save only best epochs (min loss).
+    :param shuffle_trace_and_label_sets: Shuffle the datasets.
+    :param separate_validation_dataset: Use a separate validation dataset (8m).
+    :param balance_datasets: Balance the datasets (undersample).
     :return: None.
     """
     # Initialise variables
+    validation_set = None
+    validation_labels = None
     training_model_id = 1
     additive_noise_trace = None
     clean_trace = None
@@ -409,6 +469,7 @@ def training_cnn_110(
 
     # Get training traces path.
     training_set_path = get_training_trace_path(training_dataset_id)
+    validation_set_path = get_validation_data_path__8m()
 
     # Get training traces (based on trace process)
     if trace_process_id == 2:
@@ -426,6 +487,11 @@ def training_cnn_110(
             training_set_path, "nor_traces_maxmin__sbox_range_204_314.npy"
         )
         training_trace_set = np.load(trace_set_file_path)
+        if separate_validation_dataset:
+            validation_set_file_path = os.path.join(
+                validation_set_path, "nor_traces_maxmin__sbox_range_204_314.npy"
+            )
+            validation_set = np.load(validation_set_file_path)
     elif trace_process_id == 6:
         trace_set_file_path = os.path.join(
             training_set_path, "trace_process_6-max_avg(before_sbox).npy"
@@ -441,6 +507,11 @@ def training_cnn_110(
             training_set_path, "trace_process_8-standardization_sbox.npy"
         )
         training_trace_set = np.load(trace_set_file_path)
+        if separate_validation_dataset:
+            validation_set_file_path = os.path.join(
+                validation_set_path, "trace_process_8-standardization_sbox.npy"
+            )
+            validation_set = np.load(validation_set_file_path)
     elif trace_process_id == 9:
         trace_set_file_path = os.path.join(
             training_set_path, "trace_process_9-maxmin_[-1_1]_[0_400].npy"
@@ -454,10 +525,7 @@ def training_cnn_110(
     else:
         return "Trace_process_id is wrong!"
 
-    if trace_process_id == 11:
-        training_trace_set -= np.mean(training_trace_set, axis=0)
-
-    # Get labels
+    # Get training labels
     if training_dataset_id == 1:
         # Get cipher-text numpy array..
         cipher_text_file_path = os.path.join(
@@ -483,6 +551,31 @@ def training_cnn_110(
         labels = np.load(labels_path)
     else:
         return "Something's wrong with the labels."
+
+    # Get validation labels
+    if separate_validation_dataset:
+        val_labels_path = os.path.join(
+            validation_set_path,
+            "labels.npy"
+        )
+        validation_labels = np.load(val_labels_path)
+
+    # Balance the training dataset
+    if balance_datasets:
+        undersample = RandomUnderSampler(
+            sampling_strategy="auto",
+            # random_state=10
+        )
+        training_trace_set, labels = undersample.fit_resample(
+            training_trace_set, labels
+        )
+
+    # Shuffle training data
+    if shuffle_trace_and_label_sets:
+        training_trace_set, labels = unison_shuffle_traces_and_labels(
+            trace_set=training_trace_set,
+            labels=labels
+        )
 
     # Get path to store model
     model_save_file_path = get_training_model_file_save_path(
@@ -517,6 +610,10 @@ def training_cnn_110(
             training_dataset_id=training_dataset_id,
         )
 
+    if trace_process_id == 11:
+        training_trace_set -= np.mean(training_trace_set, axis=0)
+        # training_trace_set *= 20
+
     # Cut trace set to the sbox output range
     training_trace_set = cut_trace_set__column_range(
         trace_set=training_trace_set,
@@ -540,38 +637,39 @@ def training_cnn_110(
         )
 
     # Plot the traces as a final check
-    fig = plt.figure(figsize=(14, 14))
+    plt.style.use(NORD_LIGHT_MPL_STYLE_PATH)
+    fig = plt.figure(figsize=(10, 10))
     ax = fig.gca()
     ax.plot(
         training_trace_set[0],
-        color="deepskyblue",
         label="Training trace 1"
     )
     ax.plot(
         training_trace_set[1],
-        color="seagreen",
         label="Training trace 2"
     )
     ax.plot(
         training_trace_set[2],
-        color="blueviolet",
         label="Training trace 3"
     )
     if additive_noise_method_id is not None:
         ax.plot(
             additive_noise_trace[start:end],
-            color="lightcoral",
             label="Additive noise"
         )
     if denoising_method_id is not None:
-        ax.plot(clean_trace[0], color="orange", label="Clean trace.")
+        ax.plot(
+            clean_trace[0],
+            color=NORD_LIGHT_ORANGE,
+            label="Clean trace."
+        )
     trace_fig_save_path_dir = os.path.dirname(model_save_file_path)
     trace_fig_file_path = os.path.join(
         trace_fig_save_path_dir,
         "training_trace_and_processing_attribute.png"
     )
     ax.legend()
-    plt.savefig(fname=trace_fig_file_path)
+    fig.savefig(fname=trace_fig_file_path)
     if verbose:
         plt.show()
 
@@ -584,6 +682,8 @@ def training_cnn_110(
         epochs=epochs,
         batch_size=batch_size,
         mode=mode,
+        x_validation=validation_set,
+        y_validation=validation_labels,
     )
 
     # Store the accuracy and loss data

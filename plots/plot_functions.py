@@ -7,11 +7,15 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import os
 
+from imblearn.under_sampling import RandomUnderSampler
+from tensorflow.python.keras.utils.np_utils import to_categorical
+
 from configs.variables import NORD_LIGHT_MPL_STYLE_PATH, \
     NORD_LIGHT_4_CUSTOM_LINES, NORD_LIGHT_BLUE, NORD_LIGHT_LIGHT_BLUE, \
     NORD_LIGHT_RED, NORD_LIGHT_ORANGE
 from utils.db_utils import get_db_absolute_path, get_test_trace_path
 from utils.statistic_utils import root_mean_square
+from utils.trace_utils import get_training_trace_path
 from utils.training_utils import additive_noise__gaussian, \
     additive_noise__collected_noise__office_corridor, additive_noise__rayleigh
 
@@ -1428,3 +1432,39 @@ def plot_additive_noises_examples():
     axs[1].set_title("Recorded Noise")
     axs[2].set_title("Rayleigh")
     plt.show()
+
+
+def plot_dataset_labels_histogram(
+        training_dataset_id: int,
+):
+    """
+
+    :param training_dataset_id:
+    """
+    training_set_path = get_training_trace_path(training_dataset_id)
+    traces_path = os.path.join(
+        training_set_path,
+        "traces.npy"
+    )
+    traces = np.load(traces_path)
+    labels_path = os.path.join(
+        training_set_path,
+        "labels.npy"
+    )
+    labels = np.load(labels_path)
+
+    # reshaped_x_profiling = traces.reshape(
+    #     (traces.shape[0], traces.shape[1])
+    # )
+    # reshaped_y_profiling = to_categorical(labels, num_classes=256)
+
+    fig, (ax1, ax2) = plt.subplots(1, 2)
+    ax1.hist(labels, bins=256)
+
+    undersample = RandomUnderSampler(sampling_strategy="all")
+
+    X_over, y_over = undersample.fit_resample(traces, labels)
+    ax2.hist(y_over, bins=256)
+
+    plt.show()
+
