@@ -179,6 +179,7 @@ QUERY_LIST_INITIALIZE_DB = [
      "500k traces');"),
 
     "INSERT INTO training_models VALUES (1,'cnn_110');",
+    "INSERT INTO training_models VALUES (2,'cnn_110_sgd');",
 
     "INSERT INTO additive_noise_methods VALUES (1,'Gaussian', 'Std', 0.01, "
     "'Mean', 0); ",

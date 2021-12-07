@@ -9,7 +9,7 @@ from imblearn.under_sampling import RandomUnderSampler
 from keras import backend as keras_backend
 from keras.callbacks import ModelCheckpoint
 from keras.models import Sequential
-from keras.optimizers import RMSprop
+from keras.optimizers import RMSprop, SGD
 from keras.utils import to_categorical
 from numba import jit
 from tensorflow.python.keras.layers import Conv1D, AveragePooling1D, Flatten, \
@@ -97,7 +97,99 @@ def cnn_110_model(classes=256):
         # metrics=['accuracy']
         metrics=[CategoricalAccuracy(name="accuracy")],
     )
+    return sequential_model
 
+
+def cnn_110_sgd_model(classes=256):
+    """
+    CNN with input size 110.
+    :param classes:
+    :return: Keras/TF sequential CNN model with input size 110, classes 256.
+    """
+    sequential_model = Sequential()
+    sequential_model.add(
+        Conv1D(
+            input_shape=(110, 1),
+            filters=4,
+            kernel_size=3,
+            activation='relu',
+            padding='same')
+    )
+    sequential_model.add(AveragePooling1D(pool_size=2, strides=1))
+    sequential_model.add(Conv1D(
+        filters=8,
+        kernel_size=3,
+        activation='relu',
+        padding='same')
+    )
+    sequential_model.add(AveragePooling1D(pool_size=2, strides=1))
+    sequential_model.add(
+        Conv1D(filters=16, kernel_size=3, activation='relu', padding='same'))
+    sequential_model.add(AveragePooling1D(pool_size=2, strides=1))
+    sequential_model.add(
+        Conv1D(filters=32, kernel_size=3, activation='relu', padding='same')
+    )
+    sequential_model.add(AveragePooling1D(pool_size=2, strides=1))
+    sequential_model.add(Flatten())
+    # model.add(Dropout(0.2))
+    sequential_model.add(Dense(units=200, activation='relu'))
+    sequential_model.add(Dense(units=200, activation='relu'))
+    sequential_model.add(
+        Dense(units=classes, activation='softmax', name='predictions')
+    )
+    optimizer = SGD(learning_rate=0.0001, name="SGD", nesterov=True)
+    sequential_model.compile(
+        loss=CategoricalCrossentropy(name="loss"),
+        optimizer=optimizer,
+        metrics=[CategoricalAccuracy(name="accuracy")],
+    )
+
+    return sequential_model
+
+
+def cnn_110_model_grid_search():
+    """
+    CNN with input size 110.
+    :return: Keras/TF sequential CNN model with input size 110, classes 256.
+    """
+    sequential_model = Sequential()
+    sequential_model.add(
+        Conv1D(
+            input_shape=(110, 1),
+            filters=4,
+            kernel_size=3,
+            activation='relu',
+            padding='same')
+    )
+    sequential_model.add(AveragePooling1D(pool_size=2, strides=1))
+    sequential_model.add(Conv1D(
+        filters=8,
+        kernel_size=3,
+        activation='relu',
+        padding='same')
+    )
+    sequential_model.add(AveragePooling1D(pool_size=2, strides=1))
+    sequential_model.add(
+        Conv1D(filters=16, kernel_size=3, activation='relu', padding='same'))
+    sequential_model.add(AveragePooling1D(pool_size=2, strides=1))
+    sequential_model.add(
+        Conv1D(filters=32, kernel_size=3, activation='relu', padding='same')
+    )
+    sequential_model.add(AveragePooling1D(pool_size=2, strides=1))
+    sequential_model.add(Flatten())
+    # model.add(Dropout(0.2))
+    sequential_model.add(Dense(units=200, activation='relu'))
+    sequential_model.add(Dense(units=200, activation='relu'))
+    sequential_model.add(
+        Dense(units=256, activation='softmax', name='predictions')
+    )
+    optimizer = RMSprop(lr=0.00005)
+    sequential_model.compile(
+        loss=CategoricalCrossentropy(name="loss"),
+        optimizer=optimizer,
+        # metrics=['accuracy']
+        metrics=[CategoricalAccuracy(name="accuracy")],
+    )
     return sequential_model
 
 
@@ -164,42 +256,9 @@ def train_model(
 
     # Import validation data
     if x_validation is not None and y_validation is not None:
-        # Shuffle the dataset
-        x_validation, y_validation = unison_shuffle_traces_and_labels(
-            trace_set=x_validation,
-            labels=y_validation,
-        )
-
-        # Use 20k for validation
-        x_validation = x_validation[:20000]
-        y_validation = y_validation[:20000]
-
-        # Balance the dataset
-        undersample = RandomUnderSampler(
-            sampling_strategy="all",
-            random_state=101
-        )
-        x_validation, y_validation = undersample.fit_resample(
-            x_validation, y_validation
-        )
-
-        # Shuffle the dataset
-        x_validation, y_validation = unison_shuffle_traces_and_labels(
-            trace_set=x_validation,
-            labels=y_validation,
-        )
-
-        # Reshape y
-        reshaped_y_val = to_categorical(y_validation, num_classes=256)
-
-        # Cut and reshape x
-        x_validation = cut_trace_set__column_range(
-            trace_set=x_validation,
-            range_start=130,
-            range_end=240,
-        )
-        reshaped_x_val = x_validation.reshape(
-            (x_validation.shape[0], x_validation.shape[1], 1)
+        reshaped_x_val, reshaped_y_val = preprocess_validation_data(
+            x_validation=x_validation,
+            y_validation=y_validation,
         )
 
         history = deep_learning_model.fit(
@@ -225,6 +284,52 @@ def train_model(
             shuffle=True,
         )
         return history
+
+
+def preprocess_validation_data(x_validation, y_validation):
+    """
+
+    :param x_validation:
+    :param y_validation:
+    """
+    x_validation, y_validation = unison_shuffle_traces_and_labels(
+        trace_set=x_validation,
+        labels=y_validation,
+    )
+
+    # Use 20k for validation
+    x_validation = x_validation[:20000]
+    y_validation = y_validation[:20000]
+
+    # Balance the dataset
+    undersample = RandomUnderSampler(
+        sampling_strategy="all",
+        random_state=101
+    )
+    x_validation, y_validation = undersample.fit_resample(
+        x_validation, y_validation
+    )
+
+    # Shuffle the dataset
+    x_validation, y_validation = unison_shuffle_traces_and_labels(
+        trace_set=x_validation,
+        labels=y_validation,
+    )
+
+    # Reshape y
+    reshaped_y_val = to_categorical(y_validation, num_classes=256)
+
+    # Cut and reshape x
+    x_validation = cut_trace_set__column_range(
+        trace_set=x_validation,
+        range_start=130,
+        range_end=240,
+    )
+    reshaped_x_val = x_validation.reshape(
+        (x_validation.shape[0], x_validation.shape[1], 1)
+    )
+
+    return reshaped_x_val, reshaped_y_val
 
 
 @jit
@@ -418,7 +523,8 @@ def denoising_of_trace_set(
         raise f"Denoising method id {denoising_method_id} is not correct."
 
 
-def training_cnn_110(
+def training_deep_learning_model(
+        training_model_id: int = 1,
         training_dataset_id: int = 1,
         keybyte: int = 0,
         epochs: int = 100,
@@ -431,13 +537,15 @@ def training_cnn_110(
         shuffle_trace_and_label_sets: bool = False,
         separate_validation_dataset: bool = False,
         balance_datasets: bool = False,
-) -> Optional[str]:
+        grid_search: bool = False,
+):
     """
-    The main function for training the CNN 110 classifier.
+    The main function for training the deep learning classifier.
     Uses training traces from Wang_2021 (5 devices).
     Only CNN with input size 110 and output size 256 is used now.
 
-    :param training_dataset_id:
+    :param training_model_id:
+    :param training_dataset_id: The id for the dl-model.
     :param keybyte: The keybyte classifier to train.
     :param epochs: Number of epochs to perform.
     :param batch_size: The batch-size used in training.
@@ -449,12 +557,12 @@ def training_cnn_110(
     :param shuffle_trace_and_label_sets: Shuffle the datasets.
     :param separate_validation_dataset: Use a separate validation dataset (8m).
     :param balance_datasets: Balance the datasets (undersample).
+    :param grid_search: If a grid search is to be performed or not. Experimental.
     :return: None.
     """
     # Initialise variables
     validation_set = None
     validation_labels = None
-    training_model_id = 1
     additive_noise_trace = None
     clean_trace = None
     start = 204
@@ -590,6 +698,8 @@ def training_cnn_110(
     # Get the DL-model
     if training_model_id == 1:
         deep_learning_model = cnn_110_model()
+    elif training_model_id == 2:
+        deep_learning_model = cnn_110_sgd_model()
     else:
         raise "No other model is currently investigated."
     if verbose:
@@ -635,6 +745,22 @@ def training_cnn_110(
             range_start=0,
             range_end=len(training_trace_set[1])
         )
+
+    # If performing a grid search:
+    if grid_search:
+        reshaped_x_profiling = training_trace_set.reshape(
+            (training_trace_set.shape[0], training_trace_set.shape[1], 1)
+        )
+        reshaped_y_profiling = to_categorical(labels, num_classes=256)
+        if separate_validation_dataset:
+            return (
+                reshaped_x_profiling,
+                reshaped_y_profiling,
+                validation_set,
+                validation_labels
+            )
+        else:
+            return reshaped_x_profiling, reshaped_y_profiling
 
     # Plot the traces as a final check
     plt.style.use(NORD_LIGHT_MPL_STYLE_PATH)
