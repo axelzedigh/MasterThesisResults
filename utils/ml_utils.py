@@ -203,7 +203,6 @@ def grid_search_cnn_model():
     param_grid = dict(
         epochs=[5, 10, 20, 50, 75, 100],
         batch_size=[10, 20, 40, 100]
-
     )
     grid = GridSearchCV(estimator=model, param_grid=param_grid, n_jobs=-1, cv=3)
 
