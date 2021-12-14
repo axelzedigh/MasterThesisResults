@@ -103,7 +103,7 @@ def termination_point_test_and_insert_to_db(
 
 
 if __name__ == "__main__":
-    case = 3
+    case = 1
     if case == 1:
         if sys.argv[11].strip() == "None":
             additive_id = None
@@ -162,7 +162,7 @@ if __name__ == "__main__":
     elif case == 3:
         # database = "main.db"
         database = "tmp_1.db"
-        runs = 2
+        runs = 5
         test_dataset_ids = [1]
         training_dataset_ids = [3]
         environment_ids = [1]
@@ -170,10 +170,10 @@ if __name__ == "__main__":
         devices = [10, 6, 7, 8, 9]
         training_model_id = 1
         # epochs = [x for x in range(15, 21)]
-        epochs = [17]
-        additive_noise_method_ids = [None]
+        epochs = [20]
+        additive_noise_method_ids = [6]
         denoising_method_ids = [None]
-        trace_process_ids = [8]
+        trace_process_ids = [12]
 
         for test_dataset_id in test_dataset_ids:
             for training_dataset_id in training_dataset_ids:
