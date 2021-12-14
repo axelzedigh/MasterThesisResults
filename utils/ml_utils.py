@@ -11,8 +11,9 @@ from tqdm import tqdm
 from utils.db_utils import get_training_model_file_path, get_test_trace_path
 from utils.trace_utils import get_normalized_test_traces, \
     get_training_model_file_save_path, unison_shuffle_traces_and_labels
-from utils.training_utils import cnn_110_model_grid_search, \
-    training_deep_learning_model, preprocess_validation_data
+from utils.training_utils import training_deep_learning_model, preprocess_validation_data
+from scripts.model_training.deep_learning_models import \
+    cnn_110_model_grid_search
 
 
 def get_model_predictions(

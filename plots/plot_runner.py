@@ -4,7 +4,7 @@ import os
 import numpy as np
 from matplotlib import pyplot as plt
 
-from plots.plot_functions import plot_dataset_labels_histogram
+from plots.history_log_plots import plot_history_log
 from utils.db_utils import get_training_trace_path__combined_200k_data, \
     get_test_trace_path
 from utils.denoising_utils import wiener_filter
@@ -36,6 +36,7 @@ def wiener_filter__1():
 
 
 def training_maxmin_sbox_range():
+    """Plot maxmin sbox range"""
     training_set_path = get_training_trace_path__combined_200k_data()
     file_path = os.path.join(
         training_set_path, "nor_traces_maxmin__sbox_range_204_314.npy"
@@ -97,20 +98,21 @@ if __name__ == "__main__":
     # wiener_filter__1()
     # training_maxmin_sbox_range()
     # test_maxmin_sbox_range()
-    # plot_history_log(
-    #     training_dataset_id=1,
-    #     trace_process_id=3,
-    #     keybyte=0,
-    #     additive_noise_method_id=4,
-    #     denoising_method_id=None,
-    #     save=True,
-    #     show=True,
-    # )
+    plot_history_log(
+        training_dataset_id=1,
+        trace_process_id=3,
+        keybyte=0,
+        additive_noise_method_id=None,
+        denoising_method_id=1,
+        save=True,
+        show=True,
+    )
     # plot_best_additive_noise_methods()
     # plot_all_of_an_additive_noise(
     #     additive_noise_method="Collected"
     # )
     # test_maxmin_scaling_of_trace_set__per_trace_fit__trace_process_8()
-    plot_dataset_labels_histogram(
-        training_dataset_id=3,
-    )
+    # plot_dataset_labels_histogram(
+    #     training_dataset_id=3,
+    # )
+    # plot_randomized_trace_cut()

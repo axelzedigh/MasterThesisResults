@@ -8,24 +8,24 @@ import numpy as np
 from imblearn.under_sampling import RandomUnderSampler
 from keras import backend as keras_backend
 from keras.callbacks import ModelCheckpoint
-from keras.models import Sequential
-from keras.optimizers import RMSprop, SGD
 from keras.utils import to_categorical
 from numba import jit
-from tensorflow.python.keras.layers import Conv1D, AveragePooling1D, Flatten, \
-    Dense
-from tensorflow.python.keras.losses import CategoricalCrossentropy
-from tensorflow.python.keras.metrics import CategoricalAccuracy
+from tensorflow.python.keras.callbacks import Callback
 
 from configs.variables import PROJECT_DIR, NORD_LIGHT_ORANGE, \
     NORD_LIGHT_MPL_STYLE_PATH
 from plots.history_log_plots import plot_history_log
+from scripts.model_training.deep_learning_models import cnn_110_model, \
+    cnn_110_sgd_model, cnn_110_model_more
+
+from scripts.model_training.deep_learning_models import cnn_110_model_simpler
+from utils.db_utils import get_test_trace_path
 from utils.denoising_utils import moving_average_filter_n3, \
     moving_average_filter_n5, wiener_filter_trace_set, moving_average_filter_n11
 from utils.statistic_utils import maxmin_scaling_of_trace_set__per_trace_fit
 from utils.trace_utils import get_training_model_file_save_path, \
     get_training_trace_path, unison_shuffle_traces_and_labels, \
-    get_validation_data_path__8m
+    get_validation_data_path__8m, get_normalized_test_traces
 
 
 def check_if_file_exists(file_path):
@@ -53,144 +53,35 @@ def mean_squared_error(y_true, y_predicted):
     )
 
 
-def cnn_110_model(classes=256):
+class TerminateOnBaseline(Callback):
+    """Callback that terminates training when either
+    acc or val_acc reaches a specified baseline.
     """
-    CNN with input size 110.
-    :param classes:
-    :return: Keras/TF sequential CNN model with input size 110, classes 256.
-    """
-    sequential_model = Sequential()
-    sequential_model.add(
-        Conv1D(
-            input_shape=(110, 1),
-            filters=4,
-            kernel_size=3,
-            activation='relu',
-            padding='same')
-    )
-    sequential_model.add(AveragePooling1D(pool_size=2, strides=1))
-    sequential_model.add(Conv1D(
-        filters=8,
-        kernel_size=3,
-        activation='relu',
-        padding='same')
-    )
-    sequential_model.add(AveragePooling1D(pool_size=2, strides=1))
-    sequential_model.add(
-        Conv1D(filters=16, kernel_size=3, activation='relu', padding='same'))
-    sequential_model.add(AveragePooling1D(pool_size=2, strides=1))
-    sequential_model.add(
-        Conv1D(filters=32, kernel_size=3, activation='relu', padding='same')
-    )
-    sequential_model.add(AveragePooling1D(pool_size=2, strides=1))
-    sequential_model.add(Flatten())
-    # model.add(Dropout(0.2))
-    sequential_model.add(Dense(units=200, activation='relu'))
-    sequential_model.add(Dense(units=200, activation='relu'))
-    sequential_model.add(
-        Dense(units=classes, activation='softmax', name='predictions')
-    )
-    optimizer = RMSprop(lr=0.00005)
-    sequential_model.compile(
-        loss=CategoricalCrossentropy(name="loss"),
-        optimizer=optimizer,
-        # metrics=['accuracy']
-        metrics=[CategoricalAccuracy(name="accuracy")],
-    )
-    return sequential_model
+    def __init__(self, monitor='accuracy', baseline=0.0095):
+        super(TerminateOnBaseline, self).__init__()
+        self.monitor = monitor
+        self.baseline = baseline
+
+    def on_epoch_end(self, epoch, logs=None):
+        logs = logs or {}
+        acc = logs.get(self.monitor)
+        if acc is not None:
+            if acc >= self.baseline:
+                print('Epoch %d: Reached baseline, terminating training' % (epoch))
+                self.model.stop_training = True
 
 
-def cnn_110_sgd_model(classes=256):
+class EvaluateCallback(Callback):
     """
-    CNN with input size 110.
-    :param classes:
-    :return: Keras/TF sequential CNN model with input size 110, classes 256.
+    Evaluate on test.
     """
-    sequential_model = Sequential()
-    sequential_model.add(
-        Conv1D(
-            input_shape=(110, 1),
-            filters=4,
-            kernel_size=3,
-            activation='relu',
-            padding='same')
-    )
-    sequential_model.add(AveragePooling1D(pool_size=2, strides=1))
-    sequential_model.add(Conv1D(
-        filters=8,
-        kernel_size=3,
-        activation='relu',
-        padding='same')
-    )
-    sequential_model.add(AveragePooling1D(pool_size=2, strides=1))
-    sequential_model.add(
-        Conv1D(filters=16, kernel_size=3, activation='relu', padding='same'))
-    sequential_model.add(AveragePooling1D(pool_size=2, strides=1))
-    sequential_model.add(
-        Conv1D(filters=32, kernel_size=3, activation='relu', padding='same')
-    )
-    sequential_model.add(AveragePooling1D(pool_size=2, strides=1))
-    sequential_model.add(Flatten())
-    # model.add(Dropout(0.2))
-    sequential_model.add(Dense(units=200, activation='relu'))
-    sequential_model.add(Dense(units=200, activation='relu'))
-    sequential_model.add(
-        Dense(units=classes, activation='softmax', name='predictions')
-    )
-    optimizer = SGD(learning_rate=0.0001, name="SGD", nesterov=True)
-    sequential_model.compile(
-        loss=CategoricalCrossentropy(name="loss"),
-        optimizer=optimizer,
-        metrics=[CategoricalAccuracy(name="accuracy")],
-    )
+    def __init__(self, x_test, y_test):
+        self.x_test = x_test
+        self.y_test = y_test
 
-    return sequential_model
-
-
-def cnn_110_model_grid_search():
-    """
-    CNN with input size 110.
-    :return: Keras/TF sequential CNN model with input size 110, classes 256.
-    """
-    sequential_model = Sequential()
-    sequential_model.add(
-        Conv1D(
-            input_shape=(110, 1),
-            filters=4,
-            kernel_size=3,
-            activation='relu',
-            padding='same')
-    )
-    sequential_model.add(AveragePooling1D(pool_size=2, strides=1))
-    sequential_model.add(Conv1D(
-        filters=8,
-        kernel_size=3,
-        activation='relu',
-        padding='same')
-    )
-    sequential_model.add(AveragePooling1D(pool_size=2, strides=1))
-    sequential_model.add(
-        Conv1D(filters=16, kernel_size=3, activation='relu', padding='same'))
-    sequential_model.add(AveragePooling1D(pool_size=2, strides=1))
-    sequential_model.add(
-        Conv1D(filters=32, kernel_size=3, activation='relu', padding='same')
-    )
-    sequential_model.add(AveragePooling1D(pool_size=2, strides=1))
-    sequential_model.add(Flatten())
-    # model.add(Dropout(0.2))
-    sequential_model.add(Dense(units=200, activation='relu'))
-    sequential_model.add(Dense(units=200, activation='relu'))
-    sequential_model.add(
-        Dense(units=256, activation='softmax', name='predictions')
-    )
-    optimizer = RMSprop(lr=0.00005)
-    sequential_model.compile(
-        loss=CategoricalCrossentropy(name="loss"),
-        optimizer=optimizer,
-        # metrics=['accuracy']
-        metrics=[CategoricalAccuracy(name="accuracy")],
-    )
-    return sequential_model
+    def on_epoch_end(self, epoch, logs=None):
+        y_eval = self.model.evaluate(self.x_test, self.y_test)
+        print(f"Test: {y_eval}")
 
 
 def train_model(
@@ -218,20 +109,59 @@ def train_model(
     :return: History-function.
 
     """
+    # Test trace set path
+    test_path = get_test_trace_path(
+        database="main.db",
+        test_dataset_id=1,
+        environment_id=1,
+        distance=15,
+        device=10
+    )
+
+    number_total_trace = 4900
+    testing_traces = get_normalized_test_traces(
+        trace_process_id=8,
+        test_dataset_id=1,
+        environment_id=1,
+        distance=15,
+        device=10,
+        save=False
+    )
+    labels = np.load(os.path.join(test_path, "label_lastround_Sout_0.npy"))
+    testing_traces = testing_traces[:number_total_trace]
+    testing_traces = cut_trace_set__column_range(trace_set=testing_traces)
+    labels = labels[:number_total_trace]
+    testing_traces = testing_traces.reshape(
+        (testing_traces.shape[0], testing_traces.shape[1], 1)
+    )
+    labels = to_categorical(labels, 256)
+
     # Check if file-path exists
     check_if_file_exists(os.path.dirname(model_save_path))
 
     # Save model every epoch
     if mode == 1:
         save_model = ModelCheckpoint(model_save_path)
+        callbacks = [save_model]
     elif mode == 2:
         save_model = ModelCheckpoint(
             model_save_path,
-            monitor='val_loss',
-            mode='min',
+            monitor='acc',
+            mode='max',
             save_best_only=True
         )
-    callbacks = [save_model]
+        callbacks = [save_model]
+    elif mode == 3:
+        callbacks = [
+            ModelCheckpoint(model_save_path),
+            EvaluateCallback(x_test=testing_traces, y_test=labels),
+        ]
+    elif mode == 4:
+        callbacks = [
+            ModelCheckpoint(model_save_path),
+            EvaluateCallback(x_test=testing_traces, y_test=labels),
+            TerminateOnBaseline(monitor='val_accuracy', baseline=0.01)
+        ]
 
     # Get the input layer shape
     input_layer_shape = deep_learning_model.get_layer(index=0).input_shape
@@ -344,6 +274,27 @@ def cut_trace_set__column_range(
     """
     assert (range_start and range_end) < len(trace_set[0])
     return trace_set[:, range_start:range_end]
+
+
+def cut_trace_set__column_range__randomized(
+        trace_set, range_start=204, range_end=314, randomize=1
+) -> np.array:
+    """
+    :param trace_set: Trace set to cut.
+    :param range_start: Start column position.
+    :param range_end: End column position.
+    :param randomize:
+    :return:
+    """
+    assert (range_start and range_end) < len(trace_set[0])
+    new_trace_set = np.empty(shape=(trace_set.shape[0], 110))
+    rng = np.random.default_rng()
+    for i, trace in enumerate(trace_set):
+        k = int(rng.integers(low=-randomize, high=randomize+1, size=1))
+        rand_start = range_start + k
+        rand_end = range_end + k
+        new_trace_set[i] = trace[rand_start:rand_end]
+    return np.array(new_trace_set)
 
 
 def additive_noise_to_trace_set(
@@ -585,7 +536,7 @@ def training_deep_learning_model(
             training_set_path, "traces.npy"
         )
         training_trace_set = np.load(trace_set_file_path)
-    elif trace_process_id == 3:
+    elif trace_process_id in [3, 13]:
         trace_set_file_path = os.path.join(
             training_set_path, "nor_traces_maxmin.npy"
         )
@@ -610,7 +561,7 @@ def training_deep_learning_model(
             training_set_path, "trace_process_7-max_avg(sbox).npy"
         )
         training_trace_set = np.load(trace_set_file_path)
-    elif trace_process_id in [8, 11]:
+    elif trace_process_id in [8, 11, 12]:
         trace_set_file_path = os.path.join(
             training_set_path, "trace_process_8-standardization_sbox.npy"
         )
@@ -668,6 +619,10 @@ def training_deep_learning_model(
         )
         validation_labels = np.load(val_labels_path)
 
+    # Limit the dataset
+    # training_trace_set = training_trace_set[:100000]
+    # labels = labels[:100000]
+
     # Balance the training dataset
     if balance_datasets:
         undersample = RandomUnderSampler(
@@ -700,6 +655,10 @@ def training_deep_learning_model(
         deep_learning_model = cnn_110_model()
     elif training_model_id == 2:
         deep_learning_model = cnn_110_sgd_model()
+    elif training_model_id == 3:
+        deep_learning_model = cnn_110_model_simpler()
+    elif training_model_id == 4:
+        deep_learning_model = cnn_110_model_more()
     else:
         raise "No other model is currently investigated."
     if verbose:
@@ -725,11 +684,20 @@ def training_deep_learning_model(
         # training_trace_set *= 20
 
     # Cut trace set to the sbox output range
-    training_trace_set = cut_trace_set__column_range(
-        trace_set=training_trace_set,
-        range_start=start,
-        range_end=end,
-    )
+    if trace_process_id in [12, 13]:
+        training_trace_set = cut_trace_set__column_range__randomized(
+            trace_set=training_trace_set,
+            range_start=start,
+            range_end=end,
+            randomize=1,
+        )
+    else:
+        training_trace_set = cut_trace_set__column_range(
+            trace_set=training_trace_set,
+            range_start=start,
+            range_end=end,
+        )
+
     # Cut clean trace if denoising
     if clean_trace is not None:
         clean_trace = cut_trace_set__column_range(

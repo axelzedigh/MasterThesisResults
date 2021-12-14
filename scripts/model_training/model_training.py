@@ -29,19 +29,19 @@ if __name__ == "__main__":
         )
     elif case == 2:
         keybyte = 0
-        epochs = 20
+        epochs = 25
         batch_size = 100
         verbose = False
-        mode = 1
+        mode = 3
         shuffle = True
         sep_validation_dataset = False
-        balance_dataset = True
+        balance_dataset = False
 
-        training_model_id = 2
+        training_model_id = 1
         training_dataset_ids = [3]
         additive_noise_method_ids = [None]
-        denoising_method_ids = [None]
-        trace_process_ids = [4]
+        denoising_method_ids = [1]
+        trace_process_ids = [12]
 
         for training_dataset_id in training_dataset_ids:
             for additive_noise_method_id in additive_noise_method_ids:

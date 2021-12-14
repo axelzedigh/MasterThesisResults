@@ -219,21 +219,70 @@ def normalize_training_traces__trace_process_9_10(
     plt.show()
 
 
+def normalize_training_traces__trace_process_3(
+        training_dataset_id: int = 2,
+):
+    """
+    :param training_dataset_id:  Either 2 ot 3.
+    :param trace_process_id:  Either 9 0r 10.
+    """
+    start = 130
+    end = 240
+
+    if training_dataset_id == 1:
+        print("Currently not available (no traces.npy file for this dataset).")
+        sys.exit(-1)
+    elif training_dataset_id == 2:
+        training_dataset_path = get_training_trace_path__combined_100k_data()
+    elif training_dataset_id == 3:
+        training_dataset_path = get_training_trace_path__combined_500k_data()
+    else:
+        print("Wrong choice of training dataset id.")
+        sys.exit(-1)
+
+    # Load trace set file
+    training_trace_set_file_name = os.path.join(
+        training_dataset_path, "traces.npy"
+    )
+    training_trace_set = np.load(training_trace_set_file_name)
+
+    # Normalize trace set.
+    training_trace_set = maxmin_scaling_of_trace_set__per_trace_fit(
+        trace_set=training_trace_set, range_start=0, range_end=-1,
+        scaling_range=(0, 1)
+    )
+
+    # Save file
+    training_save_path = os.path.join(
+        training_dataset_path,
+        "nor_traces_maxmin.npy"
+    )
+
+    np.save(training_save_path, training_trace_set)
+
+    fig = plt.figure(figsize=(22, 7))
+    ax = fig.gca()
+    ax.plot(training_trace_set[0])
+    ax.plot(training_trace_set[1])
+    ax.plot(training_trace_set[2])
+    plt.show()
+
+
 if __name__ == "__main__":
     # normalize_training_traces_200k()
-    training_dataset_ids = [2, 3]
-    trace_process_ids = [7]
+    # training_dataset_ids = [2, 3]
+    # trace_process_ids = [7]
     # test_dataset_id = 2
     # environment_id = 1
     # distance = 2
     # devices = [9, 10]
 
-    for training_dataset_id in training_dataset_ids:
-        for trace_process_id in trace_process_ids:
-            normalize_training_traces__trace_process_6_and_7(
-                training_dataset_id=training_dataset_id,
-                trace_process_id=trace_process_id,
-            )
+    # for training_dataset_id in training_dataset_ids:
+    #     for trace_process_id in trace_process_ids:
+    #         normalize_training_traces__trace_process_6_and_7(
+    #             training_dataset_id=training_dataset_id,
+    #             trace_process_id=trace_process_id,
+    #         )
 
     # normalize_training_traces__trace_process_8(training_dataset_id=2)
     # normalize_training_traces__trace_process_8(training_dataset_id=3)
@@ -245,4 +294,5 @@ if __name__ == "__main__":
     #             training_dataset_id=training_dataset_id,
     #             trace_process_id=trace_process_id,
     #         )
-    pass
+    normalize_training_traces__trace_process_3(2)
+    normalize_training_traces__trace_process_3(3)

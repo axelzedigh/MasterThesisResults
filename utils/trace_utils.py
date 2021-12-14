@@ -855,7 +855,7 @@ def get_normalized_test_traces(
     :param device:
     :param save:
     """
-    assert trace_process_id in range(1, 12)
+    assert trace_process_id in range(1, 14)
 
     test_trace_set_path = get_test_trace_path(
         database="main.db",
@@ -864,7 +864,7 @@ def get_normalized_test_traces(
         distance=distance,
         device=device,
     )
-    if trace_process_id == 3 and not save:
+    if trace_process_id in [3, 13] and not save:
         test_trace_set_file_path = os.path.join(
             test_trace_set_path, "nor_traces_maxmin.npy"
         )
@@ -875,7 +875,7 @@ def get_normalized_test_traces(
     test_trace_set = np.load(test_trace_set_file_path)
 
     # Normalize trace set
-    if trace_process_id == 3:
+    if trace_process_id in [3, 13]:
         pass
     elif trace_process_id in [4, 5]:
         test_trace_set = maxmin_scaling_of_trace_set__per_trace_fit(
@@ -924,7 +924,7 @@ def get_normalized_test_traces(
         save_path = os.path.join(
             test_trace_set_path, "trace_process_10-maxmin_[-1_1]_[204_314].npy"
         )
-    elif trace_process_id == 11:
+    elif trace_process_id in [11, 12]:
         test_trace_set = standardization_of_trace_set__per_trace_fit(
             trace_set=test_trace_set, range_start=204, range_end=314
         )

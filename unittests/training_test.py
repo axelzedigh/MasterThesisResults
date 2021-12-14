@@ -9,7 +9,8 @@ from utils.trace_utils import get_trace_set__processed, \
     get_training_model_file_save_path
 from utils.training_utils import cut_trace_set__column_range, \
     additive_noise__gaussian, additive_noise__rayleigh, \
-    additive_noise__collected_noise__office_corridor, denoising_of_trace_set
+    additive_noise__collected_noise__office_corridor, denoising_of_trace_set, \
+    cut_trace_set__column_range__randomized
 
 
 class TrainingTestCase(unittest.TestCase):
@@ -37,6 +38,11 @@ class TrainingTestCase(unittest.TestCase):
         self.assertEqual(self.trace_set.shape[1], 400)
         trace_set_110 = cut_trace_set__column_range(self.trace_set)
         self.assertEqual(trace_set_110.shape[1], 110)
+
+    def test_cut_trace_set__column_range__randomized(self):
+        self.assertEqual(self.trace_set.shape[1], 400)
+        trace_set = cut_trace_set__column_range__randomized(self.trace_set, randomize=5)
+        self.assertEqual(trace_set.shape[1], 110)
 
     def test_additive_noise__gaussian(self):
         trace_set, noise_trace = additive_noise__gaussian(

@@ -17,7 +17,8 @@ from utils.db_utils import get_db_absolute_path, get_test_trace_path
 from utils.statistic_utils import root_mean_square
 from utils.trace_utils import get_training_trace_path
 from utils.training_utils import additive_noise__gaussian, \
-    additive_noise__collected_noise__office_corridor, additive_noise__rayleigh
+    additive_noise__collected_noise__office_corridor, additive_noise__rayleigh, \
+    cut_trace_set__column_range__randomized
 
 
 def plot_trace_metadata_depth__one(test_dataset_id, distance, device,
@@ -1468,3 +1469,28 @@ def plot_dataset_labels_histogram(
 
     plt.show()
 
+
+def plot_randomized_trace_cut():
+    """Test to plot and see if randomized cut works as expected."""
+    training_set_path = get_training_trace_path(training_dataset_id=2)
+    trace_set_file_path = os.path.join(
+        training_set_path, "trace_process_8-standardization_sbox.npy"
+    )
+    training_trace_set = np.load(trace_set_file_path)
+    trace_set = cut_trace_set__column_range__randomized(
+        trace_set=training_trace_set,
+        range_start=130,
+        range_end=240,
+        randomize=1
+    )
+
+    # MPL styling
+    plt.style.use(NORD_LIGHT_MPL_STYLE_PATH)
+    fig = plt.figure()
+    ax = fig.gca()
+    ax.plot(trace_set[0])
+    ax.plot(trace_set[1])
+    ax.plot(trace_set[2])
+    ax.plot(trace_set[3])
+    ax.plot(trace_set[4])
+    plt.show()
