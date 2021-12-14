@@ -180,6 +180,7 @@ QUERY_LIST_INITIALIZE_DB = [
 
     "INSERT INTO training_models VALUES (1,'cnn_110');",
     "INSERT INTO training_models VALUES (2,'cnn_110_sgd');",
+    "INSERT INTO training_models VALUES (3,'cnn_110_simpler');",
 
     "INSERT INTO additive_noise_methods VALUES (1,'Gaussian', 'Std', 0.01, "
     "'Mean', 0); ",
@@ -233,6 +234,10 @@ QUERY_LIST_INITIALIZE_DB = [
      "Sbox Range [204:314]');"),
     ("INSERT INTO trace_processes VALUES (11, 'Standardization - SBox Range - "
      "Difference with Mean');"),
+    ("INSERT INTO trace_processes VALUES (12, 'Standardization - SBox Range - "
+     "Misalignment ± 1');"),
+    ("INSERT INTO trace_processes VALUES (13, 'MaxMin - Whole trace - "
+     "Misalignment ± 1');"),
 ]
 
 QUERY_RANK_TEST_GROUPED_A = """

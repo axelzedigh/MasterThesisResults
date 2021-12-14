@@ -358,7 +358,7 @@ class AddToDatabaseTestCase(unittest.TestCase):
         self.assertIsNotNone(test_path)
 
     def test_get_training_model_file_path(self):
-        training_model_id = 1
+        training_model_id = 3
         additive_noise_method_id = None
         denoising_method_id = 1
         epoch = 50
@@ -370,8 +370,11 @@ class AddToDatabaseTestCase(unittest.TestCase):
             additive_noise_method_id=additive_noise_method_id,
             denoising_method_id=denoising_method_id,
             epoch=epoch,
-            keybyte=keybyte
+            keybyte=keybyte,
+            trace_process_id=8,
+            training_dataset_id=3,
         )
+        print(training_model_file_path)
 
         self.assertIsNotNone(training_model_file_path)
 
