@@ -26,6 +26,7 @@ def termination_point_test_and_insert_to_db(
         additive_noise_method_id,
         denoising_method_id,
         trace_process_id,
+        plot,
 ):
     """
 
@@ -71,6 +72,7 @@ def termination_point_test_and_insert_to_db(
         additive_noise_method_id=additive_noise_method_id,
         denoising_method_id=denoising_method_id,
         trace_process_id=trace_process_id,
+        plot=plot,
     )
 
     for _ in tqdm_iterator:
@@ -79,6 +81,7 @@ def termination_point_test_and_insert_to_db(
             predictions=p,
             key_interest=k,
             cts_interest=c,
+            plot=plot,
         )
         if termination_point is not None:
             tp_list.append(termination_point)
@@ -103,7 +106,7 @@ def termination_point_test_and_insert_to_db(
 
 
 if __name__ == "__main__":
-    case = 1
+    case = 3
     if case == 1:
         if sys.argv[11].strip() == "None":
             additive_id = None
@@ -129,6 +132,7 @@ if __name__ == "__main__":
             additive_noise_method_id=additive_id,
             denoising_method_id=denoising_id,
             trace_process_id=int(sys.argv[13]),
+            plot=False
         )
     elif case == 2:
         database = "tmp_1.db"
@@ -158,6 +162,7 @@ if __name__ == "__main__":
             additive_noise_method_id=additive_noise_method_id,
             denoising_method_id=denoising_method_id,
             trace_process_id=trace_process_id,
+            plot=False
         )
     elif case == 3:
         # database = "main.db"
@@ -167,13 +172,14 @@ if __name__ == "__main__":
         training_dataset_ids = [3]
         environment_ids = [1]
         distances = [15]
-        devices = [10, 6, 7, 8, 9]
+        devices = [7, 8, 9, 10, 6]
         training_model_id = 1
         # epochs = [x for x in range(15, 21)]
-        epochs = [20]
+        epochs = [12]
         additive_noise_method_ids = [6]
         denoising_method_ids = [None]
-        trace_process_ids = [12]
+        trace_process_ids = [14]
+        plot = False
 
         for test_dataset_id in test_dataset_ids:
             for training_dataset_id in training_dataset_ids:
@@ -198,4 +204,5 @@ if __name__ == "__main__":
                                                 additive_noise_method_id=additive_noise_method_id,
                                                 denoising_method_id=denoising_method_id,
                                                 trace_process_id=trace_process_id,
+                                                plot=plot,
                                             )

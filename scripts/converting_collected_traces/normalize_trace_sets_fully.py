@@ -106,17 +106,23 @@ def normalize_training_traces__trace_process_6_and_7(
     plt.show()
 
 
-def normalize_training_traces__trace_process_8(
+def normalize_training_traces__standardization(
         training_dataset_id: int = 2,
+        trace_process_id: int = 8,
 ):
     """
     Standardize the training trace set.
 
+    :param trace_process_id:
     :param training_dataset_id:
     """
 
-    start = 130
-    end = 240
+    if trace_process_id == 14:
+        start = 130 - 4
+        end = 240 - 4
+    else:
+        start = 130
+        end = 240
 
     if training_dataset_id == 1:
         print("Currently not available (no traces.npy file for this dataset).")
@@ -141,9 +147,15 @@ def normalize_training_traces__trace_process_8(
     )
 
     # Save file
-    training_save_path = os.path.join(
-        training_dataset_path, "trace_process_8-standardization_sbox.npy"
-    )
+    if trace_process_id == 14:
+        training_save_path = os.path.join(
+            training_dataset_path, "trace_process_14-standardization_sbox.npy"
+        )
+    else:
+        training_save_path = os.path.join(
+            training_dataset_path, "trace_process_8-standardization_sbox.npy"
+        )
+
     np.save(training_save_path, training_trace_set)
 
     fig = plt.figure(figsize=(22, 7))
@@ -284,9 +296,13 @@ if __name__ == "__main__":
     #             trace_process_id=trace_process_id,
     #         )
 
-    # normalize_training_traces__trace_process_8(training_dataset_id=2)
-    # normalize_training_traces__trace_process_8(training_dataset_id=3)
-    #
+    normalize_training_traces__standardization(
+        training_dataset_id=2, trace_process_id=14
+    )
+    normalize_training_traces__standardization(
+        training_dataset_id=3, trace_process_id=14
+    )
+
     #
     # for training_dataset_id in training_dataset_ids:
     #     for trace_process_id in trace_process_ids:
@@ -294,5 +310,5 @@ if __name__ == "__main__":
     #             training_dataset_id=training_dataset_id,
     #             trace_process_id=trace_process_id,
     #         )
-    normalize_training_traces__trace_process_3(2)
-    normalize_training_traces__trace_process_3(3)
+    # normalize_training_traces__trace_process_3(2)
+    # normalize_training_traces__trace_process_3(3)

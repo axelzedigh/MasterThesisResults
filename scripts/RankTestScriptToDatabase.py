@@ -315,8 +315,12 @@ def termination_point_test_setup(
     """
 
     # Range in traces to test.
-    range_start = 204
-    range_end = 314
+    if trace_process_id == 14:
+        range_start = 200
+        range_end = 310
+    else:
+        range_start = 204
+        range_end = 314
 
     database = get_db_file_path(database)
 

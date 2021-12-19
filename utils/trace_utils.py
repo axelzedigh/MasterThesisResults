@@ -855,7 +855,7 @@ def get_normalized_test_traces(
     :param device:
     :param save:
     """
-    assert trace_process_id in range(1, 14)
+    assert trace_process_id in range(1, 15)
 
     test_trace_set_path = get_test_trace_path(
         database="main.db",
@@ -927,6 +927,10 @@ def get_normalized_test_traces(
     elif trace_process_id in [11, 12]:
         test_trace_set = standardization_of_trace_set__per_trace_fit(
             trace_set=test_trace_set, range_start=204, range_end=314
+        )
+    elif trace_process_id == 14:
+        test_trace_set = standardization_of_trace_set__per_trace_fit(
+            trace_set=test_trace_set, range_start=200, range_end=310
         )
     else:
         print("Wrong trace process id!")

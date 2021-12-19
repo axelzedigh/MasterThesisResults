@@ -238,6 +238,8 @@ QUERY_LIST_INITIALIZE_DB = [
      "Misalignment ± 1');"),
     ("INSERT INTO trace_processes VALUES (13, 'MaxMin - Whole trace - "
      "Misalignment ± 1');"),
+    ("INSERT INTO trace_processes VALUES (14, 'Standardization - SBox Range "
+     "[200, 310] - Misalignment ± 1');"),
 ]
 
 QUERY_RANK_TEST_GROUPED_A = """

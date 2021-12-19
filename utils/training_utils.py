@@ -516,15 +516,21 @@ def training_deep_learning_model(
     validation_labels = None
     additive_noise_trace = None
     clean_trace = None
-    start = 204
-    end = 314
+
     if training_dataset_id in [2, 3]:
-        # start = 200
-        # end = 320
-        # start = 209
-        # end = 329
-        start = 130
-        end = 240
+        if trace_process_id == 14:
+            start = 130 - 4
+            end = 240 - 4
+        else:
+            start = 130
+            end = 240
+    else:
+        if trace_process_id == 14:
+            start = 200
+            end = 310
+        else:
+            start = 204
+            end = 314
 
     # Get training traces path.
     training_set_path = get_training_trace_path(training_dataset_id)
@@ -579,6 +585,11 @@ def training_deep_learning_model(
     elif trace_process_id == 10:
         trace_set_file_path = os.path.join(
             training_set_path, "trace_process_10-maxmin_[-1_1]_[204_314].npy"
+        )
+        training_trace_set = np.load(trace_set_file_path)
+    elif trace_process_id == 14:
+        trace_set_file_path = os.path.join(
+            training_set_path, "trace_process_14-standardization_sbox.npy"
         )
         training_trace_set = np.load(trace_set_file_path)
     else:
@@ -684,7 +695,7 @@ def training_deep_learning_model(
         # training_trace_set *= 20
 
     # Cut trace set to the sbox output range
-    if trace_process_id in [12, 13]:
+    if trace_process_id in [12, 13, 14]:
         training_trace_set = cut_trace_set__column_range__randomized(
             trace_set=training_trace_set,
             range_start=start,
