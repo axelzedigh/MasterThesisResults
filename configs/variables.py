@@ -32,10 +32,17 @@ VIEW_RANK_TEST_INDEX = {
 # Paths
 PROJECT_DIR = os.getenv("MASTER_THESIS_RESULTS")
 RAW_DATA_DIR = os.getenv("MASTER_THESIS_RESULTS_RAW_DATA")
+REPORT_DIR = os.getenv("MASTER_THESIS_REPORT_DIR")
+
+# Report variables
+REPORT_TEXT_WIDTH = 369.88583
 
 # Matplotlib styling variables
 NORD_LIGHT_MPL_STYLE_PATH = os.path.join(
     PROJECT_DIR, "configs/matplotlib_styles", "nord-light.mplstyle"
+)
+NORD_LIGHT_MPL_STYLE_2_PATH = os.path.join(
+    PROJECT_DIR, "configs/matplotlib_styles", "nord-light_2.mplstyle"
 )
 NORD_DARK_MPL_STYLE_PATH = os.path.join(
     PROJECT_DIR, "configs/matplotlib_styles", "nord-dark.mplstyle"
