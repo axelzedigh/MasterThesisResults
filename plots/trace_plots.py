@@ -6,10 +6,13 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 from matplotlib import pyplot as plt
+from matplotlib.gridspec import GridSpec
 
 from configs.variables import NORD_LIGHT_MPL_STYLE_PATH, \
-    NORD_LIGHT_4_CUSTOM_LINES, NORD_LIGHT_LIGHT_BLUE
-from utils.db_utils import get_db_absolute_path, get_test_trace_path
+    NORD_LIGHT_4_CUSTOM_LINES, NORD_LIGHT_LIGHT_BLUE, REPORT_DIR, \
+    NORD_LIGHT_MPL_STYLE_2_PATH
+from utils.db_utils import get_db_absolute_path, get_test_trace_path, \
+    get_training_model_file_path
 from utils.plot_utils import set_size
 from utils.trace_utils import get_training_trace_path
 from utils.training_utils import additive_noise__gaussian, \
@@ -105,6 +108,108 @@ def plot_additive_noise_comparison_all(
     return full_rank_test
 
 
+def plot_overview(
+        test_dataset_id: int = 1,
+        environment_id: int = 1,
+        distance: float = 15,
+        device: int = 6,
+        trace_index: int = 1,
+        trace_process_id: int = 3,
+        save_path: str = REPORT_DIR,
+        format: str = "png",
+        show: bool = True,
+):
+    """
+    :param test_dataset_id:
+    :param environment_id:
+    :param distance:
+    :param device:
+    :param trace_process_id:
+    :param trace_index: The index of the trace in the trace set.
+    :param save_path:
+    :param format:
+    :param show:
+    """
+
+    # MPL styling
+    plt.style.use(NORD_LIGHT_MPL_STYLE_2_PATH)
+    plt.rcParams.update({
+        "lines.linewidth": 1,
+    })
+    w, h = set_size(subplots=(2, 2), fraction=1)
+    fig = plt.figure(constrained_layout=True, figsize=(w, h))
+    gs = GridSpec(1, 8, figure=fig)
+    ax1 = fig.add_subplot(gs[0:, 0:4])
+    ax2 = fig.add_subplot(gs[0:, 4:6])
+    ax3 = fig.add_subplot(gs[0:, 6:8])
+
+    # Load a trace set
+    trace_set_path = get_test_trace_path(
+        database="main.db",
+        test_dataset_id=test_dataset_id,
+        environment_id=environment_id,
+        distance=distance,
+        device=device,
+    )
+    if trace_process_id == 2:
+        file_path = os.path.join(trace_set_path, "traces.npy")
+    elif trace_process_id == 3:
+        file_path = os.path.join(trace_set_path, "nor_traces_maxmin.npy")
+    elif trace_process_id == 4 or 5:
+        file_path = os.path.join(
+            trace_set_path,
+            "nor_traces_maxmin__sbox_range_204_314.npy"
+        )
+    else:
+        raise "Incorrect trace_processing_id"
+    trace_set = np.load(file_path)
+
+    # Max/min
+    if trace_process_id == 2 or 3:
+        ex_trace = trace_set[trace_index]
+        ex_max = float(max(ex_trace))
+        ex_min = float(min(ex_trace))
+        ex_scaling = round(float(1 / (ex_max - ex_min)), 2)
+        arg_max = np.argmax(ex_trace)
+        arg_min = np.argmin(ex_trace)
+    elif trace_process_id == 4 or 5:
+        ex_trace = trace_set[trace_index]
+        ex_max = float(max(ex_trace[204:314]))
+        ex_min = float(min(ex_trace[204:314]))
+        ex_scaling = round(float(1 / (ex_max - ex_min)), 2)
+        arg_max = np.argmax(ex_trace)
+        arg_min = np.argmin(ex_trace)
+    else:
+        raise "Incorrect trace_process_id."
+
+    ax1.plot(ex_trace)
+    ax1.axhline(ex_max)
+    ax1.axhline(ex_min)
+    ax1.axvline(x=204, color=NORD_LIGHT_LIGHT_BLUE, linestyle="--")
+    ax1.axvline(x=314, color=NORD_LIGHT_LIGHT_BLUE, linestyle="--")
+    # plt.suptitle(
+    #     f"Example trace (index {trace_index}) for trace process id "
+    #     f"{trace_processing_id}. Test dataset id: {test_dataset_id}, "
+    #     f"Environment: {environment_id}, Distance: {distance}m, "
+    #     f"Device: {device}\nMax: {round(ex_max, 4)}, "
+    #     f"Min: {round(ex_min, 4)}, ArgMax: {arg_max}, ArgMin: {arg_min}, "
+    #     f"Scaling: {ex_scaling}",
+    #     fontsize=14,
+    #     y=0.95
+    # )
+
+    # History plot
+    if save_path:
+        path = os.path.join(
+            save_path,
+            f"figures/{trace_process_id}",
+            f"trace_and_history.{format}",
+        )
+        plt.savefig(path)
+    if show:
+        plt.show()
+
+
 def plot_example_test_traces_with_max_min(
         test_dataset_id: int = 1,
         environment_id: int = 1,
@@ -112,6 +217,8 @@ def plot_example_test_traces_with_max_min(
         device: int = 6,
         trace_processing_id: int = 2,
         trace_index: int = 1,
+        save_path: str = REPORT_DIR,
+        show: bool = True,
 ):
     """
     :param test_dataset_id:
@@ -120,6 +227,8 @@ def plot_example_test_traces_with_max_min(
     :param device:
     :param trace_processing_id:
     :param trace_index: The index of the trace in the trace set.
+    :param save_path:
+    :param show:
     """
 
     # MPL styling
@@ -181,7 +290,11 @@ def plot_example_test_traces_with_max_min(
         fontsize=14,
         y=0.95
     )
-    plt.show()
+    if save_path:
+        path = os.path.join(save_path, f"figures/example_noise_traces.{format}")
+        plt.savefig(path)
+    if show:
+        plt.show()
 
 
 def plot_additive_noises_examples(

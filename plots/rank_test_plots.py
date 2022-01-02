@@ -198,7 +198,7 @@ def plot_best_additive_noise_methods_2(
     # MPL styling
     plt.style.use(NORD_LIGHT_MPL_STYLE_2_PATH)
     custom_lines = NORD_LIGHT_4_CUSTOM_LINES
-    w, h = set_size(subplots=(2, 2))
+    w, h = set_size(subplots=(2, 2), fraction=1)
     fig = plt.figure(constrained_layout=True, figsize=(w, h))
     gs = GridSpec(1, 8, figure=fig)
     ax1 = fig.add_subplot(gs[0:, 0:5])
