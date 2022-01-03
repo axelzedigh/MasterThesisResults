@@ -512,16 +512,31 @@ def plot_example_normalized_training_trace(
         ax1.axvline(x=130, color=NORD_LIGHT_RED, linestyle="--")
         ax1.axvline(x=240, color=NORD_LIGHT_RED, linestyle="--")
 
-    ax2.plot(training_trace_set[0])
-    ax2.axhline(np.max(training_trace_set[0]))
-    ax2.axhline(np.min(training_trace_set[0]))
     if training_dataset_id == 1:
-        ax2.axvline(x=204, color=NORD_LIGHT_RED, linestyle="--")
-        ax2.axvline(x=314, color=NORD_LIGHT_RED, linestyle="--")
+        ax2.plot(training_trace_set[0][204:314])
+        ax2.axhline(np.max(training_trace_set[0][204:314]))
+        ax2.axhline(np.min(training_trace_set[0][204:314]))
     else:
-        ax2.axvline(x=130, color=NORD_LIGHT_RED, linestyle="--")
-        ax2.axvline(x=240, color=NORD_LIGHT_RED, linestyle="--")
+        ax2.plot(training_trace_set[0][130:240])
+        if trace_process_id == 14:
+            ax2.plot(training_trace_set[1][130:240])
+            ax2.plot(training_trace_set[2][130:240])
+        ax2.axhline(np.max(training_trace_set[0][130:240]))
+        ax2.axhline(np.min(training_trace_set[0][130:240]))
+    if trace_process_id in [3, 4, 5, 6, 7]:
+        ax2.set_ylim(0, 1)
+    elif trace_process_id in [8, 11, 12, 14]:
+        ax2.set_ylim(-2.5, 2.5)
+    elif trace_process_id in [9, 10]:
+        ax2.set_ylim(-1, 1)
 
+    # if training_dataset_id == 1:
+    #     ax2.axvline(x=204, color=NORD_LIGHT_RED, linestyle="--")
+    #     ax2.axvline(x=314, color=NORD_LIGHT_RED, linestyle="--")
+    # else:
+    #     ax2.axvline(x=130, color=NORD_LIGHT_RED, linestyle="--")
+    #     ax2.axvline(x=240, color=NORD_LIGHT_RED, linestyle="--")
+    #
     plt.tight_layout()
 
     if save_path:

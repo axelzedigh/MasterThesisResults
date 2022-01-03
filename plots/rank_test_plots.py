@@ -469,7 +469,6 @@ def plot_all_of_an_additive_noise(
         fontsize=16
     )
     plt.tight_layout()
-    plt.tight_layout()
     if save:
         plt.savefig(
             f"../docs/figs/{additive_noise_method.replace(' ', '_')}_comparison.png")
