@@ -32,6 +32,9 @@ def plot_histogram_overview(
     :param trace_process_id:
     :param device:
     :param distance:
+    :param save_path:
+    :param file_format:
+    :param show:
     """
     query = """
     select * from rank_test;
