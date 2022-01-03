@@ -10,7 +10,7 @@ from matplotlib.gridspec import GridSpec
 
 from configs.variables import NORD_LIGHT_MPL_STYLE_PATH, \
     NORD_LIGHT_4_CUSTOM_LINES, NORD_LIGHT_LIGHT_BLUE, REPORT_DIR, \
-    NORD_LIGHT_MPL_STYLE_2_PATH
+    NORD_LIGHT_MPL_STYLE_2_PATH, NORD_LIGHT_YELLOW, NORD_LIGHT_RED
 from utils.db_utils import get_db_absolute_path, get_test_trace_path, \
     get_training_model_file_path
 from utils.plot_utils import set_size
@@ -218,6 +218,7 @@ def plot_example_test_traces_with_max_min(
         trace_processing_id: int = 2,
         trace_index: int = 1,
         save_path: str = REPORT_DIR,
+        format: str = "png",
         show: bool = True,
 ):
     """
@@ -418,3 +419,117 @@ def plot_randomized_trace_cut():
     ax.plot(trace_set[3])
     ax.plot(trace_set[4])
     plt.show()
+
+
+def plot_example_normalized_training_trace(
+        training_dataset_id: int = 3,
+        trace_process_id: int = 3,
+        save_path: str = REPORT_DIR,
+        file_format: str = "png",
+        show: bool = False,
+):
+    """
+
+    :param training_dataset_id: 
+    :param trace_process_id: 
+    :param save_path: 
+    :param file_format: 
+    :param show: 
+    :return: 
+    """
+    # MPL styling
+    plt.style.use(NORD_LIGHT_MPL_STYLE_2_PATH)
+    plt.rcParams.update({
+        "lines.linewidth": 1,
+    })
+    w, h = set_size(subplots=(1, 1), fraction=1)
+    # fig, axs = plt.figure(constrained_layout=True, figsize=(w, h))
+    fig, axs = plt.subplots(2, 1, figsize=(w, h))
+    ax1 = axs[0]
+    ax2 = axs[1]
+    # gs = GridSpec(2, 8, figure=fig)
+    # ax1 = fig.add_subplot(gs[0:, 0:8])
+    # ax2 = fig.add_subplot(gs[1:, 0:8])
+
+    # Get training traces path.
+    training_set_path = get_training_trace_path(training_dataset_id)
+
+    # Get training traces (based on trace process)
+    trace_set_file_path_not_normalized = os.path.join(
+        training_set_path, "traces.npy"
+    )
+    training_trace_set_not_normalized = np.load(trace_set_file_path_not_normalized)
+    if trace_process_id in [3, 13]:
+        trace_set_file_path = os.path.join(
+            training_set_path, "nor_traces_maxmin.npy"
+        )
+        training_trace_set = np.load(trace_set_file_path)
+    elif trace_process_id in [4, 5]:
+        trace_set_file_path = os.path.join(
+            training_set_path, "nor_traces_maxmin__sbox_range_204_314.npy"
+        )
+        training_trace_set = np.load(trace_set_file_path)
+    elif trace_process_id == 6:
+        trace_set_file_path = os.path.join(
+            training_set_path, "trace_process_6-max_avg(before_sbox).npy"
+        )
+        training_trace_set = np.load(trace_set_file_path)
+    elif trace_process_id == 7:
+        trace_set_file_path = os.path.join(
+            training_set_path, "trace_process_7-max_avg(sbox).npy"
+        )
+        training_trace_set = np.load(trace_set_file_path)
+    elif trace_process_id in [8, 11, 12]:
+        trace_set_file_path = os.path.join(
+            training_set_path, "trace_process_8-standardization_sbox.npy"
+        )
+        training_trace_set = np.load(trace_set_file_path)
+    elif trace_process_id == 9:
+        trace_set_file_path = os.path.join(
+            training_set_path, "trace_process_9-maxmin_[-1_1]_[0_400].npy"
+        )
+        training_trace_set = np.load(trace_set_file_path)
+    elif trace_process_id == 10:
+        trace_set_file_path = os.path.join(
+            training_set_path, "trace_process_10-maxmin_[-1_1]_[204_314].npy"
+        )
+        training_trace_set = np.load(trace_set_file_path)
+    elif trace_process_id == 14:
+        trace_set_file_path = os.path.join(
+            training_set_path, "trace_process_14-standardization_sbox.npy"
+        )
+        training_trace_set = np.load(trace_set_file_path)
+    else:
+        return "Trace_process_id is wrong!"
+
+    ax1.plot(training_trace_set_not_normalized[0])
+    ax1.axhline(np.max(training_trace_set_not_normalized[0]))
+    ax1.axhline(np.min(training_trace_set_not_normalized[0]))
+    if training_dataset_id == 1:
+        ax1.axvline(x=204, color=NORD_LIGHT_RED, linestyle="--")
+        ax1.axvline(x=314, color=NORD_LIGHT_RED, linestyle="--")
+    else:
+        ax1.axvline(x=130, color=NORD_LIGHT_RED, linestyle="--")
+        ax1.axvline(x=240, color=NORD_LIGHT_RED, linestyle="--")
+
+    ax2.plot(training_trace_set[0])
+    ax2.axhline(np.max(training_trace_set[0]))
+    ax2.axhline(np.min(training_trace_set[0]))
+    if training_dataset_id == 1:
+        ax2.axvline(x=204, color=NORD_LIGHT_RED, linestyle="--")
+        ax2.axvline(x=314, color=NORD_LIGHT_RED, linestyle="--")
+    else:
+        ax2.axvline(x=130, color=NORD_LIGHT_RED, linestyle="--")
+        ax2.axvline(x=240, color=NORD_LIGHT_RED, linestyle="--")
+
+    plt.tight_layout()
+
+    if save_path:
+        path = os.path.join(
+            save_path,
+            f"figures/{trace_process_id}",
+            f"example_normalized_training_trace.{file_format}",
+        )
+        plt.savefig(path)
+    if show:
+        plt.show()
