@@ -117,13 +117,13 @@ def plot_history_log__overview_trace_process(
     ]
 
     # Create 4 x 4 grid
-    w, h = set_size(subplots=(nrows, ncols / 2), fraction=1)
+    w, h = set_size(subplots=(nrows, 2), fraction=1)
     fig = plt.figure(figsize=(w, h))
     fig.subplots_adjust(hspace=0.2, wspace=0.2)
     additive_noise_method_ids = ["None", 1, 3, 4, 5, 6, 7, 8, 9, 10, 11]
-    i = 5
-    j = 9
-    k = 13
+    i = ncols + 1
+    j = ncols * 2 + 1
+    k = ncols * 2 + 1
     tot = 0
     for additive_noise in additive_noise_method_ids:
         tot += 1
@@ -150,7 +150,7 @@ def plot_history_log__overview_trace_process(
             elif additive_noise in [1, 2, 3, 4, 5]:
                 ax1 = plt.subplot(nrows, ncols, i)
                 ax1.yaxis.set_major_formatter(ticker.StrMethodFormatter("{x:.1f}"))
-                if i != 5:
+                if i != ncols + 1:
                     ax1.yaxis.set_major_formatter(ticker.NullFormatter())
                 else:
                     ax1.set_ylabel("GWN")
@@ -158,7 +158,7 @@ def plot_history_log__overview_trace_process(
             elif additive_noise in [6, 7, 8, 9]:
                 ax1 = plt.subplot(nrows, ncols, j)
                 ax1.yaxis.set_major_formatter(ticker.StrMethodFormatter("{x:.1f}"))
-                if j != 9:
+                if j != ncols * 2 + 1:
                     ax1.yaxis.set_major_formatter(ticker.NullFormatter())
                 else:
                     ax1.set_ylabel("Collected")
@@ -166,7 +166,7 @@ def plot_history_log__overview_trace_process(
             elif additive_noise in [10, 11]:
                 ax1 = plt.subplot(nrows, ncols, k)
                 ax1.yaxis.set_major_formatter(ticker.StrMethodFormatter("{x:.1f}"))
-                if k != 13:
+                if k != ncols * 3 + 1:
                     ax1.yaxis.set_major_formatter(ticker.NullFormatter())
                 else:
                     ax1.set_ylabel("Rayleigh")
