@@ -15,19 +15,20 @@ if __name__ == "__main__":
     # )
 
     # Best additive noise methods
-    # trace_process_id = 3
-    # wang, zedigh = plot_best_additive_noise_methods_2(
-    #     trace_process_id=trace_process_id,
-    #     save_path=REPORT_DIR,
-    #     format="pgf",
-    # )
-    # df_to_latex__additive(
-    #     wang,
-    #     zedigh,
-    #     trace_process_id=3,
-    #     file_name=f"best_additive_{trace_process_id}",
-    #     label="tbl:best_additive",
-    # )
+    trace_process_id = 3
+    wang, zedigh = plot_best_additive_noise_methods_2(
+        trace_process_id=trace_process_id,
+        save_path=REPORT_DIR,
+        format="pgf",
+        # show=True,
+    )
+    df_to_latex__additive(
+        wang,
+        zedigh,
+        trace_process_id=3,
+        file_name=f"best_additive_{trace_process_id}",
+        label="tbl:best_additive",
+    )
 
     # plot_example_normalized_training_trace(
     #     training_dataset_id=3,
@@ -49,16 +50,15 @@ if __name__ == "__main__":
     #     show=True,
     # )
 
-    plot_history_log__overview_trace_process(
-        training_dataset_id=3,
-        trace_process_id=8,
-        save_path=REPORT_DIR,
-        file_format="pgf",
-        show=True,
-        last_gaussian=5,
-        last_collected=9,
-        last_rayleigh=11,
-        nrows=4,
-        ncols=4,
-    )
-
+    # plot_history_log__overview_trace_process(
+    #     training_dataset_id=3,
+    #     trace_process_id=8,
+    #     save_path=REPORT_DIR,
+    #     file_format="pgf",
+    #     show=True,
+    #     last_gaussian=5,
+    #     last_collected=9,
+    #     last_rayleigh=11,
+    #     nrows=4,
+    #     ncols=4,
+    # )

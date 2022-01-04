@@ -196,8 +196,6 @@ def plot_history_log__overview_trace_process(
             except:
                 pass
 
-            # ax1.set_xlabel("Epoch")
-            # ax1.set_ylabel("Accuracy")
             ax2 = ax1.twinx()
             ax2.plot(history_log["loss"], label="Loss", color=NORD_LIGHT_RED)
             ax2.plot(history_log["val_loss"], label="Validation Loss", color=NORD_LIGHT_YELLOW)
@@ -226,9 +224,6 @@ def plot_history_log__overview_trace_process(
             elif additive_noise == 11:
                 ax1.set_title("mode=0.0276")
 
-            # ax1.xaxis.set_major_formatter(
-            #     ticker.ScalarFormatter(useMathText=True))
-            # ax1.ticklabel_format(useMathText=True)
             ax1.xaxis.set_major_locator(ticker.MaxNLocator(integer=True, nbins=5))
             ax1.set_ylim(0, 2.5)
             ax2.set_ylim(4.6, 5.6)

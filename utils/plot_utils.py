@@ -37,6 +37,20 @@ def set_size(width_pt=REPORT_TEXT_WIDTH, fraction=1, subplots=(1, 1)):
     return fig_width_in, fig_height_in
 
 
+def interval_upper(x):
+    a = 1.96
+    mean = x.mean()
+    sem = x.sem()
+    return mean + a*sem
+
+
+def interval_lower(x):
+    a = 1.96
+    mean = x.mean()
+    sem = x.sem()
+    return mean - a*sem
+
+
 def df_to_latex__additive(
         wang: pd.DataFrame,
         zedigh: pd.DataFrame,
@@ -54,7 +68,16 @@ def df_to_latex__additive(
         }
     )
     wang = wang.groupby(["Noise method", "Device"]).agg(
-        {'Termination point': ['mean', 'std', 'count']})
+        {'Termination point': ['mean', 'std', 'count', interval_lower, interval_upper]})
+    wang = wang.rename(
+        columns={
+            "mean": "Mean",
+            "std": "∂",
+            "count": "Count",
+            "interval_lower": "CI-",
+            "interval_upper": "CI+",
+        }
+    )
     latex = wang.to_latex(
         # header=["M", "D", "M"],
         sparsify=True,
@@ -81,7 +104,16 @@ def df_to_latex__additive(
         }
     )
     zedigh = zedigh.groupby(["Noise method", "Device"]).agg(
-        {'Termination point': ['mean', 'std', 'count']})
+        {'Termination point': ['mean', 'std', 'count', interval_lower, interval_upper]})
+    zedigh = zedigh.rename(
+        columns={
+            "mean": "Mean",
+            "std": "∂",
+            "count": "Count",
+            "interval_lower": "CI-",
+            "interval_upper": "CI+",
+        }
+    )
     latex = zedigh.to_latex(
         # header=["M", "D", "M"],
         # columns=["Noise method", "Device", "mean", "std", "count"],
