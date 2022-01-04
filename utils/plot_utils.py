@@ -72,10 +72,10 @@ def df_to_latex__additive(
     wang = wang.rename(
         columns={
             "mean": "Mean",
-            "std": "∂",
+            "std": "$\sigma$",
             "count": "Count",
-            "interval_lower": "CI-",
-            "interval_upper": "CI+",
+            "interval_lower": "$CI_{-}$",
+            "interval_upper": "$CI_{+}$",
         }
     )
     latex = wang.to_latex(
@@ -83,7 +83,8 @@ def df_to_latex__additive(
         sparsify=True,
         float_format="%.0f",
         label=label + "_wang",
-        caption=f"Table for Wang 2021 dataset (trace process {trace_process_id})"
+        escape=False,
+        caption=f"Table for Wang 2021 dataset (trace process {trace_process_id})",
     )
 
     file_path = os.path.join(
@@ -108,10 +109,10 @@ def df_to_latex__additive(
     zedigh = zedigh.rename(
         columns={
             "mean": "Mean",
-            "std": "∂",
+            "std": "$\sigma$",
             "count": "Count",
-            "interval_lower": "CI-",
-            "interval_upper": "CI+",
+            "interval_lower": "$CI_{-}$",
+            "interval_upper": "$CI_{+}$",
         }
     )
     latex = zedigh.to_latex(
@@ -120,6 +121,7 @@ def df_to_latex__additive(
         sparsify=True,
         float_format="%.0f",
         label=label + "_zedigh",
+        escape=False,
         caption=f"Table for Zedigh 2021 dataset (trace process {trace_process_id})"
     )
 

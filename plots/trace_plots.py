@@ -313,14 +313,8 @@ def plot_additive_noises_examples(
     trace_processing_id = 3
 
     # MPL styling
-    plt.style.use(NORD_LIGHT_MPL_STYLE_PATH)
-    plt.rcParams.update({
-        "font.family": "serif",  # use serif/main font for text elements
-        "text.usetex": True,  # use inline math for ticks
-        "pgf.rcfonts": False  # don't setup fonts from rc parameters
-    })
-
-    fig, axs = plt.subplots(3, 1, figsize=set_size(fraction=1, subplots=(3, 1)))
+    plt.style.use(NORD_LIGHT_MPL_STYLE_2_PATH)
+    fig, axs = plt.subplots(3, 1, figsize=set_size(fraction=1, subplots=(1, 1)))
 
     # Load a trace set
     trace_set_path = get_test_trace_path(
@@ -345,13 +339,13 @@ def plot_additive_noises_examples(
 
     # Gaussian
     _, noise = additive_noise__gaussian(trace_set=trace_set, mean=0, std=0.01)
-    axs[0].plot(noise[204:314], label="$∂$=0.01", alpha=0.75)
+    axs[0].plot(noise[204:314], label="$\sigma$=0.01", alpha=0.75, lw=0.75)
     # _, noise = additive_noise__gaussian(trace_set=trace_set, mean=0, std=0.02)
     # axs[0].plot(noise[204:314], label="∂=0.02", alpha=0.75)
     # _, noise = additive_noise__gaussian(trace_set=trace_set, mean=0, std=0.03)
     # axs[0].plot(noise[204:314], label="∂=0.03", alpha=0.75)
     _, noise = additive_noise__gaussian(trace_set=trace_set, mean=0, std=0.04)
-    axs[0].plot(noise[204:314], label="$∂$=0.04", alpha=0.75)
+    axs[0].plot(noise[204:314], label="$\sigma$=0.04", alpha=0.75, lw=0.75)
     # _, noise = additive_noise__gaussian(trace_set=trace_set, mean=0, std=0.05)
     # axs[0].plot(noise[204:314], label="∂=0.05", alpha=0.75)
 
@@ -359,35 +353,44 @@ def plot_additive_noises_examples(
     _, noise = additive_noise__collected_noise__office_corridor(
         trace_set=trace_set, scaling_factor=25, mean_adjust=False
     )
-    axs[1].plot(noise[204:314], label="scaling=25", alpha=0.75)
+    axs[1].plot(noise[204:314], label="scaling=25", alpha=0.75, lw=0.75)
     _, noise = additive_noise__collected_noise__office_corridor(
         trace_set=trace_set, scaling_factor=50, mean_adjust=False
     )
-    axs[1].plot(noise[204:314], label="scaling=50", alpha=0.75)
+    axs[1].plot(noise[204:314], label="scaling=50", alpha=0.75, lw=0.75)
     _, noise = additive_noise__collected_noise__office_corridor(
         trace_set=trace_set, scaling_factor=75, mean_adjust=False
     )
-    axs[1].plot(noise[204:314], label="scaling=75", alpha=0.75)
+    axs[1].plot(noise[204:314], label="scaling=75", alpha=0.75, lw=0.75)
     _, noise = additive_noise__collected_noise__office_corridor(
         trace_set=trace_set, scaling_factor=105, mean_adjust=False
     )
-    axs[1].plot(noise[204:314], label="scaling=105", alpha=0.75)
+    axs[1].plot(noise[204:314], label="scaling=105", alpha=0.75, lw=0.75)
 
     # Rayleigh
     _, noise = additive_noise__rayleigh(trace_set=trace_set, mode=0.0138)
-    axs[2].plot(noise[204:314], label="mode=0.0138", alpha=0.75)
+    axs[2].plot(noise[204:314], label="mode=0.0138", alpha=0.75, lw=0.75)
     _, noise = additive_noise__rayleigh(trace_set=trace_set, mode=0.0276)
-    axs[2].plot(noise[204:314], label="mode=0.0276", alpha=0.75)
+    axs[2].plot(noise[204:314], label="mode=0.0276", alpha=0.75, lw=0.75)
 
-    axs[0].legend()
-    axs[1].legend()
-    axs[2].legend()
+    leg = axs[0].legend(bbox_to_anchor=(1.04,0.5), loc="center left", borderaxespad=0)
+    for legobj in leg.legendHandles:
+        legobj.set_linewidth(2.0)
+    leg = axs[1].legend(bbox_to_anchor=(1.04,0.5), loc="center left", borderaxespad=0)
+    for legobj in leg.legendHandles:
+        legobj.set_linewidth(2.0)
+    leg = axs[2].legend(bbox_to_anchor=(1.04,0.5), loc="center left", borderaxespad=0)
+    for legobj in leg.legendHandles:
+        legobj.set_linewidth(2.0)
+
     axs[0].set_ylim(-0.15, 0.15)
     axs[1].set_ylim(-0.15, 0.15)
     axs[2].set_ylim(-0.15, 0.15)
-    axs[0].set_title("Gaussian Noise")
-    axs[1].set_title("Recorded Noise")
-    axs[2].set_title("Rayleigh")
+    axs[0].set_ylabel("Gaussian")
+    axs[1].set_ylabel("Recorded")
+    axs[2].set_ylabel("Rayleigh")
+    plt.tight_layout()
+
     if save_path:
         path = os.path.join(save_path, f"figures/example_noise_traces.{format}")
         plt.savefig(path)
