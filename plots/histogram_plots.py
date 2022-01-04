@@ -14,12 +14,14 @@ from utils.trace_utils import get_training_trace_path
 
 
 def plot_histogram_overview(
+        training_model_id: int = 1,
         training_dataset_id: int = 3,
         test_dataset_id: int = 1,
         environment_id: int = 1,
         trace_process_id: int = 3,
         device: int = 6,
         distance: float = 15,
+        epoch: int = 65,
         save_path: str = REPORT_DIR,
         file_format: str = "png",
         show: bool = False,
@@ -36,13 +38,27 @@ def plot_histogram_overview(
     :param file_format:
     :param show:
     """
-    query = """
-    select * from rank_test;
+
+    query = f"""
+    select 
+        *
+    from 
+        rank_test
+    where
+        training_model_id = {training_model_id}
+        AND test_dataset_id = {test_dataset_id}
+        AND training_dataset_id = {training_dataset_id}
+        AND environment_id = {environment_id}
+        AND distance = {distance}
+        AND device = {device}
+        AND epoch = {epoch}
+        AND trace_process_id = {trace_process_id}
+    ;
     """
     database = get_db_absolute_path("main.db")
     con = lite.connect(database)
-    full_rank_test = pd.read_sql_query(query, con)
-    full_rank_test.fillna("None", inplace=True)
+    rank_test = pd.read_sql_query(query, con)
+    rank_test.fillna("None", inplace=True)
     con.close()
 
     # MPL styling
@@ -62,14 +78,14 @@ def plot_histogram_overview(
     j = 9
     k = 13
     for additive_noise in additive_noise_method_ids:
-        data = full_rank_test.copy()
-        data = data[data["test_dataset_id"] == test_dataset_id]
-        data = data[data["training_dataset_id"] == training_dataset_id]
-        data = data[data["environment_id"] == environment_id]
-        data = data[data["distance"] == distance]
-        data = data[data["device"] == device]
+        data = rank_test.copy()
+        # data = data[data["test_dataset_id"] == test_dataset_id]
+        # data = data[data["training_dataset_id"] == training_dataset_id]
+        # data = data[data["environment_id"] == environment_id]
+        # data = data[data["distance"] == distance]
+        # data = data[data["device"] == device]
         data = data[data["additive_noise_method_id"] == additive_noise]
-        data = data[data["trace_process_id"] == trace_process_id]
+        # data = data[data["trace_process_id"] == trace_process_id]
         if not data["termination_point"].empty:
             if additive_noise == "None":
                 ax = plt.subplot(4, 4, 1)

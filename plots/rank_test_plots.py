@@ -8,7 +8,7 @@ from matplotlib import pyplot as plt
 from matplotlib.gridspec import GridSpec
 
 from configs.variables import NORD_LIGHT_MPL_STYLE_PATH, \
-    NORD_LIGHT_4_CUSTOM_LINES, NORD_LIGHT_MPL_STYLE_2_PATH
+    NORD_LIGHT_4_CUSTOM_LINES, NORD_LIGHT_MPL_STYLE_2_PATH, REPORT_DIR
 from utils.db_utils import get_db_absolute_path
 from utils.plot_utils import set_size
 
@@ -293,14 +293,14 @@ def plot_best_additive_noise_methods_2(
         y=full_rank_test__wang["termination_point"],
         hue=full_rank_test__wang["additive_noise_method"],
         ax=ax1,
-        errwidth=2,
+        errwidth=1.5,
     )
     sns2 = sns.barplot(
         x=full_rank_test__zedigh["device"],
         y=full_rank_test__zedigh["termination_point"],
         hue=full_rank_test__zedigh["additive_noise_method"],
         ax=ax2,
-        errwidth=2,
+        errwidth=1.5,
     )
     # plt.suptitle(
     #     f"Best additive noise, 15m, trace process {trace_process_id}",
@@ -666,3 +666,112 @@ def plot_epoch_comparison(
         )
     plt.show()
     return full_rank_test
+
+
+def plot_epoch_comparison_report(
+        training_model_id: int = 1,
+        training_dataset_id: int = 1,
+        test_dataset_id: int = 1,
+        trace_process_id: int = 3,
+        environment_id: int = 1,
+        distance: float = 15,
+        device: int = 6,
+        additive_noise_method_id: Optional[int] = None,
+        save_path: Optional[str] = REPORT_DIR,
+        format: str = "png",
+        show: bool = False,
+) -> pd.DataFrame:
+    """
+    :param training_model_id:
+    :param training_dataset_id:
+    :param test_dataset_id:
+    :param trace_process_id:
+    :param environment_id:
+    :param device:
+    :param distance:
+    :param additive_noise_method_id:
+    :param save_path:
+    :param format:
+    :param show:
+    """
+
+    # MPL styling
+    plt.style.use(NORD_LIGHT_MPL_STYLE_2_PATH)
+    w, h = set_size(subplots=(1, 2), fraction=1)
+    fig = plt.figure(constrained_layout=True, figsize=(w, h))
+    gs = GridSpec(1, 8, figure=fig)
+    ax1 = fig.add_subplot(gs[0:, 0:8])
+
+    database = get_db_absolute_path("main.db")
+    con = lite.connect(database)
+
+    if additive_noise_method_id is None:
+        query1 = f"""
+        select
+            device, 
+            epoch, 
+            termination_point
+        from
+            rank_test
+        where
+            training_model_id = {training_model_id}
+            AND test_dataset_id = {test_dataset_id}
+            AND training_dataset_id = {training_dataset_id}
+            AND environment_id = {environment_id}
+            AND device = {device}
+            AND distance = {distance}
+            AND trace_process_id = {trace_process_id}
+            AND additive_noise_method_id IS NULL
+            AND denoising_method_id IS NULL
+        order by 
+            epoch;
+        """
+    else:
+        query1 = f"""
+        select
+            device, 
+            epoch, 
+            additive_noise_method_id,
+            termination_point
+        from
+            rank_test
+        where
+            training_model_id = {training_model_id}
+            AND test_dataset_id = {test_dataset_id}
+            AND training_dataset_id = {training_dataset_id}
+            AND environment_id = {environment_id}
+            AND device = {device}
+            AND distance = {distance}
+            AND trace_process_id = {trace_process_id}
+            AND additive_noise_method_id = {additive_noise_method_id}
+            AND denoising_method_id IS NULL
+        order by 
+            epoch;
+        """
+
+    rank_test_data = pd.read_sql_query(query1, con)
+    con.close()
+    rank_test_data.fillna("None", inplace=True)
+    ylim_bottom = 0
+    ylim_top = 1000
+    sns1 = sns.barplot(
+        x=rank_test_data["epoch"],
+        y=rank_test_data["termination_point"],
+        hue=rank_test_data["device"],
+        ax=ax1,
+        errwidth=2,
+    )
+    ax1.set_ylim(ylim_bottom, ylim_top)
+    ax1.set_ylabel("Termination point")
+    ax1.set_xlabel("Epoch")
+    ax1.legend([], [], frameon=False)
+    # plt.tight_layout()
+    if save_path:
+        path = os.path.join(
+            save_path,
+            f"figures/{trace_process_id}/epoch_comparison_additive_method_{additive_noise_method_id}.{format}"
+        )
+        plt.savefig(path)
+    if show:
+        plt.show()
+    return rank_test_data
