@@ -3,6 +3,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 import os
 
+from matplotlib.gridspec import GridSpec
+
 from configs.variables import NORD_LIGHT_MPL_STYLE_2_PATH, NORD_LIGHT_RED, \
     REPORT_DIR
 from utils.plot_utils import set_size
@@ -28,9 +30,11 @@ def plot_recorded_noise(
     })
 
     # MLP fig/ax
-    w, h = set_size(subplots=(1, 2), fraction=1)
-    fig = plt.figure(figsize=(w, h))
-    ax = fig.gca()
+    w, h = set_size(subplots=(2, 2), fraction=1)
+    fig = plt.figure(constrained_layout=True, figsize=(w, h))
+    gs = GridSpec(2, 1, figure=fig)
+    ax1 = fig.add_subplot(gs[0:1, 0])
+    ax2 = fig.add_subplot(gs[1:2, 0])
 
     # Get noise data
     project_dir = os.getenv("MASTER_THESIS_RESULTS")
@@ -57,17 +61,21 @@ def plot_recorded_noise(
     rayleigh_noise_arr = np.array(rayleigh_noise_set)
 
     # Plot
-    ax.hist(
+    ax1.hist(
         noise_traces_fixed, bins=100, density=True, histtype="stepfilled"
     )
-    ax.hist(
+    ax1.hist(
         rayleigh_noise_arr.flatten(), bins=100, density=True, histtype="step",
         color=NORD_LIGHT_RED, rwidth=4
             )
-    ax.set_xlabel("Noise sample amplitude")
-    ax.set_ylabel("Count")
-    ax.legend(labels=["Recorded noise", "Rayleigh, mode=0.00055"], loc=1)
-    plt.tight_layout()
+    ax1.set_xlabel("Sample data amplitude")
+    ax1.set_ylabel("Frequency")
+    ax1.legend(labels=["Recorded noise", "Rayleigh, mode=0.00055"], loc=1)
+
+    ax2.psd(x=noise_traces_fixed, Fs=5e6)
+    ax2.set_xlim(0, 100000)
+
+    # plt.tight_layout()
     if save_path:
         path = os.path.join(
             save_path,

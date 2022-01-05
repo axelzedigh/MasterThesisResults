@@ -119,4 +119,4 @@ if __name__ == "__main__":
     # histogram_plots()
     # history_log_plots()
     # epoch_comparison_plots()
-    plot_recorded_noise(file_format="pgf")
+    plot_recorded_noise(file_format="pgf", show=True)
