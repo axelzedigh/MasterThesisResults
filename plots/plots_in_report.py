@@ -1,18 +1,20 @@
 from configs.variables import REPORT_DIR
 from plots.histogram_plots import plot_histogram_overview
 from plots.history_log_plots import plot_history_log__overview_trace_process
-from plots.noise_plots import plot_recorded_noise
+from plots.noise_plots import plot_recorded_noise, plot_training_diff_psd
 from plots.rank_test_plots import plot_best_additive_noise_methods_2, \
-    plot_epoch_comparison_report
+    plot_epoch_comparison_report, plot_all_of_an_additive_noise__report
 from plots.trace_plots import plot_overview, plot_additive_noises_examples, \
     plot_example_normalized_training_trace
 from utils.plot_utils import df_to_latex__additive
+
 
 def additive_noise_example_plot():
     plot_additive_noises_examples(
         save_path=REPORT_DIR,
         format="pgf",
     )
+
 
 def best_additive_plots_and_tables():
     trace_process_id = 3
@@ -27,8 +29,23 @@ def best_additive_plots_and_tables():
         zedigh,
         trace_process_id=3,
         file_name=f"best_additive_{trace_process_id}",
-        label="tbl:best_additive",
+        label=f"tbl:best_additive_{trace_process_id}",
     )
+
+
+def additive_noise_comparision_plot():
+    plot_all_of_an_additive_noise__report(
+        training_dataset='Wang_2021 - Cable, 5 devices, 200k traces',
+        additive_noise_method="Gaussian",
+        trace_process_id=3,
+        epoch=65,
+        distance=15,
+        environment="office_corridor",
+        save_path=REPORT_DIR,
+        file_format="pgf",
+        show=True,
+    )
+
 
 def normalized_trace_plots():
     plot_example_normalized_training_trace(
@@ -38,6 +55,7 @@ def normalized_trace_plots():
         file_format="pgf",
         show=True
     )
+
 
 def histogram_plots():
     plot_histogram_overview(
@@ -54,6 +72,7 @@ def histogram_plots():
         show=True,
     )
 
+
 def history_log_plots():
     plot_history_log__overview_trace_process(
         training_dataset_id=1,
@@ -67,6 +86,7 @@ def history_log_plots():
         nrows=4,
         ncols=4,
     )
+
 
 def epoch_comparison_plots():
     plot_epoch_comparison_report(
@@ -94,7 +114,7 @@ def epoch_comparison_plots():
         additive_noise_method_id=7,
         save_path=REPORT_DIR,
         format="pgf",
-        # show=True
+        show=True
     )
 
     plot_epoch_comparison_report(
@@ -115,8 +135,18 @@ def epoch_comparison_plots():
 if __name__ == "__main__":
     # additive_noise_example_plot()
     # best_additive_plots_and_tables()
+    additive_noise_comparision_plot()
     # normalized_trace_plots()
     # histogram_plots()
     # history_log_plots()
     # epoch_comparison_plots()
-    plot_recorded_noise(file_format="pgf", show=True)
+    # plot_recorded_noise(file_format="pgf", show=True)
+    # plot_training_diff_psd(
+    #     training_dataset_id=3,
+    #     additive_noise_method_id=None,
+    #     denoising_method_id=None,
+    #     #save_path=REPORT_DIR,
+    #     save_path=None,
+    #     file_format="pgf",
+    #     show=True
+    # )
