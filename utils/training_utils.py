@@ -127,14 +127,14 @@ def train_model(
         device=10,
         save=False
     )
-    labels = np.load(os.path.join(test_path, "label_lastround_Sout_0.npy"))
+    eval_callback_labels = np.load(os.path.join(test_path, "label_lastround_Sout_0.npy"))
     testing_traces = testing_traces[:number_total_trace]
     testing_traces = cut_trace_set__column_range(trace_set=testing_traces)
-    labels = labels[:number_total_trace]
+    eval_callback_labels = eval_callback_labels[:number_total_trace]
     testing_traces = testing_traces.reshape(
         (testing_traces.shape[0], testing_traces.shape[1], 1)
     )
-    labels = to_categorical(labels, 256)
+    eval_callback_labels = to_categorical(eval_callback_labels, 256)
 
     # Check if file-path exists
     check_if_file_exists(os.path.dirname(model_save_path))
@@ -154,12 +154,12 @@ def train_model(
     elif mode == 3:
         callbacks = [
             ModelCheckpoint(model_save_path),
-            EvaluateCallback(x_test=testing_traces, y_test=labels),
+            EvaluateCallback(x_test=testing_traces, y_test=eval_callback_labels),
         ]
     elif mode == 4:
         callbacks = [
             ModelCheckpoint(model_save_path),
-            EvaluateCallback(x_test=testing_traces, y_test=labels),
+            EvaluateCallback(x_test=testing_traces, y_test=eval_callback_labels),
             TerminateOnBaseline(monitor='val_accuracy', baseline=0.01)
         ]
 

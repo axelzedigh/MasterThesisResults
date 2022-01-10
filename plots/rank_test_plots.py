@@ -52,7 +52,8 @@ def plot_best_additive_noise_methods(
         additive_noise_method_parameter_1_value, 
         additive_noise_method_parameter_2, 
         additive_noise_method_parameter_2_value, 
-        termination_point
+        termination_point,
+        date_added
     from
         full_rank_test
     where
@@ -70,7 +71,8 @@ def plot_best_additive_noise_methods(
             OR additive_noise_method_parameter_1_value = {rayleigh_value}
         )
     order by
-        additive_noise_method
+        additive_noise_method,
+        date_added
         ;
     """
 
@@ -83,7 +85,8 @@ def plot_best_additive_noise_methods(
         additive_noise_method_parameter_1_value, 
         additive_noise_method_parameter_2, 
         additive_noise_method_parameter_2_value, 
-        termination_point
+        termination_point,
+        date_added
     from
         full_rank_test
     where
@@ -101,7 +104,8 @@ def plot_best_additive_noise_methods(
             OR additive_noise_method_parameter_1_value = {rayleigh_value}
         )
     order by
-        additive_noise_method
+        additive_noise_method,
+        date_added
         ;
     """
 
@@ -175,7 +179,9 @@ def plot_best_additive_noise_methods(
 
 
 def plot_best_additive_noise_methods_2(
-        training_dataset: str = 'Wang_2021 - Cable, 5 devices, 200k traces',
+        training_dataset: str = 'Wang_2021 - Cable, 5 devices, 500k traces',
+        epoch: int = 65,
+        distance: float = 15,
         trace_process_id: int = 3,
         gaussian_value: float = 0.04,
         collected_value: float = 25,
@@ -224,8 +230,8 @@ def plot_best_additive_noise_methods_2(
         AND training_dataset = '{training_dataset}'
         AND environment = 'office_corridor'
         AND test_dataset = 'Wang_2021'
-        AND epoch = 65 
-        AND distance = 15
+        AND epoch = {epoch}
+        AND distance = {distance}
         AND denoising_method IS NULL
         AND (
             additive_noise_method_parameter_1_value = {gaussian_value}
@@ -296,31 +302,9 @@ def plot_best_additive_noise_methods_2(
         ax=ax1,
         errwidth=1.5,
     )
-    sns2 = sns.barplot(
-        x=full_rank_test__zedigh["device"],
-        y=full_rank_test__zedigh["termination_point"],
-        hue=full_rank_test__zedigh["additive_noise_method"],
-        ax=ax2,
-        errwidth=1.5,
-    )
-    # plt.suptitle(
-    #     f"Best additive noise, 15m, trace process {trace_process_id}",
-    #     fontsize=18,
-    #     y=0.95
-    # )
     ax1.set_ylim(ylim_bottom, ylim_top)
     ax1.set_ylabel("Termination point")
     ax1.set_xlabel("Device\n(Wang 2021)")
-    # axs[0].text(x=-0.1, y=(ylim_top - 200), s="Wang 2021", fontsize=16)
-    # ax2.set_ylabel("Termination point")
-    sns2.set(ylabel=None, yticklabels=[])
-    sns2.tick_params(left=False)
-    ax2.set_ylim(ylim_bottom, ylim_top)
-    ax2.set_xlabel("Device\n(Zedigh 2021)")
-    # axs[1].text(x=-0.1, y=(ylim_top - 200), s="Zedigh 2021", fontsize=16)
-    # plt.tight_layout()
-    # axs[0].legend(custom_lines, labels)
-    # axs[1].legend(custom_lines, labels)
     ax1.legend(
         handles=custom_lines,
         labels=labels,
@@ -329,7 +313,22 @@ def plot_best_additive_noise_methods_2(
         mode="expand",
         ncol=2
     )
-    ax2.legend([], [], frameon=False)
+
+    try:
+        sns2 = sns.barplot(
+            x=full_rank_test__zedigh["device"],
+            y=full_rank_test__zedigh["termination_point"],
+            hue=full_rank_test__zedigh["additive_noise_method"],
+            ax=ax2,
+            errwidth=1.5,
+        )
+        sns2.set(ylabel=None, yticklabels=[])
+        sns2.tick_params(left=False)
+        ax2.set_ylim(ylim_bottom, ylim_top)
+        ax2.set_xlabel("Device\n(Zedigh 2021)")
+        ax2.legend([], [], frameon=False)
+    except:
+        pass
     if save_path:
         path = os.path.join(
             save_path,
@@ -578,7 +577,7 @@ def plot_all_of_an_additive_noise__report(
         inplace=True)
     con.close()
     ylim_bottom = 0
-    ylim_top = 1200
+    ylim_top = 1500
     sns1 = sns.barplot(
         x=full_rank_test__wang["device"],
         y=full_rank_test__wang["termination_point"],
@@ -591,11 +590,6 @@ def plot_all_of_an_additive_noise__report(
         hue=full_rank_test__zedigh["Additive parameter 1"],
         ax=ax2
     )
-    # plt.suptitle(
-    #     f"""{additive_noise_method.capitalize()} additive noise, {distance}m, trace process {trace_process_id}""",
-    #     fontsize=18,
-    #     y=0.95
-    # )
 
     ax1.set_ylim(ylim_bottom, ylim_top)
     ax1.set_ylabel("Termination point")
@@ -613,7 +607,7 @@ def plot_all_of_an_additive_noise__report(
     ax1.legend(
         # handles=custom_lines,
         # labels=labels,
-        bbox_to_anchor=(0., 1, 1.5, 0),
+        bbox_to_anchor=(0., 1, 1.4, 0),
         loc="lower left",
         mode="expand",
         ncol=5

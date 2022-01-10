@@ -17,7 +17,7 @@ from utils.plot_utils import set_size
 from utils.trace_utils import get_training_trace_path
 from utils.training_utils import additive_noise__gaussian, \
     additive_noise__collected_noise__office_corridor, additive_noise__rayleigh, \
-    cut_trace_set__column_range__randomized
+    cut_trace_set__column_range__randomized, cut_trace_set__column_range
 
 
 def plot_additive_noise_comparison_all(
@@ -505,6 +505,10 @@ def plot_example_normalized_training_trace(
     else:
         return "Trace_process_id is wrong!"
 
+    if trace_process_id == 11:
+        training_trace_set -= np.mean(training_trace_set, axis=0)
+        # training_trace_set *= 20
+
     ax1.plot(training_trace_set_not_normalized[0])
     ax1.axhline(np.max(training_trace_set_not_normalized[0]))
     ax1.axhline(np.min(training_trace_set_not_normalized[0]))
@@ -520,16 +524,33 @@ def plot_example_normalized_training_trace(
         ax2.axhline(np.max(training_trace_set[0][204:314]))
         ax2.axhline(np.min(training_trace_set[0][204:314]))
     else:
-        ax2.plot(training_trace_set[0][130:240])
-        if trace_process_id == 14:
-            ax2.plot(training_trace_set[1][130:240])
-            ax2.plot(training_trace_set[2][130:240])
-        ax2.axhline(np.max(training_trace_set[0][130:240]))
-        ax2.axhline(np.min(training_trace_set[0][130:240]))
+        if trace_process_id in [12, 13, 14]:
+            training_trace_set = cut_trace_set__column_range__randomized(
+                trace_set=training_trace_set,
+                range_start=130,
+                range_end=240,
+                randomize=1,
+            )
+        else:
+            training_trace_set = cut_trace_set__column_range(
+                trace_set=training_trace_set,
+                range_start=130,
+                range_end=240,
+            )
+        ax2.plot(training_trace_set[0])
+        if trace_process_id in [12, 13, 14]:
+            ax2.plot(training_trace_set[1])
+            ax2.plot(training_trace_set[2])
+        ax2.axhline(np.max(training_trace_set[0]))
+        ax2.axhline(np.min(training_trace_set[0]))
+
     if trace_process_id in [3, 4, 5, 6, 7]:
         ax2.set_ylim(0, 1)
-    elif trace_process_id in [8, 11, 12, 14]:
+    elif trace_process_id in [8, 12, 14]:
         ax2.set_ylim(-2.5, 2.5)
+    elif trace_process_id in [11]:
+        # ax2.set_ylim(-2.5, 2.5)
+        pass
     elif trace_process_id in [9, 10]:
         ax2.set_ylim(-1, 1)
 
