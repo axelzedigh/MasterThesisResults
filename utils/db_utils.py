@@ -400,12 +400,12 @@ def create_md__full_rank_test__grouped(database="main.db", path="docs"):
     file.close()
     file = open(file_path, "a")
     file.write("| test_dataset | training_dataset | environment | distance | "
-               "device | training_model | keybyte | epoch | additive method | "
+               "device | training_model | keybyte | epoch | trace process id | additive method | "
                "param 1| value | param 2 | value | denoising method | param 1 "
                "| value | param 2 | value | counted tp | avg tp's |\n")
     file.write(
         "|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|"
-        "---|---|---|\n"
+        "---|---|---|---|\n"
     )
     for data in full_rank_test_rows:
         file.write(
@@ -419,6 +419,7 @@ def create_md__full_rank_test__grouped(database="main.db", path="docs"):
             f"{data[14]} | {data[15]} | "
             f"{data[16]} | {data[17]} | "
             f"{data[18]} | {data[19]} |"
+            f"{data[20]} |"
             "\n"
         )
 
