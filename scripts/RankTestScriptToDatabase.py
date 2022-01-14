@@ -392,7 +392,7 @@ def termination_point_test_setup(
             training_trace_set
         )
         testing_traces -= np.mean(training_trace_set, axis=0)
-        # testing_traces *= 20
+        testing_traces *= 40
 
     if plot:
         # Plot traces

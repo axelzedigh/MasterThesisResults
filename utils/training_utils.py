@@ -16,7 +16,7 @@ from configs.variables import PROJECT_DIR, NORD_LIGHT_ORANGE, \
     NORD_LIGHT_MPL_STYLE_PATH
 from plots.history_log_plots import plot_history_log
 from scripts.model_training.deep_learning_models import cnn_110_model, \
-    cnn_110_sgd_model, cnn_110_model_more
+    cnn_110_sgd_model, cnn_110_model_more, cnn_110_model_batch_normalization
 
 from scripts.model_training.deep_learning_models import cnn_110_model_simpler
 from utils.db_utils import get_test_trace_path
@@ -670,17 +670,12 @@ def training_deep_learning_model(
         deep_learning_model = cnn_110_model_simpler()
     elif training_model_id == 4:
         deep_learning_model = cnn_110_model_more()
+    elif training_model_id == 5:
+        deep_learning_model = cnn_110_model_batch_normalization()
     else:
         raise "No other model is currently investigated."
     if verbose:
         print(deep_learning_model.summary())
-
-    # Apply additive noise
-    if additive_noise_method_id is not None:
-        training_trace_set, additive_noise_trace = additive_noise_to_trace_set(
-            trace_set=training_trace_set,
-            additive_noise_method_id=additive_noise_method_id
-        )
 
     # Denoise the trace set.
     if denoising_method_id is not None:
@@ -692,7 +687,14 @@ def training_deep_learning_model(
 
     if trace_process_id == 11:
         training_trace_set -= np.mean(training_trace_set, axis=0)
-        # training_trace_set *= 20
+        training_trace_set *= 40
+
+    # Apply additive noise
+    if additive_noise_method_id is not None:
+        training_trace_set, additive_noise_trace = additive_noise_to_trace_set(
+            trace_set=training_trace_set,
+            additive_noise_method_id=additive_noise_method_id
+        )
 
     # Cut trace set to the sbox output range
     if trace_process_id in [12, 13, 14]:
