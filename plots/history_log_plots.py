@@ -123,7 +123,7 @@ def plot_history_log__overview_trace_process(
     additive_noise_method_ids = ["None", 1, 3, 4, 5, 6, 7, 8, 9, 10, 11]
     i = ncols + 1
     j = ncols * 2 + 1
-    k = ncols * 2 + 1
+    k = ncols * 3 + 1
     tot = 0
     for additive_noise in additive_noise_method_ids:
         tot += 1
