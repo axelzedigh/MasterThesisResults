@@ -181,6 +181,8 @@ QUERY_LIST_INITIALIZE_DB = [
     "INSERT INTO training_models VALUES (1,'cnn_110');",
     "INSERT INTO training_models VALUES (2,'cnn_110_sgd');",
     "INSERT INTO training_models VALUES (3,'cnn_110_simpler');",
+    "INSERT INTO training_models VALUES (4,'cnn_110_more');",
+    "INSERT INTO training_models VALUES (5,'cnn_110_batch_normalization');",
 
     "INSERT INTO additive_noise_methods VALUES (1,'Gaussian', 'Std', 0.01, "
     "'Mean', 0); ",
@@ -272,6 +274,7 @@ SELECT
     training_model,
     keybyte,
     epoch,
+    trace_process_id,
     additive_noise_method
         AS additive_method,
     additive_noise_method_parameter_1
@@ -302,6 +305,7 @@ GROUP BY
     training_dataset,
     environment,
     distance,
+    trace_process_id,
     additive_method,
     additive_param_1,
     additive_param_1_value,
