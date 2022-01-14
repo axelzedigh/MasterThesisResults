@@ -66,6 +66,8 @@ def df_to_latex__additive(
             "termination_point": "Termination point",
             "additive_noise_method": "Noise method",
             "device": "Device",
+            "epoch": "Epoch",
+            "Additive parameter 1": "Parameter Value",
         }
     )
 
@@ -94,8 +96,8 @@ def df_to_latex__additive(
     elif table_type == "per_additive_method":
         g = wang.groupby(["Noise method", "Device"])
         # wang = g.apply(lambda x: x.sample(g.size().min())).reset_index(
-        wang = g.apply(lambda x: x.sample(100)).reset_index(drop=True)
-        wang = wang.groupby(["Noise method"]).agg(
+        wang = g.apply(lambda x: x.sample(g.size().min())).reset_index(drop=True)
+        wang = wang.groupby(["Noise method", "Epoch", "Parameter Value"]).agg(
             {'Termination point': ['mean', 'std', 'count', interval_lower,
                                    interval_upper]})
         wang = wang.rename(
@@ -131,6 +133,8 @@ def df_to_latex__additive(
             "termination_point": "Termination point",
             "additive_noise_method": "Noise method",
             "device": "Device",
+            "epoch": "Epoch",
+            "Additive parameter 1": "Parameter Value",
         }
     )
     if table_type == "per_device":
@@ -158,9 +162,9 @@ def df_to_latex__additive(
         )
     elif table_type == "per_additive_method":
         g = zedigh.groupby(["Noise method", "Device"])
-        zedigh = g.apply(lambda x: x.sample(100)).reset_index(
+        zedigh = g.apply(lambda x: x.sample(g.size().min())).reset_index(
             drop=True)
-        zedigh = zedigh.groupby(["Noise method"]).agg(
+        zedigh = zedigh.groupby(["Noise method", "Epoch", "Parameter Value"]).agg(
             {'Termination point': ['mean', 'std', 'count', interval_lower,
                                    interval_upper]})
         zedigh = zedigh.rename(

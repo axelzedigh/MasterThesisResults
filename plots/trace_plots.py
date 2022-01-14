@@ -17,7 +17,8 @@ from utils.plot_utils import set_size
 from utils.trace_utils import get_training_trace_path
 from utils.training_utils import additive_noise__gaussian, \
     additive_noise__collected_noise__office_corridor, additive_noise__rayleigh, \
-    cut_trace_set__column_range__randomized, cut_trace_set__column_range
+    cut_trace_set__column_range__randomized, cut_trace_set__column_range, \
+    denoising_of_trace_set
 
 
 def plot_additive_noise_comparison_all(
@@ -430,6 +431,7 @@ def plot_example_normalized_training_trace(
         save_path: str = REPORT_DIR,
         file_format: str = "png",
         show: bool = False,
+        denoising_method_id: Optional[int] = None,
 ):
     """
 
@@ -505,6 +507,13 @@ def plot_example_normalized_training_trace(
     else:
         return "Trace_process_id is wrong!"
 
+    if denoising_method_id is not None:
+        training_trace_set, start, end, clean_trace = denoising_of_trace_set(
+            trace_set=training_trace_set,
+            denoising_method_id=denoising_method_id,
+            training_dataset_id=training_dataset_id,
+        )
+
     if trace_process_id == 11:
         training_trace_set -= np.mean(training_trace_set, axis=0)
         # training_trace_set *= 20
@@ -564,11 +573,157 @@ def plot_example_normalized_training_trace(
     plt.tight_layout()
 
     if save_path:
-        path = os.path.join(
-            save_path,
-            f"figures/{trace_process_id}",
-            f"example_normalized_training_trace.{file_format}",
+        if denoising_method_id:
+            path = os.path.join(
+                save_path,
+                f"figures/{trace_process_id}",
+                f"example_normalized_training_trace_denoising_{denoising_method_id}.{file_format}",
+            )
+            plt.savefig(path)
+        else:
+            path = os.path.join(
+                save_path,
+                f"figures/{trace_process_id}",
+                f"example_normalized_training_trace.{file_format}",
+            )
+            plt.savefig(path)
+    if show:
+        plt.show()
+
+
+def plot_example_normalized_training_trace_1_row(
+        training_dataset_id: int = 3,
+        trace_process_id: int = 3,
+        save_path: str = REPORT_DIR,
+        file_format: str = "pgf",
+        show: bool = False,
+        denoising_method_id: Optional[int] = None,
+):
+    """
+
+    :param training_dataset_id:
+    :param trace_process_id:
+    :param denoising_method_id:
+    :param save_path:
+    :param file_format:
+    :param show:
+    :return:
+    """
+    # MPL styling
+    plt.style.use(NORD_LIGHT_MPL_STYLE_2_PATH)
+    plt.rcParams.update({
+        "lines.linewidth": 1,
+    })
+    w, h = set_size(subplots=(0.5, 1), fraction=1)
+    fig, ax1 = plt.subplots(1, 1, figsize=(w, h))
+
+    # Get training traces path.
+    training_set_path = get_training_trace_path(training_dataset_id)
+
+    # Get training traces (based on trace process)
+    if trace_process_id in [3, 13]:
+        trace_set_file_path = os.path.join(
+            training_set_path, "nor_traces_maxmin.npy"
         )
-        plt.savefig(path)
+        training_trace_set = np.load(trace_set_file_path)
+    elif trace_process_id in [4, 5]:
+        trace_set_file_path = os.path.join(
+            training_set_path, "nor_traces_maxmin__sbox_range_204_314.npy"
+        )
+        training_trace_set = np.load(trace_set_file_path)
+    elif trace_process_id == 6:
+        trace_set_file_path = os.path.join(
+            training_set_path, "trace_process_6-max_avg(before_sbox).npy"
+        )
+        training_trace_set = np.load(trace_set_file_path)
+    elif trace_process_id == 7:
+        trace_set_file_path = os.path.join(
+            training_set_path, "trace_process_7-max_avg(sbox).npy"
+        )
+        training_trace_set = np.load(trace_set_file_path)
+    elif trace_process_id in [8, 11, 12]:
+        trace_set_file_path = os.path.join(
+            training_set_path, "trace_process_8-standardization_sbox.npy"
+        )
+        training_trace_set = np.load(trace_set_file_path)
+    elif trace_process_id == 9:
+        trace_set_file_path = os.path.join(
+            training_set_path, "trace_process_9-maxmin_[-1_1]_[0_400].npy"
+        )
+        training_trace_set = np.load(trace_set_file_path)
+    elif trace_process_id == 10:
+        trace_set_file_path = os.path.join(
+            training_set_path, "trace_process_10-maxmin_[-1_1]_[204_314].npy"
+        )
+        training_trace_set = np.load(trace_set_file_path)
+    elif trace_process_id == 14:
+        trace_set_file_path = os.path.join(
+            training_set_path, "trace_process_14-standardization_sbox.npy"
+        )
+        training_trace_set = np.load(trace_set_file_path)
+    else:
+        return "Trace_process_id is wrong!"
+
+    if denoising_method_id is not None:
+        training_trace_set, start, end, clean_trace = denoising_of_trace_set(
+            trace_set=training_trace_set,
+            denoising_method_id=denoising_method_id,
+            training_dataset_id=training_dataset_id,
+        )
+
+    if trace_process_id == 11:
+        training_trace_set -= np.mean(training_trace_set, axis=0)
+        training_trace_set *= 40
+
+    if training_dataset_id == 1:
+        ax1.plot(training_trace_set[0][204:314])
+        ax1.axhline(np.max(training_trace_set[0][204:314]))
+        ax1.axhline(np.min(training_trace_set[0][204:314]))
+    else:
+        if trace_process_id in [12, 13, 14]:
+            training_trace_set = cut_trace_set__column_range__randomized(
+                trace_set=training_trace_set,
+                range_start=130,
+                range_end=240,
+                randomize=1,
+            )
+        else:
+            training_trace_set = cut_trace_set__column_range(
+                trace_set=training_trace_set,
+                range_start=130,
+                range_end=240,
+            )
+        ax1.plot(training_trace_set[0])
+        ax1.plot(training_trace_set[111111])
+        ax1.plot(training_trace_set[-1])
+        # ax1.axhline(np.max(training_trace_set[0]))
+        # ax1.axhline(np.min(training_trace_set[0]))
+
+    if trace_process_id in [3, 4, 5, 6, 7]:
+        ax1.set_ylim(0, 1)
+    elif trace_process_id in [8, 12, 14]:
+        ax1.set_ylim(-2.5, 2.5)
+    elif trace_process_id in [11]:
+        # ax2.set_ylim(-2.5, 2.5)
+        pass
+    elif trace_process_id in [9, 10]:
+        ax1.set_ylim(-1, 1)
+    plt.tight_layout()
+
+    if save_path:
+        if denoising_method_id:
+            path = os.path.join(
+                save_path,
+                f"figures/{trace_process_id}",
+                f"example_normalized_training_trace_denoising_{denoising_method_id}__sbox.{file_format}",
+            )
+            plt.savefig(path)
+        else:
+            path = os.path.join(
+                save_path,
+                f"figures/{trace_process_id}",
+                f"example_normalized_training_trace__sbox.{file_format}",
+            )
+            plt.savefig(path)
     if show:
         plt.show()
