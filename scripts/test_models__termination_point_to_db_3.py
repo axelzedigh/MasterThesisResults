@@ -170,19 +170,18 @@ if __name__ == "__main__":
     elif case == 3:
         database = "main.db"
         # database = "tmp_1.db"
+        runs = 100
         # runs = 2
-        runs = 12
         test_dataset_ids = [1]
         training_dataset_ids = [3]
         environment_ids = [1]
         distances = [15]
-        # devices = [6, 7, 8, 9, 10]
-        devices = [8]
+        devices = [8, 9, 10]
+        # devices = [10]
         training_model_id = 1
-        # epochs = [x for x in range(2, 20)]
-        epochs = [12]
-        # additive_noise_method_ids = [None]
-        additive_noise_method_ids = [10]
+        # epochs = [x for x in range(2, 21)]
+        epochs = [13]
+        additive_noise_method_ids = [5]
         denoising_method_ids = [None]
         trace_process_ids = [12]
         plot = False

@@ -1,6 +1,6 @@
 import os
 import sqlite3 as lite
-from typing import Tuple, Optional
+from typing import Tuple, Optional, List
 
 import pandas as pd
 import seaborn as sns
@@ -196,6 +196,9 @@ def plot_best_additive_noise_methods_2(
         y_top: int = 1200,
         row_size: float = 2,
         col_size: float = 2,
+        x_label: bool = True,
+        y_label_subtext: Optional[str] = None,
+        custom_labels: bool = False,
 ) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """
     :param training_dataset:
@@ -301,12 +304,12 @@ def plot_best_additive_noise_methods_2(
         "additive_noise_method_parameter_1_value": "Additive parameter 1"},
         inplace=True)
     labels = [
-        "None",
-        f"Recorded: Scaling factor = {collected_value}",
-        f"Gaussian: $\sigma$ = {gaussian_value}",
-        f"Rayleigh: Mode = {rayleigh_value}"
+        f"None: $e_{{{epoch_none}}}$",
+        f"Re: {collected_value} $e_{{{epoch_collected}}}$",
+        f"G: {gaussian_value} $e_{{{epoch_gaussian}}}$",
+        f"Ra: {rayleigh_value} $e_{{{epoch_rayleigh}}}$",
     ]
-    sns1 = sns.barplot(
+    sns.barplot(
         x=full_rank_test__wang["device"],
         y=full_rank_test__wang["termination_point"],
         hue=full_rank_test__wang["additive_noise_method"],
@@ -314,16 +317,30 @@ def plot_best_additive_noise_methods_2(
         errwidth=1.5,
     )
     ax1.set_ylim(y_bottom, y_top)
-    ax1.set_ylabel("Termination point")
-    ax1.set_xlabel("Device\n(Wang 2021)")
-    ax1.legend(
-        # handles=custom_lines,
-        # labels=labels,
-        bbox_to_anchor=(0., 1, 1.5, 0),
-        loc="lower left",
-        mode="expand",
-        ncol=4
-    )
+    if y_label_subtext is not None:
+        ax1.set_ylabel(f"{y_label_subtext}\nTermination point")
+    else:
+        ax1.set_ylabel("Termination point")
+    if x_label:
+        ax1.set_xlabel("Device\n(Wang 2021)")
+    if custom_labels:
+        ax1.legend(
+            handles=custom_lines,
+            labels=labels,
+            bbox_to_anchor=(0., 1, 1.4, 0),
+            loc="lower left",
+            mode="expand",
+            ncol=5
+        )
+    else:
+        ax1.legend(
+            # handles=custom_lines,
+            # labels=labels,
+            bbox_to_anchor=(0., 1, 1.4, 0),
+            loc="lower left",
+            mode="expand",
+            ncol=5
+        )
 
     try:
         sns2 = sns.barplot(
@@ -336,7 +353,10 @@ def plot_best_additive_noise_methods_2(
         sns2.set(ylabel=None, yticklabels=[])
         sns2.tick_params(left=False)
         ax2.set_ylim(y_bottom, y_top)
-        ax2.set_xlabel("Device\n(Zedigh 2021)")
+        if x_label:
+            ax2.set_xlabel("Device\n(Zedigh 2021)")
+        else:
+            ax2.set_xlabel("")
         ax2.legend([], [], frameon=False)
     except:
         pass
@@ -497,6 +517,8 @@ def plot_all_of_an_additive_noise__report(
         save_path: Optional[str] = REPORT_DIR,
         file_format: str = "pgf",
         show: bool = False,
+        x_label: bool = True,
+        y_label_subtext: Optional[str] = None,
 ) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """
     :param training_dataset:
@@ -508,7 +530,9 @@ def plot_all_of_an_additive_noise__report(
     :param save_path:
     :param file_format:
     :param show:
+    :param x_label:
     """
+
     # MPL styling
     plt.style.use(NORD_LIGHT_MPL_STYLE_2_PATH)
     # custom_lines = NORD_LIGHT_4_CUSTOM_LINES
@@ -596,8 +620,12 @@ def plot_all_of_an_additive_noise__report(
         ax=ax1
     )
     ax1.set_ylim(ylim_bottom, ylim_top)
-    ax1.set_ylabel("Termination point")
-    ax1.set_xlabel("Device\n(Wang 2021)")
+    if y_label_subtext is not None:
+        ax1.set_ylabel(f"Termination point\n({y_label_subtext})")
+    else:
+        ax1.set_ylabel("Termination point")
+    if x_label:
+        ax1.set_xlabel("Device\n(Wang 2021)")
     ax1.legend(
         # handles=custom_lines,
         # labels=labels,
@@ -617,7 +645,8 @@ def plot_all_of_an_additive_noise__report(
         sns2.set(ylabel=None, yticklabels=[])
         sns2.tick_params(left=False)
         ax2.set_ylim(ylim_bottom, ylim_top)
-        ax2.set_xlabel("Device\n(Zedigh 2021)")
+        if x_label:
+            ax2.set_xlabel("Device\n(Zedigh 2021)")
         ax2.legend([], [], frameon=False)
     except:
         pass
@@ -657,6 +686,9 @@ def plot_all_of_an_additive_noise__report__2(
         y_top: int = 1200,
         row_size: float = 2,
         col_size: float = 2,
+        x_label: bool = True,
+        y_label_subtext: Optional[str] = None,
+        labels: Optional[List] = None,
 ) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """
     :param training_model:
@@ -681,11 +713,14 @@ def plot_all_of_an_additive_noise__report__2(
     :param y_top:
     :param row_size:
     :param col_size:
+    :param x_label:
+    :param y_label_subtext:
+    :param labels:
     """
 
     # MPL styling
     plt.style.use(NORD_LIGHT_MPL_STYLE_2_PATH)
-    # custom_lines = NORD_LIGHT_4_CUSTOM_LINES
+    custom_lines = NORD_LIGHT_4_CUSTOM_LINES
     w, h = set_size(subplots=(row_size, col_size), fraction=1)
     fig = plt.figure(constrained_layout=True, figsize=(w, h))
     gs = GridSpec(1, 7, figure=fig)
@@ -750,7 +785,8 @@ def plot_all_of_an_additive_noise__report__2(
             AND denoising_method IS NULL
             AND (additive_noise_method IS NULL OR additive_noise_method = '{additive_noise_method}')
             AND (
-                (additive_noise_method_parameter_1_value = {parameter_1_value_1} AND epoch = {epoch_1})
+                (additive_noise_method IS NULL AND epoch = {epoch_none})
+                OR (additive_noise_method_parameter_1_value = {parameter_1_value_1} AND epoch = {epoch_1})
                 OR (additive_noise_method_parameter_1_value = {parameter_1_value_2} AND epoch = {epoch_2})
                 OR (additive_noise_method_parameter_1_value = {parameter_1_value_3} AND epoch = {epoch_3})
                 OR (additive_noise_method_parameter_1_value = {parameter_1_value_4} AND epoch = {epoch_4})
@@ -779,16 +815,32 @@ def plot_all_of_an_additive_noise__report__2(
         ax=ax1
     )
     ax1.set_ylim(y_bottom, y_top)
-    ax1.set_ylabel("Termination point")
-    ax1.set_xlabel("Device\n(Wang 2021)")
-    ax1.legend(
-        # handles=custom_lines,
-        # labels=labels,
-        bbox_to_anchor=(0., 1, 1.4, 0),
-        loc="lower left",
-        mode="expand",
-        ncol=5
-    )
+    if y_label_subtext is not None:
+        ax1.set_ylabel(f"{y_label_subtext}\nTermination point")
+    else:
+        ax1.set_ylabel("Termination point")
+    if x_label:
+        ax1.set_xlabel("Device\n(Wang 2021)")
+    else:
+        ax1.set_xlabel("")
+    if labels:
+        ax1.legend(
+            handles=custom_lines,
+            labels=labels,
+            bbox_to_anchor=(0., 1, 1.4, 0),
+            loc="lower left",
+            mode="expand",
+            ncol=5
+        )
+    else:
+        ax1.legend(
+            # handles=custom_lines,
+            # labels=labels,
+            bbox_to_anchor=(0., 1, 1.4, 0),
+            loc="lower left",
+            mode="expand",
+            ncol=5
+        )
 
     try:
         sns2 = sns.barplot(
@@ -800,7 +852,10 @@ def plot_all_of_an_additive_noise__report__2(
         sns2.set(ylabel=None, yticklabels=[])
         sns2.tick_params(left=False)
         ax2.set_ylim(y_bottom, y_top)
-        ax2.set_xlabel("Device\n(Zedigh 2021)")
+        if x_label:
+            ax2.set_xlabel("Device\n(Zedigh 2021)")
+        else:
+            ax2.set_xlabel("")
         ax2.legend([], [], frameon=False)
     except:
         pass

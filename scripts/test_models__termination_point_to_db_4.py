@@ -56,10 +56,7 @@ def termination_point_test_and_insert_to_db(
     elif denoising_method_id == 5:
         filter_function = moving_average_filter_n11
 
-    tqdm_iterator = tqdm(
-        range(0, runs),
-        desc=f"add:{additive_noise_method_id} ep:{epoch}, Mean =  {termination_point}"
-    )
+    tqdm_iterator = tqdm(range(0, runs), desc=f"TP ep:{epoch}, Mean =  {termination_point}")
 
     t, p, k, c = termination_point_test_setup(
         database=database,
@@ -171,20 +168,20 @@ if __name__ == "__main__":
         database = "main.db"
         # database = "tmp_1.db"
         # runs = 2
-        runs = 12
+        runs = 100
         test_dataset_ids = [1]
         training_dataset_ids = [3]
         environment_ids = [1]
         distances = [15]
-        # devices = [6, 7, 8, 9, 10]
-        devices = [8]
+        devices = [6, 7, 8, 9, 10]
+        # devices = [10]
         training_model_id = 1
         # epochs = [x for x in range(2, 20)]
-        epochs = [12]
-        # additive_noise_method_ids = [None]
-        additive_noise_method_ids = [10]
+        epochs = [16]
+        additive_noise_method_ids = [None]
+        # additive_noise_method_ids = [5]
         denoising_method_ids = [None]
-        trace_process_ids = [12]
+        trace_process_ids = [8]
         plot = False
 
         for test_dataset_id in test_dataset_ids:

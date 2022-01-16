@@ -32,16 +32,16 @@ if __name__ == "__main__":
         epochs = 20
         batch_size = 100
         verbose = False
-        mode = 3
+        mode = 1
         shuffle = True
         sep_validation_dataset = False
         balance_dataset = True
 
         training_model_id = 1
         training_dataset_ids = [3]
-        additive_noise_method_ids = [None, 3, 4, 5, 10, 11]
+        additive_noise_method_ids = [5]
         denoising_method_ids = [None]
-        trace_process_ids = [10]
+        trace_process_ids = [12]
 
         for training_dataset_id in training_dataset_ids:
             for additive_noise_method_id in additive_noise_method_ids:

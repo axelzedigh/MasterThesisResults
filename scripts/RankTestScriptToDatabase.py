@@ -468,3 +468,53 @@ def termination_point_test__rank_test(
         plt.show()
 
     return term_point
+
+
+def termination_point_test__rank_test__2000(
+        testing_traces: np.array,
+        predictions: np.array,
+        key_interest: np.array,
+        cts_interest: np.array,
+        plot: bool = False,
+) -> Optional[int]:
+    """
+
+    :param testing_traces:
+    :param predictions:
+    :param key_interest:
+    :param cts_interest:
+    :param plot:
+    :return:
+    """
+
+    # randomly select trace for testing
+    number = 2000
+    average = 50   # 50
+    ranks_array = []
+
+    for i in range(average):
+        select = random.sample(range(len(testing_traces)), number)
+        selected_cts_interest = cts_interest[select]
+        selected_predictions = predictions[select]
+
+        # Calculate subkey probability for selected traces
+        probabilities = prediction_to_probability(
+            selected_cts_interest, selected_predictions, number
+        )
+        ranks = rank_cal(probabilities, key_interest, number)
+        ranks_array.append(ranks)
+
+    ranks_array = np.array(ranks_array)
+
+    term_point = None
+    for i in range(ranks_array.shape[1]):
+        if np.count_nonzero(ranks_array[:, i]) < int(average / 2):
+            term_point = i
+            break
+
+    if plot:
+        average_ranks = np.sum(ranks_array, axis=0) / average
+        plt.plot(average_ranks)
+        plt.show()
+
+    return term_point
