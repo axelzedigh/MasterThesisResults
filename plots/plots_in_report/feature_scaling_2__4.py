@@ -50,6 +50,14 @@ if __name__ == '__main__':
         # show=True,
         y_top=1000,
         row_size=1,
+        x_label=False,
+        y_label_subtext="Gaussian",
+        labels=[
+            f"None $e_{{{epoch_none}}}$",
+            f"0.03 $e_{{{20}}}$",
+            f"0.04 $e_{{{9}}}$",
+            f"0.05 $e_{{{16}}}$",
+        ],
     )
 
     plot_all_of_an_additive_noise__report__2(
@@ -67,6 +75,13 @@ if __name__ == '__main__':
         # show=True,
         y_top=1000,
         row_size=1,
+        x_label=False,
+        y_label_subtext="Recorded",
+        labels=[
+            f"None $e_{{{epoch_none}}}$",
+            f"25 $e_{{{12}}}$",
+            f"50 $e_{{{7}}}$",
+        ],
     )
 
     plot_all_of_an_additive_noise__report__2(
@@ -84,6 +99,13 @@ if __name__ == '__main__':
         # show=True,
         y_top=1000,
         row_size=1,
+        x_label=False,
+        y_label_subtext="Rayleigh",
+        labels=[
+            f"None $e_{{{epoch_none}}}$",
+            f"0.0138 $e_{{{20}}}$",
+            f"0.0276 $e_{{{15}}}$",
+        ],
     )
 
     wang, zedigh = plot_best_additive_noise_methods_2(
@@ -101,6 +123,9 @@ if __name__ == '__main__':
         # show=True,
         y_top=1000,
         row_size=1,
+        x_label=True,
+        y_label_subtext="Best Additive Noise",
+        custom_labels=True
     )
 
     df_to_latex__additive(

@@ -14,21 +14,21 @@ if __name__ == '__main__':
         file_format="pgf", show=False, denoising_method_id=None
     )
 
-    plot_epoch_comparison_report(
-        training_model_id=1,
-        training_dataset_id=3,
-        test_dataset_id=1,
-        trace_process_id=trace_process_id,
-        environment_id=1,
-        distance=15,
-        device=10,
-        additive_noise_method_id=11,
-        save_path=REPORT_DIR,
-        file_format="pgf",
-        # show=True,
-        y_bottom=100,
-        y_top=400,
-    )
+    # plot_epoch_comparison_report(
+    #     training_model_id=1,
+    #     training_dataset_id=3,
+    #     test_dataset_id=1,
+    #     trace_process_id=trace_process_id,
+    #     environment_id=1,
+    #     distance=15,
+    #     device=10,
+    #     additive_noise_method_id=11,
+    #     save_path=REPORT_DIR,
+    #     file_format="pgf",
+    #     # show=True,
+    #     y_bottom=100,
+    #     y_top=400,
+    # )
 
     epoch_none = 6  # ??
     plot_all_of_an_additive_noise__report__2(
@@ -39,13 +39,20 @@ if __name__ == '__main__':
         parameter_1_value_3=0.04,
         parameter_1_value_4=0.05,
         epoch_none=epoch_none,
-        epoch_1=20,  # ??
-        epoch_2=20,
-        epoch_3=7,  # ??
-        epoch_4=16,
+        epoch_1=0,
+        epoch_2=0,
+        epoch_3=0,
+        epoch_4=0,
         # show=True,
         y_top=1000,
         row_size=1,
+        x_label=False,
+        y_label_subtext="Gaussian",
+        labels=[
+            f"None $e_{{{epoch_none}}}$",
+            f"0.03 $e_{{{0}}}$",
+            f"0.04 $e_{{{0}}}$",
+        ],
     )
 
     plot_all_of_an_additive_noise__report__2(
@@ -56,13 +63,22 @@ if __name__ == '__main__':
         parameter_1_value_3=75,
         parameter_1_value_4=105,
         epoch_none=epoch_none,
-        epoch_1=20,  # Not investigated yet
+        epoch_1=20,
         epoch_2=7,
-        epoch_3=12,  # Not investigated yet
+        epoch_3=12,
         epoch_4=19,
         # show=True,
         y_top=1000,
         row_size=1,
+        x_label=False,
+        y_label_subtext="Recorded",
+        labels=[
+            f"None $e_{{{epoch_none}}}$",
+            f"25 $e_{{{20}}}$",
+            f"50 $e_{{{7}}}$",
+            f"75 $e_{{{12}}}$",
+            f"100 $e_{{{19}}}$",
+        ],
     )
 
     plot_all_of_an_additive_noise__report__2(
@@ -80,6 +96,13 @@ if __name__ == '__main__':
         # show=True,
         y_top=1000,
         row_size=1,
+        x_label=False,
+        y_label_subtext="Rayleigh",
+        labels=[
+            f"None $e_{{{epoch_none}}}$",
+            f"0.0138 $e_{{{20}}}$",
+            f"0.0276 $e_{{{15}}}$",
+        ],
     )
 
     wang, zedigh = plot_best_additive_noise_methods_2(
@@ -97,6 +120,9 @@ if __name__ == '__main__':
         # show=True,
         y_top=1000,
         row_size=1,
+        x_label=True,
+        y_label_subtext="Best Additive Noise",
+        custom_labels=True
     )
 
     df_to_latex__additive(
@@ -119,8 +145,8 @@ if __name__ == '__main__':
 
     plot_histogram_overview(
         training_model_id=1,
-        training_dataset_id=training_dataset_id,
-        test_dataset_id=test_dataset_id,
+        training_dataset_id=3,
+        test_dataset_id=1,
         environment_id=1,
         trace_process_id=3,
         device=6,

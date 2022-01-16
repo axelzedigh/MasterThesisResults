@@ -626,10 +626,12 @@ def plot_example_normalized_training_trace_1_row(
             training_set_path, "nor_traces_maxmin.npy"
         )
         training_trace_set = np.load(trace_set_file_path)
+        label = "MaxMin [0, 1]\nWhole trace"
     elif trace_process_id in [4, 5]:
         trace_set_file_path = os.path.join(
             training_set_path, "nor_traces_maxmin__sbox_range_204_314.npy"
         )
+        label = "MaxMin [0, 1]\nSbox"
         training_trace_set = np.load(trace_set_file_path)
     elif trace_process_id == 6:
         trace_set_file_path = os.path.join(
@@ -646,15 +648,23 @@ def plot_example_normalized_training_trace_1_row(
             training_set_path, "trace_process_8-standardization_sbox.npy"
         )
         training_trace_set = np.load(trace_set_file_path)
+        if trace_process_id == 8:
+            label = "Standardization Sbox"
+        elif trace_process_id == 11:
+            label = "Standardization Sbox\nMean difference"
+        elif trace_process_id == 12:
+            label = "Standardization Sbox\nTranslation"
     elif trace_process_id == 9:
         trace_set_file_path = os.path.join(
             training_set_path, "trace_process_9-maxmin_[-1_1]_[0_400].npy"
         )
         training_trace_set = np.load(trace_set_file_path)
+        label = "MaxMin [-1, 1]\nWhole trace"
     elif trace_process_id == 10:
         trace_set_file_path = os.path.join(
             training_set_path, "trace_process_10-maxmin_[-1_1]_[204_314].npy"
         )
+        label = "MaxMin [-1, 1]\nSbox"
         training_trace_set = np.load(trace_set_file_path)
     elif trace_process_id == 14:
         trace_set_file_path = os.path.join(
@@ -698,6 +708,8 @@ def plot_example_normalized_training_trace_1_row(
         ax1.plot(training_trace_set[-1])
         # ax1.axhline(np.max(training_trace_set[0]))
         # ax1.axhline(np.min(training_trace_set[0]))
+
+    ax1.set_ylabel(label)
 
     if trace_process_id in [3, 4, 5, 6, 7]:
         ax1.set_ylim(0, 1)

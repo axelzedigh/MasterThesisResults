@@ -47,6 +47,14 @@ if __name__ == '__main__':
         # show=True,
         y_top=1000,
         row_size=1,
+        x_label=False,
+        y_label_subtext="Gaussian",
+        labels=[
+            f"None $e_{{{epoch_none}}}$",
+            f"0.03 $e_{{{7}}}$",
+            f"0.04 $e_{{{7}}}$",
+            f"0.05 $e_{{{19}}}$",
+        ],
     )
 
     plot_all_of_an_additive_noise__report__2(
@@ -58,12 +66,19 @@ if __name__ == '__main__':
         parameter_1_value_4=105,
         epoch_none=epoch_none,
         epoch_1=12,
-        epoch_2=0,
+        epoch_2=4,
         epoch_3=0,
         epoch_4=0,
         # show=True,
         y_top=1000,
         row_size=1,
+        x_label=False,
+        y_label_subtext="Recorded",
+        labels=[
+            f"None $e_{{{epoch_none}}}$",
+            f"25 $e_{{{12}}}$",
+            f"50 $e_{{{4}}}$",
+        ],
     )
 
     plot_all_of_an_additive_noise__report__2(
@@ -81,6 +96,13 @@ if __name__ == '__main__':
         # show=True,
         y_top=1000,
         row_size=1,
+        x_label=False,
+        y_label_subtext="Rayleigh",
+        labels=[
+            f"None $e_{{{epoch_none}}}$",
+            f"0.0138 $e_{{{6}}}$",
+            f"0.0276 $e_{{{13}}}$",
+        ],
     )
 
     wang, zedigh = plot_best_additive_noise_methods_2(
@@ -88,16 +110,19 @@ if __name__ == '__main__':
         trace_process_id=trace_process_id,
         save_path=REPORT_DIR,
         file_format="pgf",
-        gaussian_value=0.05,  # ???
-        collected_value=50,  # ???
-        rayleigh_value=0.0138,  # ???
+        gaussian_value=0.05,
+        collected_value=50,
+        rayleigh_value=0.0138,
         epoch_none=epoch_none,
-        epoch_gaussian=19,  # ???
-        epoch_collected=7,  # ???
-        epoch_rayleigh=6,  # ???
+        epoch_gaussian=19,
+        epoch_collected=4,
+        epoch_rayleigh=6,
         # show=True,
         y_top=1000,
         row_size=1,
+        x_label=True,
+        y_label_subtext="Best Additive Noise",
+        custom_labels=True
     )
 
     df_to_latex__additive(

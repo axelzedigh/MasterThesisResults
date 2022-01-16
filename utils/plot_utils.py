@@ -92,6 +92,7 @@ def df_to_latex__additive(
             label=label + "_wang",
             escape=False,
             caption=f"Table for Wang 2021 dataset (trace process {trace_process_id})",
+            position="H",
         )
     elif table_type == "per_additive_method":
         g = wang.groupby(["Noise method", "Device"])
@@ -116,6 +117,7 @@ def df_to_latex__additive(
             label=label + "_wang",
             escape=False,
             caption=f"Table for Wang 2021 dataset (trace process {trace_process_id})",
+            position="H",
         )
 
     file_path = os.path.join(
@@ -158,7 +160,8 @@ def df_to_latex__additive(
             float_format="%.0f",
             label=label + "_zedigh",
             escape=False,
-            caption=f"Table for Zedigh 2021 dataset (trace process {trace_process_id})"
+            caption=f"Table for Zedigh 2021 dataset (trace process {trace_process_id})",
+            position="H",
         )
     elif table_type == "per_additive_method":
         g = zedigh.groupby(["Noise method", "Device"])
@@ -183,6 +186,7 @@ def df_to_latex__additive(
             label=label + "_wang",
             escape=False,
             caption=f"Table for Wang 2021 dataset (trace process {trace_process_id})",
+            position="H",
         )
 
     file_path = os.path.join(

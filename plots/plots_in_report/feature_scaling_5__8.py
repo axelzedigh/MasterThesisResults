@@ -33,7 +33,7 @@ if __name__ == '__main__':
         y_top=400,
     )
 
-    epoch_none = 0
+    epoch_none = 16
     plot_all_of_an_additive_noise__report__2(
         trace_process_id=trace_process_id,
         additive_noise_method='Gaussian',
@@ -42,31 +42,46 @@ if __name__ == '__main__':
         parameter_1_value_3=0.04,
         parameter_1_value_4=0.05,
         epoch_none=epoch_none,
-        epoch_1=20,
+        epoch_1=0,
         epoch_2=10,
-        epoch_3=7,  # ??
+        epoch_3=5,
         epoch_4=17,
         # show=True,
         y_top=1000,
         row_size=1,
+        x_label=False,
+        y_label_subtext="Gaussian",
+        labels=[
+            f"None $e_{{{epoch_none}}}$",
+            f"0.03 $e_{{{10}}}$",
+            f"0.04 $e_{{{5}}}$",
+            f"0.05 $e_{{{17}}}$",
+        ],
     )
 
-    # plot_all_of_an_additive_noise__report__2(
-    #     trace_process_id=trace_process_id,
-    #     additive_noise_method='Collected',
-    #     parameter_1_value_1=25,
-    #     parameter_1_value_2=50,
-    #     parameter_1_value_3=75,
-    #     parameter_1_value_4=105,
-    #     epoch_none=epoch_none,
-    #     epoch_1=0,
-    #     epoch_2=17,
-    #     epoch_3=0,
-    #     epoch_4=0,
-    #     show=True,
-    #     y_top=1000,
-    #     row_size=1,
-    # )
+    plot_all_of_an_additive_noise__report__2(
+        trace_process_id=trace_process_id,
+        additive_noise_method='Collected',
+        parameter_1_value_1=25,
+        parameter_1_value_2=50,
+        parameter_1_value_3=75,
+        parameter_1_value_4=105,
+        epoch_none=epoch_none,
+        epoch_1=9,
+        epoch_2=8,
+        epoch_3=0,
+        epoch_4=0,
+        # show=True,
+        y_top=1000,
+        row_size=1,
+        x_label=False,
+        y_label_subtext="Recorded",
+        labels=[
+            f"None $e_{{{epoch_none}}}$",
+            f"25 $e_{{{9}}}$",
+            f"50 $e_{{{8}}}$",
+        ],
+    )
 
     plot_all_of_an_additive_noise__report__2(
         trace_process_id=trace_process_id,
@@ -83,6 +98,13 @@ if __name__ == '__main__':
         # show=True,
         y_top=1000,
         row_size=1,
+        x_label=False,
+        y_label_subtext="Rayleigh",
+        labels=[
+            f"None $e_{{{epoch_none}}}$",
+            f"0.0138 $e_{{{6}}}$",
+            f"0.0276 $e_{{{15}}}$",
+        ],
     )
 
     wang, zedigh = plot_best_additive_noise_methods_2(
@@ -95,11 +117,14 @@ if __name__ == '__main__':
         rayleigh_value=0.0138,
         epoch_none=epoch_none,
         epoch_gaussian=17,
-        epoch_collected=0,
-        epoch_rayleigh=0,
+        epoch_collected=8,
+        epoch_rayleigh=6,
         # show=True,
         y_top=1000,
         row_size=1,
+        x_label=True,
+        y_label_subtext="Best Additive Noise",
+        custom_labels=True
     )
 
     df_to_latex__additive(
