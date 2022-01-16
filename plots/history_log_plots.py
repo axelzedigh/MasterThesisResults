@@ -1,5 +1,5 @@
 import os
-from typing import Optional
+from typing import Optional, List, Dict
 
 import numpy as np
 import pandas as pd
@@ -96,9 +96,13 @@ def plot_history_log__overview_trace_process(
         last_denoising: int = 2,
         nrows: int = 4,
         ncols: int = 4,
+        add_axv_dict: Optional[Dict] = None,
+        den_axv_dict: Optional[Dict] = None,
 ) -> None:
     """
     Plot the history function. Accuracy on the left, loss on the right.
+    add_axv_list = {1: 9, 4: 7,..., id: epoch}. Additive.
+    den_axv_list = {1: 9, 4: 7,..., id: epoch}. Denoising.
     """
 
     # MPL styling
@@ -230,6 +234,7 @@ def plot_history_log__overview_trace_process(
             ax1.xaxis.set_major_locator(ticker.MaxNLocator(integer=True, nbins=5))
             ax1.set_ylim(0, 2.5)
             ax2.set_ylim(4.6, 5.6)
+            ax1.axvline(add_axv_dict[additive_noise], linestyle="--")
         except:
             pass
 
@@ -301,6 +306,7 @@ def plot_history_log__overview_trace_process(
             ax1.xaxis.set_major_locator(ticker.MaxNLocator(integer=True, nbins=5))
             ax1.set_ylim(0, 2.5)
             ax2.set_ylim(4.6, 5.6)
+            ax1.axvline(den_axv_dict[denoising_method], linestyle="--")
         except:
             pass
 
