@@ -93,6 +93,7 @@ def plot_history_log__overview_trace_process(
         last_gaussian: int = 5,
         last_collected: int = 9,
         last_rayleigh: int = 11,
+        last_denoising: int = 2,
         nrows: int = 4,
         ncols: int = 4,
 ) -> None:
@@ -121,9 +122,11 @@ def plot_history_log__overview_trace_process(
     fig = plt.figure(figsize=(w, h))
     fig.subplots_adjust(hspace=0.2, wspace=0.2)
     additive_noise_method_ids = ["None", 1, 3, 4, 5, 6, 7, 8, 9, 10, 11]
+    denoising_method_ids = [1, 2, 3, 4, 5]
     i = ncols + 1
     j = ncols * 2 + 1
     k = ncols * 3 + 1
+    m = ncols * 4 + 1
     tot = 0
     for additive_noise in additive_noise_method_ids:
         tot += 1
@@ -161,7 +164,7 @@ def plot_history_log__overview_trace_process(
                 if j != ncols * 2 + 1:
                     ax1.yaxis.set_major_formatter(ticker.NullFormatter())
                 else:
-                    ax1.set_ylabel("Collected")
+                    ax1.set_ylabel("Recorded")
                 j += 1
             elif additive_noise in [10, 11]:
                 ax1 = plt.subplot(nrows, ncols, k)
@@ -229,6 +232,78 @@ def plot_history_log__overview_trace_process(
             ax2.set_ylim(4.6, 5.6)
         except:
             pass
+
+    for denoising_method in denoising_method_ids:
+        tot += 1
+        try:
+            training_file_path = get_training_model_file_path(
+                database="main.db",
+                training_model_id=1,
+                additive_noise_method_id=None,
+                denoising_method_id=denoising_method,
+                epoch=1,
+                keybyte=0,
+                trace_process_id=trace_process_id,
+                training_dataset_id=training_dataset_id,
+            )
+            training_path = os.path.dirname(training_file_path)
+            history_log_file_path = os.path.join(training_path, "history_log.npy")
+            history_log_npy = np.load(history_log_file_path, allow_pickle=True)
+            history_log = history_log_npy.tolist()
+            history_log = pd.DataFrame(history_log)
+            if denoising_method:
+                ax1 = plt.subplot(nrows, ncols, m)
+                ax1.yaxis.set_major_formatter(ticker.StrMethodFormatter("{x:.1f}"))
+                if m != ncols * 4 + 1:
+                    ax1.yaxis.set_major_formatter(ticker.NullFormatter())
+                else:
+                    ax1.set_ylabel("Denoising")
+                m += 1
+            try:
+                history_log["accuracy"] = history_log["accuracy"].apply(lambda x: x*100)
+                ax1.plot(history_log["accuracy"], solid_capstyle="round",
+                         label="Accuracy")
+            except:
+                pass
+            try:
+                history_log["categorical_accuracy"] = history_log["categorical_accuracy"].apply(lambda x: x*100)
+                ax1.plot(history_log["categorical_accuracy"],
+                         solid_capstyle="round", label="Accuracy")
+            except:
+                pass
+            try:
+                history_log["val_accuracy"] = history_log["val_accuracy"].apply(lambda x: x*100)
+                ax1.plot(history_log["val_accuracy"], solid_capstyle="round",
+                         label="Validation Accuracy")
+            except:
+                pass
+            try:
+                history_log["val_categorical_accuracy"] = history_log["val_categorical_accuracy"].apply(lambda x: x*100)
+                ax1.plot(history_log["val_categorical_accuracy"],
+                         solid_capstyle="round", label="Validation Accuracy")
+            except:
+                pass
+
+            ax2 = ax1.twinx()
+            ax2.plot(history_log["loss"], label="Loss", color=NORD_LIGHT_RED)
+            ax2.plot(history_log["val_loss"], label="Validation Loss", color=NORD_LIGHT_YELLOW)
+            ax2.yaxis.set_major_formatter(ticker.NullFormatter())
+            if denoising_method in [last_denoising]:
+                ax2.yaxis.set_major_formatter(ticker.StrMethodFormatter("{x:.1f}"))
+
+            if denoising_method == 1:
+                ax1.set_title("$MAF_3$")
+            elif denoising_method == 2:
+                ax1.set_title("$MAF_5$")
+            elif denoising_method == 3:
+                ax1.set_title("Wiener Filter")
+
+            ax1.xaxis.set_major_locator(ticker.MaxNLocator(integer=True, nbins=5))
+            ax1.set_ylim(0, 2.5)
+            ax2.set_ylim(4.6, 5.6)
+        except:
+            pass
+
 
     fig.legend(
         handles=custom_lines,

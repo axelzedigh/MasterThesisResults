@@ -57,7 +57,7 @@ if __name__ == '__main__':
         last_gaussian=5,
         last_collected=9,
         last_rayleigh=11,
-        nrows=4,
+        nrows=5,
         ncols=4,
     )
 
@@ -81,6 +81,6 @@ if __name__ == '__main__':
         last_gaussian=5,
         last_collected=9,
         last_rayleigh=11,
-        nrows=4,
+        nrows=5,
         ncols=4,
     )
