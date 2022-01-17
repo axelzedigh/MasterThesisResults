@@ -2,6 +2,7 @@
 from configs.variables import REPORT_DIR
 from plots.histogram_plots import plot_histogram_overview
 from plots.history_log_plots import plot_history_log__overview_trace_process
+from plots.noise_plots import plot_recorded_noise
 from plots.rank_test_plots import plot_best_additive_noise_methods_2, \
     plot_epoch_comparison_report, plot_all_of_an_additive_noise__report, \
     plot_all_of_a_denoising_method__report, \
@@ -12,7 +13,7 @@ from utils.plot_utils import df_to_latex__additive
 if __name__ == "__main__":
     # Additive noise example
     # additive_noise_example_plot()
-    # plot_recorded_noise(file_format="pgf", show=True)
+    plot_recorded_noise(file_format="pgf", show=True)
     # plot_training_diff_psd(
     #     training_dataset_id=3,
     #     additive_noise_method_id=None,

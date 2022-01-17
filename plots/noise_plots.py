@@ -37,11 +37,11 @@ def plot_recorded_noise(
     })
 
     # MLP fig/ax
-    w, h = set_size(subplots=(2, 2), fraction=1)
+    w, h = set_size(subplots=(1, 2), fraction=1)
     fig = plt.figure(constrained_layout=True, figsize=(w, h))
-    gs = GridSpec(2, 1, figure=fig)
+    gs = GridSpec(1, 1, figure=fig)
     ax1 = fig.add_subplot(gs[0:1, 0])
-    ax2 = fig.add_subplot(gs[1:2, 0])
+    # ax2 = fig.add_subplot(gs[1:2, 0])
 
     # Get noise data
     project_dir = os.getenv("MASTER_THESIS_RESULTS")
@@ -76,11 +76,11 @@ def plot_recorded_noise(
         color=NORD_LIGHT_RED, rwidth=4
     )
     ax1.set_xlabel("Sample data amplitude")
-    ax1.set_ylabel("Frequency")
+    ax1.set_ylabel("Frequency\nof occurance")
     ax1.legend(labels=["Recorded noise", "Rayleigh, mode=0.00055"], loc=1)
 
-    ax2.psd(x=noise_traces_fixed, Fs=5e6)
-    ax2.set_xlim(0, 100000)
+    # ax2.psd(x=noise_traces_fixed, Fs=5e6)
+    # ax2.set_xlim(0, 100000)
 
     # plt.tight_layout()
     if save_path:

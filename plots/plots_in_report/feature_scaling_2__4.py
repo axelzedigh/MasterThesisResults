@@ -113,8 +113,8 @@ if __name__ == '__main__':
         trace_process_id=trace_process_id,
         save_path=REPORT_DIR,
         file_format="pgf",
-        gaussian_value=0.05,    # ??
-        collected_value=50,     # ??
+        gaussian_value=0.05,
+        collected_value=50,
         rayleigh_value=0.0138,
         epoch_none=epoch_none,
         epoch_gaussian=16,
