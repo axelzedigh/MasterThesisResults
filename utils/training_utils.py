@@ -643,6 +643,7 @@ def training_deep_learning_model(
         training_trace_set, labels = undersample.fit_resample(
             training_trace_set, labels
         )
+        print(len(training_trace_set))
 
     # Shuffle training data
     if shuffle_trace_and_label_sets:

@@ -1,14 +1,16 @@
+import os
 import sqlite3 as lite
-from typing import List
+from typing import List, Optional
 
 import numpy as np
 import pandas as pd
-from matplotlib import pyplot as plt
+from matplotlib import pyplot as plt, ticker
 
 from configs.variables import NORD_LIGHT_MPL_STYLE_PATH, \
     NORD_LIGHT_4_CUSTOM_LINES, NORD_LIGHT_RED, NORD_LIGHT_ORANGE, \
-    NORD_LIGHT_BLUE, NORD_LIGHT_LIGHT_BLUE
+    NORD_LIGHT_BLUE, NORD_LIGHT_LIGHT_BLUE, REPORT_DIR
 from utils.db_utils import get_db_absolute_path
+from utils.plot_utils import set_size
 from utils.statistic_utils import root_mean_square
 
 
@@ -87,6 +89,9 @@ def plot_test_trace_metadata_depth__mean(
         devices: List[int] = (6, 7, 8, 9, 10),
         trace_process_id: int = 2,
         environment_id: int = 1,
+        save_path: Optional[str] = REPORT_DIR,
+        file_format: str = "pgf",
+        show: bool = False,
 ):
     """
     :param test_dataset_id:
@@ -98,28 +103,42 @@ def plot_test_trace_metadata_depth__mean(
 
     # MPL styling
     plt.style.use(NORD_LIGHT_MPL_STYLE_PATH)
+    w, h = set_size(subplots=(1, 1), fraction=1)
+    fig = plt.figure(constrained_layout=True, figsize=(w, h))
+    # plt.subplots_adjust(hspace=0.5)
+    plt.rcParams.update({
+        "ytick.labelsize": "xx-small",
+        "xtick.labelsize": "xx-small",
+        "axes.titlesize": "x-small",
+        "grid.alpha": "0.25",
+    })
 
     database = get_db_absolute_path("main.db")
     con2 = lite.connect(database)
-    query = "select * from trace_metadata_depth;"
+    query = f"""
+            select 
+                * 
+            from 
+                trace_metadata_depth
+            where
+                test_dataset_id = {test_dataset_id}
+                AND environment_id = {environment_id}
+                AND trace_process_id = {trace_process_id}
+                AND distance = {distance}
+            ;
+    """
     raw_data = pd.read_sql_query(query, con2)
     con2.close()
 
-    plt.figure(figsize=(20, 5))
-    plt.subplots_adjust(hspace=0.5)
     i = 1
     for device in devices:
-        ax = plt.subplot(1, 5, i)
+        ax = plt.subplot(1, len(devices), i)
         if trace_process_id == 2:
             ax.set_ylim(0.0015, 0.014)
         elif trace_process_id == 3 or 4:
             ax.set_ylim(0, 1)
         data = raw_data.copy()
-        data = data[data["distance"] == distance]
         data = data[data["device"] == device]
-        data = data[data["environment_id"] == environment_id]
-        data = data[data["trace_process_id"] == trace_process_id]
-        data = data[data["test_dataset_id"] == test_dataset_id]
         data[204:314].plot(x="data_point_index", y="mean_val", ax=ax)
         top_value = np.max(data[204:314]["mean_val"], axis=0)
         bottom_value = np.min(data[204:314]["mean_val"], axis=0)
@@ -138,7 +157,8 @@ def plot_test_trace_metadata_depth__mean(
                 f'Range: {round(dyn_range, 4)}\nScaling: {round(scaling_factor)}',
                 horizontalalignment='left',
                 verticalalignment='top',
-                transform=ax.transAxes
+                transform=ax.transAxes,
+                fontsize=6,
             )
         else:
             ax.text(
@@ -146,15 +166,136 @@ def plot_test_trace_metadata_depth__mean(
                 f'Range: {round(dyn_range, 4)}\nScaling: {round(scaling_factor)}',
                 horizontalalignment='left',
                 verticalalignment='top',
-                transform=ax.transAxes
+                transform=ax.transAxes,
+                fontsize=6,
             )
+        if i > 1:
+            ax.yaxis.set_major_formatter(ticker.NullFormatter())
         i += 1
+        # ax.set_title(
+        #     f"""Distance: {distance}m, Device: {device}\nStd: {mean_std}, SNR: {mean_snr}"""
+        # )
         ax.set_title(
-            f"""Distance: {distance}m, Device: {device}\nStd: {mean_std}, SNR: {mean_snr}"""
+            f"""$D_{{{device}}}$, $\sigma$: {mean_std}\nSNR: {mean_snr}"""
         )
         ax.get_legend().remove()
         ax.set_xlabel("")
-    plt.show()
+    # plt.tight_layout()
+    if save_path:
+        save_path = os.path.join(
+            save_path,
+            f"figures/{trace_process_id}/trace_depth_mean__test_dataset_{test_dataset_id}_trace_process_{trace_process_id}_dist_{int(distance)}__env_{environment_id}.{file_format}"
+        )
+        plt.savefig(save_path)
+    if show:
+        plt.show()
+
+
+def plot_test_trace_metadata_depth__rms__report(
+        test_dataset_id: int = 1,
+        distance: float = 15,
+        devices: List[int] = (6, 7, 8, 9, 10),
+        trace_process_id: int = 2,
+        environment_id: int = 1,
+        save_path: Optional[str] = REPORT_DIR,
+        file_format: str = "pgf",
+        show: bool = False,
+):
+    """
+    :param test_dataset_id:
+    :param distance:
+    :param devices:
+    :param trace_process_id:
+    :param environment_id:
+    """
+
+    # MPL styling
+    plt.style.use(NORD_LIGHT_MPL_STYLE_PATH)
+    w, h = set_size(subplots=(1, 1), fraction=1)
+    fig = plt.figure(constrained_layout=True, figsize=(w, h))
+    plt.rcParams.update({
+        "ytick.labelsize": "xx-small",
+        "xtick.labelsize": "xx-small",
+        "axes.titlesize": "x-small",
+        "grid.alpha": "0.25",
+    })
+
+    database = get_db_absolute_path("main.db")
+    con2 = lite.connect(database)
+    query = f"""
+            select 
+                * 
+            from 
+                trace_metadata_depth
+            where
+                test_dataset_id = {test_dataset_id}
+                AND environment_id = {environment_id}
+                AND trace_process_id = {trace_process_id}
+                AND distance = {distance}
+            ;
+    """
+    raw_data = pd.read_sql_query(query, con2)
+    con2.close()
+
+    i = 1
+    for device in devices:
+        ax = plt.subplot(1, len(devices), i)
+        if trace_process_id == 2:
+            ax.set_ylim(0.0015, 0.014)
+        elif trace_process_id == 3 or 4:
+            ax.set_ylim(0, 1)
+        data = raw_data.copy()
+        data = data[data["device"] == device]
+        data[204:314].plot(x="data_point_index", y="rms_val", ax=ax)
+        top_value = np.max(data[204:314]["rms_val"], axis=0)
+        bottom_value = np.min(data[204:314]["rms_val"], axis=0)
+        dyn_range = top_value - bottom_value
+        scaling_factor = 1 / (max(data["mean_val"]) - min(data["mean_val"]))
+        # mean_mean = np.mean(data[204:314]["mean_val"], axis=0)
+        mean_rms = root_mean_square(data[204:314]["rms_val"])
+        mean_std = round(root_mean_square(data[204:314]["std_val"]), 5)
+        mean_snr = round(np.mean(data[204:314]["snr_val"], axis=0), 1)
+        ax.axhline(top_value, c=NORD_LIGHT_BLUE)
+        ax.axhline(bottom_value, c=NORD_LIGHT_BLUE)
+        ax.axhline(mean_rms, c=NORD_LIGHT_ORANGE)
+        if round(top_value, 5) < 0.012:
+            ax.text(
+                0.02, 0.97,
+                f'Range: {round(dyn_range, 4)}\nScaling: {round(scaling_factor)}',
+                horizontalalignment='left',
+                verticalalignment='top',
+                transform=ax.transAxes,
+                fontsize=6,
+            )
+        else:
+            ax.text(
+                0.05, 0.1,
+                f'Range: {round(dyn_range, 4)}\nScaling: {round(scaling_factor)}',
+                horizontalalignment='left',
+                verticalalignment='top',
+                transform=ax.transAxes,
+                fontsize=6,
+            )
+        if i > 1:
+            ax.yaxis.set_major_formatter(ticker.NullFormatter())
+        i += 1
+        # ax.set_title(
+        #     f"""Distance: {distance}m, Device: {device}\nStd: {mean_std}, SNR: {mean_snr}"""
+        # )
+        ax.set_title(
+            f"""$D_{{{device}}}$, $\sigma$: {mean_std}\nSNR: {mean_snr}"""
+        )
+        ax.get_legend().remove()
+        ax.set_xlabel("")
+    # plt.tight_layout()
+    if save_path:
+        save_path = os.path.join(
+            save_path,
+            f"figures/{trace_process_id}/trace_depth_rms__test_dataset_{test_dataset_id}_trace_process_{trace_process_id}_dist_{int(distance)}__env_{environment_id}.{file_format}"
+        )
+        plt.savefig(save_path)
+    if show:
+        plt.show()
 
 
 def plot_test_trace_metadata_depth__rms(

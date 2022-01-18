@@ -106,7 +106,7 @@ def termination_point_test_and_insert_to_db(
 
 
 if __name__ == "__main__":
-    case = 3
+    case = 4
     if case == 1:
         if sys.argv[11].strip() == "None":
             additive_id = None
@@ -168,20 +168,20 @@ if __name__ == "__main__":
         database = "main.db"
         # database = "tmp_1.db"
         # runs = 2
-        runs = 10
+        runs = 100
         test_dataset_ids = [1]
         training_dataset_ids = [3]
         environment_ids = [1]
         distances = [15]
         # devices = [6, 7, 8, 9, 10]
-        devices = [8]
+        devices = [10]
         training_model_id = 1
-        # epochs = [x for x in range(2, 20)]
-        epochs = [7]
+        epochs = [x for x in range(7, 20)]
+        # epochs = [17]
         # additive_noise_method_ids = [None]
-        additive_noise_method_ids = [7]
+        additive_noise_method_ids = [3, 5, 6, 7, 8]
         denoising_method_ids = [None]
-        trace_process_ids = [12]
+        trace_process_ids = [13]
         plot = False
 
         for test_dataset_id in test_dataset_ids:
@@ -209,3 +209,48 @@ if __name__ == "__main__":
                                                 trace_process_id=trace_process_id,
                                                 plot=plot,
                                             )
+    elif case == 4:
+        database = "main.db"
+        # database = "tmp_1.db"
+        # runs = 2
+        runs = 100
+        test_dataset_ids = [1]
+        training_dataset_ids = [3]
+        environment_ids = [1]
+        distances = [15]
+        devices = [6, 7, 8, 9, 10]
+        training_model_id = 1
+        denoising_method_ids = [None]
+        trace_process_ids = [13]
+        plot = False
+        additive_epochs = [
+            (3, 17),
+            (4, 15),
+            (6, 17),
+            (7, 11)
+        ]
+
+        for test_dataset_id in test_dataset_ids:
+            for training_dataset_id in training_dataset_ids:
+                for environment_id in environment_ids:
+                    for distance in distances:
+                        for device in devices:
+                            for denoising_method_id in denoising_method_ids:
+                                for trace_process_id in trace_process_ids:
+                                    for item in additive_epochs:
+                                        termination_point_test_and_insert_to_db(
+                                            database=database,
+                                            runs=runs,
+                                            test_dataset_id=test_dataset_id,
+                                            training_dataset_id=training_dataset_id,
+                                            environment_id=environment_id,
+                                            distance=distance,
+                                            device=device,
+                                            training_model_id=training_model_id,
+                                            keybyte=0,
+                                            epoch=item[1],
+                                            additive_noise_method_id=item[0],
+                                            denoising_method_id=denoising_method_id,
+                                            trace_process_id=trace_process_id,
+                                            plot=plot,
+                                        )

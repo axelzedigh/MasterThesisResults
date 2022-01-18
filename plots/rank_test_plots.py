@@ -199,6 +199,7 @@ def plot_best_additive_noise_methods_2(
         x_label: bool = True,
         y_label_subtext: Optional[str] = None,
         custom_labels: bool = False,
+        training_dataset_id: Optional[int] = None,
 ) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """
     :param training_dataset:
@@ -361,10 +362,16 @@ def plot_best_additive_noise_methods_2(
     except:
         pass
     if save_path:
-        path = os.path.join(
-            save_path,
-            f"figures/{trace_process_id}/Additive_noise_comparison_Wang_Zedigh.{file_format}"
-        )
+        if training_dataset_id:
+            path = os.path.join(
+                save_path,
+                f"figures/{trace_process_id}/additive_noise_comparison_wang_zedigh__{training_dataset_id}.{file_format}"
+            )
+        else:
+            path = os.path.join(
+                save_path,
+                f"figures/{trace_process_id}/additive_noise_comparison_wang_zedigh.{file_format}"
+            )
         plt.savefig(path)
     if show:
         plt.show()
@@ -689,6 +696,7 @@ def plot_all_of_an_additive_noise__report__2(
         x_label: bool = True,
         y_label_subtext: Optional[str] = None,
         labels: Optional[List] = None,
+        training_dataset_id: Optional[int] = None,
 ) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """
     :param training_model:
@@ -716,6 +724,7 @@ def plot_all_of_an_additive_noise__report__2(
     :param x_label:
     :param y_label_subtext:
     :param labels:
+    :param training_dataset_id:
     """
 
     # MPL styling
@@ -862,10 +871,16 @@ def plot_all_of_an_additive_noise__report__2(
     # plt.tight_layout()
 
     if save_path:
-        path = os.path.join(
-            save_path,
-            f"figures/{trace_process_id}/{additive_noise_method}_comparison__diff_epochs.{file_format}"
-        )
+        if training_dataset_id:
+            path = os.path.join(
+                save_path,
+                f"figures/{trace_process_id}/{additive_noise_method}_comparison__diff_epochs__{training_dataset_id}.{file_format}"
+            )
+        else:
+            path = os.path.join(
+                save_path,
+                f"figures/{trace_process_id}/{additive_noise_method}_comparison__diff_epochs.{file_format}"
+            )
         plt.savefig(path)
     if show:
         plt.show()

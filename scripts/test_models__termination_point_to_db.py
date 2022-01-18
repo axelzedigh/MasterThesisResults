@@ -6,7 +6,7 @@ import numpy as np
 from tqdm import tqdm
 
 from scripts.RankTestScriptToDatabase import termination_point_test_setup, \
-    termination_point_test__rank_test
+    termination_point_test__rank_test, termination_point_test__rank_test__2000
 from utils.db_utils import insert_data_to_db
 from utils.denoising_utils import moving_average_filter_n3, \
     moving_average_filter_n5, wiener_filter_trace_set, moving_average_filter_n11
@@ -79,7 +79,7 @@ def termination_point_test_and_insert_to_db(
     )
 
     for _ in tqdm_iterator:
-        termination_point = termination_point_test__rank_test(
+        termination_point = termination_point_test__rank_test__2000(
             testing_traces=t,
             predictions=p,
             key_interest=k,
@@ -109,7 +109,7 @@ def termination_point_test_and_insert_to_db(
 
 
 if __name__ == "__main__":
-    case = 3
+    case = 4
     if case == 1:
         if sys.argv[11].strip() == "None":
             additive_id = None
@@ -170,21 +170,21 @@ if __name__ == "__main__":
     elif case == 3:
         database = "main.db"
         # database = "tmp_1.db"
-        # runs = 2
-        runs = 12
+        runs = 2
+        # runs = 12
         test_dataset_ids = [1]
         training_dataset_ids = [3]
         environment_ids = [1]
         distances = [15]
         # devices = [6, 7, 8, 9, 10]
-        devices = [8]
+        devices = [10]
         training_model_id = 1
-        # epochs = [x for x in range(2, 20)]
-        epochs = [12]
+        epochs = [x for x in range(10, 20)]
+        # epochs = [12]
         # additive_noise_method_ids = [None]
-        additive_noise_method_ids = [10]
+        additive_noise_method_ids = [8]
         denoising_method_ids = [None]
-        trace_process_ids = [12]
+        trace_process_ids = [3]
         plot = False
 
         for test_dataset_id in test_dataset_ids:
@@ -212,3 +212,45 @@ if __name__ == "__main__":
                                                 trace_process_id=trace_process_id,
                                                 plot=plot,
                                             )
+    elif case == 4:
+        database = "main.db"
+        # database = "tmp_1.db"
+        # runs = 2
+        runs = 100
+        test_dataset_ids = [1]
+        training_dataset_ids = [3]
+        environment_ids = [1]
+        distances = [15]
+        devices = [6, 7, 8, 9, 10]
+        training_model_id = 1
+        denoising_method_ids = [None]
+        trace_process_ids = [3]
+        plot = False
+        additive_epochs = [
+            (8, 16),
+        ]
+
+        for test_dataset_id in test_dataset_ids:
+            for training_dataset_id in training_dataset_ids:
+                for environment_id in environment_ids:
+                    for distance in distances:
+                        for device in devices:
+                            for denoising_method_id in denoising_method_ids:
+                                for trace_process_id in trace_process_ids:
+                                    for item in additive_epochs:
+                                        termination_point_test_and_insert_to_db(
+                                            database=database,
+                                            runs=runs,
+                                            test_dataset_id=test_dataset_id,
+                                            training_dataset_id=training_dataset_id,
+                                            environment_id=environment_id,
+                                            distance=distance,
+                                            device=device,
+                                            training_model_id=training_model_id,
+                                            keybyte=0,
+                                            epoch=item[1],
+                                            additive_noise_method_id=item[0],
+                                            denoising_method_id=denoising_method_id,
+                                            trace_process_id=trace_process_id,
+                                            plot=plot,
+                                        )

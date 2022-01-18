@@ -388,9 +388,11 @@ def termination_point_test_setup(
     )]]
 
     if trace_process_id == 11:
-        training_trace_set, range_start, range_end = filter_function(
-            training_trace_set
-        )
+        if denoising_method_id in range(10):
+            training_trace_set, range_start, range_end = filter_function(
+                training_trace_set
+            )
+        # testing_traces -= np.mean(testing_traces, axis=0)
         testing_traces -= np.mean(training_trace_set, axis=0)
         testing_traces *= 40
 
