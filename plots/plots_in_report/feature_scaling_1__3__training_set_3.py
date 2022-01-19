@@ -47,7 +47,7 @@ if __name__ == '__main__':
     #     y_top=400,
     # )
 
-    epoch_none = 0
+    epoch_none = 10
     plot_all_of_an_additive_noise__report__2(
         training_dataset='Wang_2021 - Cable, 5 devices, 500k traces',
         trace_process_id=trace_process_id,
@@ -86,7 +86,7 @@ if __name__ == '__main__':
         epoch_none=epoch_none,
         epoch_1=5,
         epoch_2=18,
-        epoch_3=0,
+        epoch_3=16,
         epoch_4=0,
         # show=True,
         y_top=1000,
@@ -122,7 +122,7 @@ if __name__ == '__main__':
         y_label_subtext="Rayleigh",
         labels=[
             f"None $e_{{{epoch_none}}}$",
-            f"0.0276 $e_{{{11}}}$",
+            f"0.0276 $e_{{{17}}}$",
         ],
     )
 
@@ -137,7 +137,7 @@ if __name__ == '__main__':
         epoch_none=epoch_none,
         epoch_gaussian=13,
         epoch_collected=18,
-        epoch_rayleigh=11,
+        epoch_rayleigh=17,
         # show=True,
         y_top=1000,
         row_size=1,

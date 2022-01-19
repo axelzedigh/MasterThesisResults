@@ -490,7 +490,7 @@ def termination_point_test__rank_test__2000(
     """
 
     # randomly select trace for testing
-    number = 2000
+    number = 3000
     average = 50   # 50
     ranks_array = []
 

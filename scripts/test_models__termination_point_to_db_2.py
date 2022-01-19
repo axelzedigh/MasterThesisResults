@@ -6,7 +6,7 @@ import numpy as np
 from tqdm import tqdm
 
 from scripts.RankTestScriptToDatabase import termination_point_test_setup, \
-    termination_point_test__rank_test
+    termination_point_test__rank_test, termination_point_test__rank_test__2000
 from utils.db_utils import insert_data_to_db
 from utils.denoising_utils import moving_average_filter_n3, \
     moving_average_filter_n5, wiener_filter_trace_set, moving_average_filter_n11
@@ -79,7 +79,7 @@ def termination_point_test_and_insert_to_db(
     )
 
     for _ in tqdm_iterator:
-        termination_point = termination_point_test__rank_test(
+        termination_point = termination_point_test__rank_test__2000(
             testing_traces=t,
             predictions=p,
             key_interest=k,
@@ -217,17 +217,24 @@ if __name__ == "__main__":
         # database = "tmp_1.db"
         # runs = 2
         runs = 100
-        test_dataset_ids = [1]
+        test_dataset_ids = [2]
         training_dataset_ids = [3]
-        environment_ids = [1]
-        distances = [15]
-        devices = [6, 7, 8, 9, 10]
+        environment_ids = [2]
+        distances = [5]
+        devices = [8, 10]
         training_model_id = 1
         denoising_method_ids = [None]
-        trace_process_ids = [3]
+        trace_process_ids = [9]
         plot = False
         additive_epochs = [
-            (7, 18),
+            # (None, 6),
+            (10, 16),
+            (11, 15),
+            (6, 6),
+            (7, 4),
+            # (5, 12),
+            # (4, 11),
+            # (3, 13),
         ]
         for test_dataset_id in test_dataset_ids:
             for training_dataset_id in training_dataset_ids:

@@ -216,17 +216,17 @@ if __name__ == "__main__":
         # database = "tmp_1.db"
         # runs = 2
         runs = 100
-        test_dataset_ids = [1]
+        test_dataset_ids = [2]
         training_dataset_ids = [3]
         environment_ids = [1]
         distances = [15]
-        devices = [6, 7, 8, 9, 10]
+        devices = [8, 10]
         training_model_id = 1
         denoising_method_ids = [None]
-        trace_process_ids = [3]
+        trace_process_ids = [4]
         plot = False
         additive_epochs = [
-            (3, 17),
+            (4, 9),
         ]
 
         for test_dataset_id in test_dataset_ids:

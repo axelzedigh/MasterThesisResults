@@ -85,6 +85,7 @@ def df_to_latex__additive(
                 "interval_upper": "$CI_{+}$",
             }
         )
+        wang = wang.reset_index()
         latex = wang.to_latex(
             # header=["M", "D", "M"],
             sparsify=True,
@@ -179,6 +180,7 @@ def df_to_latex__additive(
                 "interval_upper": "$CI_{+}$",
             }
         )
+        zedigh = zedigh.reset_index()
         latex = zedigh.to_latex(
             # header=["M", "D", "M"],
             sparsify=True,

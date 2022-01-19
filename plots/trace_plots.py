@@ -684,13 +684,6 @@ def plot_example_normalized_training_trace_1_row(
             training_dataset_id=training_dataset_id,
         )
 
-    if denoising_method_id is not None:
-        training_trace_set, start, end, clean_trace = denoising_of_trace_set(
-            trace_set=training_trace_set,
-            denoising_method_id=denoising_method_id,
-            training_dataset_id=training_dataset_id,
-        )
-
     if trace_process_id == 11:
         training_trace_set -= np.mean(training_trace_set, axis=0)
         training_trace_set *= 40

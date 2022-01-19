@@ -78,7 +78,7 @@ if __name__ == '__main__':
             f"None $e_{{{epoch_none}}}$",
             f"25 $e_{{{17}}}$",
             f"50 $e_{{{11}}}$",
-            f"75 $e_{{{11}}}$",
+            f"75 $e_{{{17}}}$",
         ],
     )
 
@@ -111,11 +111,11 @@ if __name__ == '__main__':
         save_path=REPORT_DIR,
         file_format="pgf",
         gaussian_value=0.03,
-        collected_value=25,
+        collected_value=50,
         rayleigh_value=0.0276,
         epoch_none=epoch_none,
-        epoch_gaussian=12,
-        epoch_collected=17,
+        epoch_gaussian=17,
+        epoch_collected=11,
         epoch_rayleigh=17,
         # show=True,
         y_top=1000,
