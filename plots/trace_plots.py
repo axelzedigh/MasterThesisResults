@@ -626,7 +626,10 @@ def plot_example_normalized_training_trace_1_row(
             training_set_path, "nor_traces_maxmin.npy"
         )
         training_trace_set = np.load(trace_set_file_path)
-        label = "MaxMin [0, 1]\nWhole trace"
+        if trace_process_id == 3:
+            label = "MaxMin [0, 1]\nWhole trace"
+        elif trace_process_id == 13:
+            label = "MaxMin [0, 1]\nWhole trace\nTranslation ±1"
     elif trace_process_id in [4, 5]:
         trace_set_file_path = os.path.join(
             training_set_path, "nor_traces_maxmin__sbox_range_204_314.npy"
@@ -651,9 +654,9 @@ def plot_example_normalized_training_trace_1_row(
         if trace_process_id == 8:
             label = "Standardization Sbox"
         elif trace_process_id == 11:
-            label = "Standardization Sbox\nMean difference"
+            label = "Standardization Sbox\nMean difference * 40"
         elif trace_process_id == 12:
-            label = "Standardization Sbox\nTranslation"
+            label = "Standardization Sbox\nTranslation ±1"
     elif trace_process_id == 9:
         trace_set_file_path = os.path.join(
             training_set_path, "trace_process_9-maxmin_[-1_1]_[0_400].npy"
@@ -673,6 +676,13 @@ def plot_example_normalized_training_trace_1_row(
         training_trace_set = np.load(trace_set_file_path)
     else:
         return "Trace_process_id is wrong!"
+
+    if denoising_method_id is not None:
+        training_trace_set, start, end, clean_trace = denoising_of_trace_set(
+            trace_set=training_trace_set,
+            denoising_method_id=denoising_method_id,
+            training_dataset_id=training_dataset_id,
+        )
 
     if denoising_method_id is not None:
         training_trace_set, start, end, clean_trace = denoising_of_trace_set(

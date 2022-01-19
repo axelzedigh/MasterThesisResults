@@ -161,6 +161,54 @@ def get_trace_set_metadata__depth__processed(trace_set):
     return np.array(meta_data)
 
 
+def insert_big_hall_traces_depth(database: str = "main.db"):
+
+    # # Insert all from Zedigh_2021 big hall
+    test_dataset_id = 2
+    training_dataset_id = None
+    environment_id = 2
+    distances = [5]
+    devices = [8, 9, 10]
+    additive_noise_method_id = None
+    trace_process_ids = [2]
+
+    for distance in distances:
+        print(f"Distance: {distance}")
+        for device in devices:
+            print(f"Device: {device}")
+            for trace_process_id in tqdm(trace_process_ids):
+                metadata = get_trace_set_metadata__depth(
+                    database=database,
+                    test_dataset_id=test_dataset_id,
+                    training_dataset_id=training_dataset_id,
+                    environment_id=environment_id,
+                    distance=distance,
+                    device=device,
+                    additive_noise_method_id=additive_noise_method_id,
+                    trace_process_id=trace_process_id,
+                )
+                i = 0
+                for row in metadata:
+                    insert_data_to_db__trace_metadata__depth(
+                        database=database,
+                        test_dataset_id=test_dataset_id,
+                        training_dataset_id=training_dataset_id,
+                        environment_id=environment_id,
+                        distance=distance,
+                        device=device,
+                        additive_noise_method_id=additive_noise_method_id,
+                        trace_process_id=trace_process_id,
+                        data_point_index=i,
+                        max_val=row[0],
+                        min_val=row[1],
+                        mean_val=row[2],
+                        rms_val=row[3],
+                        std_val=row[4],
+                        snr_val=row[5],
+                    )
+                    i += 1
+
+
 def insert_all_trace_metadata_depth_to_db(database):
     """
 
