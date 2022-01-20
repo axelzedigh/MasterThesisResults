@@ -848,6 +848,52 @@ def insert_all_trace_metadata_width_to_db(database):
                     i += 1
 
 
+def insert_big_hall_test_traces(database: str = "main.db"):
+    # Insert test_traces for 5m big hall from Zedigh_2021
+    test_dataset_id = 2
+    training_dataset_id = None
+    environment_id = 2
+    distances = [5]
+    devices = [8, 10]
+    additive_noise_method_id = None
+    trace_process_ids = [1]
+
+    for distance in distances:
+        print(distance)
+        for device in devices:
+            print(device)
+            for trace_process_id in trace_process_ids:
+                print(trace_process_id)
+                metadata = get_trace_set_metadata__width(
+                    database=database,
+                    test_dataset_id=test_dataset_id,
+                    training_dataset_id=training_dataset_id,
+                    environment_id=environment_id,
+                    distance=distance,
+                    device=device,
+                    additive_noise_method_id=additive_noise_method_id,
+                    trace_process_id=trace_process_id,
+                )
+                i = 0
+                for row in tqdm(metadata):
+                    insert_data_to_db__trace_metadata__width(
+                        database=database,
+                        test_dataset_id=test_dataset_id,
+                        training_dataset_id=training_dataset_id,
+                        environment_id=environment_id,
+                        distance=distance,
+                        device=device,
+                        additive_noise_method_id=additive_noise_method_id,
+                        trace_process_id=trace_process_id,
+                        trace_index=i,
+                        max_val=row[0],
+                        min_val=row[1],
+                        mean_val=row[2],
+                        rms_val=row[3],
+                        std_val=row[4],
+                    )
+                    i += 1
+
 def get_training_model_file_save_path(
         training_dataset_id: int = 1,
         keybyte: int = 0,

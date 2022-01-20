@@ -223,10 +223,16 @@ if __name__ == "__main__":
         devices = [8, 10]
         training_model_id = 1
         denoising_method_ids = [None]
-        trace_process_ids = [4]
+        trace_process_ids = [3]
         plot = False
         additive_epochs = [
-            (4, 9),
+            (6, 5),
+            (7, 18),
+            (3, 17),
+            (4, 13),
+            # (5, 15),
+            # (11, 17),
+            # (None, 10),
         ]
 
         for test_dataset_id in test_dataset_ids:

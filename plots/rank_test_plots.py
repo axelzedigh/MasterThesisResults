@@ -8,7 +8,8 @@ from matplotlib import pyplot as plt
 from matplotlib.gridspec import GridSpec
 
 from configs.variables import NORD_LIGHT_MPL_STYLE_PATH, \
-    NORD_LIGHT_4_CUSTOM_LINES, NORD_LIGHT_MPL_STYLE_2_PATH, REPORT_DIR
+    NORD_LIGHT_4_CUSTOM_LINES, NORD_LIGHT_MPL_STYLE_2_PATH, REPORT_DIR, \
+    NORD_LIGHT_BLUE, NORD_LIGHT_RED, NORD_LIGHT_LIGHT_BLUE
 from utils.db_utils import get_db_absolute_path
 from utils.plot_utils import set_size
 
@@ -885,6 +886,270 @@ def plot_all_of_an_additive_noise__report__2(
     if show:
         plt.show()
     return full_rank_test__wang, full_rank_test__zedigh
+
+
+def plot_all_of_an_additive_noise__report__zedigh_distances(
+        training_model: str = 'cnn_110',
+        training_dataset: str = 'Wang_2021 - Cable, 5 devices, 500k traces',
+        additive_noise_method: str = "Gaussian",
+        parameter_1_value_1: float = 0.01,
+        parameter_1_value_2: float = 0.03,
+        parameter_1_value_3: float = 0.04,
+        parameter_1_value_4: float = 0.05,
+        trace_process_id: int = 3,
+        epoch_none: int = 12,
+        epoch_1: int = 12,
+        epoch_2: int = 12,
+        epoch_3: int = 12,
+        epoch_4: int = 12,
+        save_path: Optional[str] = REPORT_DIR,
+        file_format: str = "pgf",
+        show: bool = False,
+        y_bottom: int = 0,
+        y_top: int = 1200,
+        row_size: float = 2,
+        col_size: float = 2,
+        x_label: bool = True,
+        y_label_subtext: Optional[str] = None,
+        labels: Optional[List] = None,
+        training_dataset_id: Optional[int] = None,
+        big_hall: bool = False,
+) -> Tuple[pd.DataFrame]:
+    """
+    :param big_hall:
+    :param training_model:
+    :param parameter_1_value_4:
+    :param parameter_1_value_3:
+    :param parameter_1_value_2:
+    :param parameter_1_value_1:
+    :param training_dataset:
+    :param additive_noise_method:
+    :param trace_process_id:
+    :param epoch_none:
+    :param epoch_1:
+    :param epoch_2:
+    :param epoch_3:
+    :param epoch_4:
+    :param save_path:
+    :param file_format:
+    :param show:
+    :param y_bottom:
+    :param y_top:
+    :param row_size:
+    :param col_size:
+    :param x_label:
+    :param y_label_subtext:
+    :param labels:
+    :param training_dataset_id:
+    """
+
+    # MPL styling
+    plt.style.use(NORD_LIGHT_MPL_STYLE_2_PATH)
+    custom_lines = NORD_LIGHT_4_CUSTOM_LINES
+    w, h = set_size(subplots=(row_size, col_size), fraction=1)
+    fig = plt.figure(constrained_layout=True, figsize=(w, h))
+    if big_hall:
+        gs = GridSpec(1, 4, figure=fig)
+    else:
+        gs = GridSpec(1, 3, figure=fig)
+    ax1 = fig.add_subplot(gs[0:, 0:1])
+    ax2 = fig.add_subplot(gs[0:, 1:2])
+    ax3 = fig.add_subplot(gs[0:, 2:3])
+    if big_hall:
+        ax4 = fig.add_subplot(gs[0:, 3:4])
+
+    query_zedigh = f"""
+        select
+            environment,
+            device,
+            epoch,
+            distance,
+            additive_noise_method,
+            additive_noise_method_parameter_1,
+            additive_noise_method_parameter_1_value,
+            additive_noise_method_parameter_2,
+            additive_noise_method_parameter_2_value,
+            termination_point
+        from
+            full_rank_test
+        where
+            trace_process_id = {trace_process_id}
+            AND training_model = '{training_model}'
+            AND training_dataset = '{training_dataset}'
+            AND test_dataset = 'Zedigh_2021'
+            AND device != 9
+            AND denoising_method IS NULL
+            AND (additive_noise_method IS NULL OR additive_noise_method = '{additive_noise_method}')
+            AND (
+                (additive_noise_method IS NULL AND epoch = {epoch_none})
+                OR (additive_noise_method_parameter_1_value = {parameter_1_value_1} AND epoch = {epoch_1})
+                OR (additive_noise_method_parameter_1_value = {parameter_1_value_2} AND epoch = {epoch_2})
+                OR (additive_noise_method_parameter_1_value = {parameter_1_value_3} AND epoch = {epoch_3})
+                OR (additive_noise_method_parameter_1_value = {parameter_1_value_4} AND epoch = {epoch_4})
+            )
+        order by
+            additive_noise_method_parameter_1_value
+            ;
+    """
+
+    database = get_db_absolute_path("main.db")
+    con = lite.connect(database)
+    full_rank_test__zedigh = pd.read_sql_query(query_zedigh, con)
+    con.close()
+
+    full_rank_test__zedigh.fillna("None", inplace=True)
+    full_rank_test__zedigh.rename(columns={
+        "additive_noise_method_parameter_1_value": "Additive parameter 1"},
+        inplace=True)
+
+    # distance 15m, office corridor
+    data_15m_office = full_rank_test__zedigh.copy()
+    data_15m_office = data_15m_office[data_15m_office["distance"] == 15]
+    data_15m_office = data_15m_office[
+        data_15m_office["environment"] == "office_corridor"]
+
+    sns1 = sns.barplot(
+        x=data_15m_office["device"],
+        y=data_15m_office["termination_point"],
+        hue=data_15m_office["Additive parameter 1"],
+        ax=ax1
+    )
+    # Y
+    ax1.set_ylim(y_bottom, y_top)
+    if y_label_subtext is not None:
+        ax1.set_ylabel(f"{y_label_subtext}\nTermination point")
+    else:
+        ax1.set_ylabel("Termination point")
+    # X
+    if x_label:
+        ax1.set_xlabel("Device (15m)\nOffice Corridor")
+    else:
+        ax1.set_xlabel("")
+    # Legend
+    if labels:
+        if big_hall:
+            ax1.legend(
+                handles=custom_lines,
+                labels=labels,
+                bbox_to_anchor=(0., 1, 4, 0),
+                loc="lower left",
+                mode="expand",
+                ncol=5
+            )
+        else:
+            ax1.legend(
+                handles=custom_lines,
+                labels=labels,
+                bbox_to_anchor=(0., 1, 3, 0),
+                loc="lower left",
+                mode="expand",
+                ncol=5
+            )
+    else:
+        ax1.legend(
+            # handles=custom_lines,
+            # labels=labels,
+            bbox_to_anchor=(0., 1, 1.4, 0),
+            loc="lower left",
+            mode="expand",
+            ncol=5
+        )
+    del data_15m_office
+
+    # distance 10m, office corridor
+    data_10m_office = full_rank_test__zedigh.copy()
+    data_10m_office = data_10m_office[data_10m_office["distance"] == 10]
+    data_10m_office = data_10m_office[
+        data_10m_office["environment"] == "office_corridor"]
+
+    sns2 = sns.barplot(
+        x=data_10m_office["device"],
+        y=data_10m_office["termination_point"],
+        hue=data_10m_office["Additive parameter 1"],
+        ax=ax2
+    )
+    # Y
+    ax2.set_ylim(y_bottom, y_top)
+    sns2.set(ylabel=None, yticklabels=[])
+    sns2.tick_params(left=False)
+    # X
+    if x_label:
+        ax2.set_xlabel("Device (10m)\nOffice Corridor")
+    else:
+        ax2.set_xlabel("")
+    # Legend
+    ax2.legend([], [], frameon=False)
+    # Rm
+    del data_10m_office
+
+    # distance 5m, office corridor
+    data_5m_office = full_rank_test__zedigh.copy()
+    data_5m_office = data_5m_office[data_5m_office["distance"] == 5]
+    data_5m_office = data_5m_office[
+        data_5m_office["environment"] == "office_corridor"]
+    sns3 = sns.barplot(
+        x=data_5m_office["device"],
+        y=data_5m_office["termination_point"],
+        hue=data_5m_office["Additive parameter 1"],
+        ax=ax3
+    )
+    # Y
+    ax3.set_ylim(y_bottom, y_top)
+    sns3.set(ylabel=None, yticklabels=[])
+    sns3.tick_params(left=False)
+    # X
+    if x_label:
+        ax3.set_xlabel("Device (5m)\nOffice Corridor")
+    else:
+        ax3.set_xlabel("")
+    # Legend
+    ax3.legend([], [], frameon=False)
+    # Rm
+    del data_5m_office
+
+    # distance 5m, big hall
+    if big_hall:
+        try:
+            data_5m_hall = full_rank_test__zedigh.copy()
+            data_5m_hall = data_5m_hall[data_5m_hall["distance"] == 5]
+            data_5m_hall = data_5m_hall[data_5m_hall["environment"] == "big_hall"]
+            sns4 = sns.barplot(
+                x=data_5m_hall["device"],
+                y=data_5m_hall["termination_point"],
+                hue=data_5m_hall["Additive parameter 1"],
+                ax=ax4,
+                palette=[NORD_LIGHT_LIGHT_BLUE, NORD_LIGHT_RED]
+            )
+            # Y
+            ax4.set_ylim(0, 3000)
+            sns4.set(ylabel=None)  #, yticklabels=[])
+            # sns4.tick_params(left=False)
+            if x_label:
+                ax4.set_xlabel("Device (5m)\nBig Hall")
+            else:
+                ax4.set_xlabel("")
+            # Legend
+            ax4.legend([], [], frameon=False)
+            # Rm
+            del data_5m_office
+        except:
+            pass
+
+    if save_path:
+        if training_dataset_id:
+            path = os.path.join(
+                save_path,
+                f"figures/{trace_process_id}/{additive_noise_method}_comparison__diff_epochs__{training_dataset_id}__zedigh_traces.{file_format}"
+            )
+        else:
+            path = os.path.join(
+                save_path,
+                f"figures/{trace_process_id}/{additive_noise_method}_comparison__diff_epochs__zedigh_traces.{file_format}"
+            )
+        plt.savefig(path)
+    if show:
+        plt.show()
+    return full_rank_test__zedigh
 
 
 def plot_all_of_a_denoising_method__report(

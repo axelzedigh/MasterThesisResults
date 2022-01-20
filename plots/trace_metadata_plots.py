@@ -1,6 +1,6 @@
 import os
 import sqlite3 as lite
-from typing import List, Optional
+from typing import List, Optional, Any
 
 import numpy as np
 import pandas as pd
@@ -934,13 +934,15 @@ def plot_trace_termination_point(
         {
             "rms_val": ["mean"],
             "snr_val": [SNR_mean],
+            "std_val": [SNR_mean],
         }
     )
     data = data.reset_index()
     data["rank_additive_noise_method_id"] = data[
         "rank_additive_noise_method_id"].replace(
         [3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 10.0, 11.0],
-        ["$\sigma=0.03$", "$\sigma=0.04$", "$\sigma=0.05$", "scale=25", "scale=50", "scale=75",
+        ["$\sigma=0.03$", "$\sigma=0.04$", "$\sigma=0.05$", "scale=25",
+         "scale=50", "scale=75",
          "mode=0.0138", "mode=0.0276"]
     )
 
@@ -955,11 +957,11 @@ def plot_trace_termination_point(
         try:
             corr = data.corr()
             corr_val = round(corr["avg_term_p"]["rms_val"][0], 3)
-            corr_val_rms_snr = round(corr["rms_val"]["mean"]["snr_val"][0], 3)
+            # corr_val_rms_snr = round(corr["rms_val"]["mean"]["snr_val"][0], 3)
             props = dict(boxstyle='round', facecolor='white', alpha=1)
             ax1.text(
                 0.5, 0.97,
-                f"Correlation\nTermination Point $\propto RMS$: {corr_val}\n$RMS\propto SNR$: {corr_val_rms_snr}",
+                f"Correlation\nTermination Point $\propto RMS$: {corr_val}",
                 horizontalalignment='left',
                 verticalalignment='top',
                 transform=ax1.transAxes,
@@ -971,7 +973,6 @@ def plot_trace_termination_point(
 
         s.set_ylabel("Average termination point")
         s.set_xlabel("Average $RMS_{sbox}$")
-
     elif val_type == "snr":
         s = sns.lineplot(
             x=data["snr_val"]["SNR_mean"],
@@ -996,9 +997,33 @@ def plot_trace_termination_point(
             )
         except:
             pass
+    elif val_type == "std":
+        s = sns.lineplot(
+            x=data["std_val"]["SNR_mean"],
+            y=data["avg_term_p"],
+            hue=data["rank_additive_noise_method_id"],
+            ax=ax1,
+            marker='o'
+        )
+        try:
+            corr = data.corr()
+            corr_val = round(corr["avg_term_p"]["std_val"][0], 3)
+            corr_val_rms_std = round(corr["rms_val"]["mean"]["std_val"][0], 3)
+            props = dict(boxstyle='round', facecolor='white', alpha=1)
+            ax1.text(
+                0.5, 0.97,
+                f"Correlation\nTermination Point $\propto \sigma_d$: {corr_val}\n$RMS \propto \sigma$: {corr_val_rms_std}",
+                horizontalalignment='left',
+                verticalalignment='top',
+                transform=ax1.transAxes,
+                fontsize=6,
+                bbox=props,
+            )
+        except:
+            pass
 
         s.set_ylabel("Average termination point")
-        s.set_xlabel("$SNR_{d,sbox}$")
+        s.set_xlabel("$\sigma_{d,sbox}$")
 
     if legend_on:
         s.legend(
@@ -1008,12 +1033,80 @@ def plot_trace_termination_point(
             ncol=4,
         )
     else:
-        plt.legend([],[], frameon=False)
+        plt.legend([], [], frameon=False)
 
     if save_path:
         path = os.path.join(
             save_path,
             f"figures/{trace_process_id}/quality_compare_{val_type}_device_{device}_training_{training_dataset_id}_test_{test_dataset_id}_env_{environment_id}.{file_format}"
+        )
+        plt.savefig(path)
+    if show:
+        plt.show()
+
+
+def plot_trace_width__rms(
+        test_dataset_id: Optional[Any] = 1,
+        training_dataset_id: Optional[Any] = 3,
+        distance: float = 15,
+        device: int = 6,
+        environment_id: int = 1,
+        trace_process_id: int = 1,
+        save_path: Optional[str] = REPORT_DIR,
+        file_format: str = "pgf",
+        show: bool = False,
+):
+    """
+
+    :param test_dataset_id:
+    :param training_dataset_id:
+    :param distance:
+    :param device:
+    :param trace_process_id:
+    :return:
+    """
+    # MPL styling
+    plt.style.use(NORD_LIGHT_MPL_STYLE_2_PATH)
+    w, h = set_size(subplots=(0.5, 1), fraction=1)
+    fig = plt.figure(figsize=(w, h), constrained_layout=True)
+    ax1 = fig.gca()
+    # ax2 = plt.subplot(1, 2, 2)
+
+    database = get_db_absolute_path("main.db")
+    con2 = lite.connect(database)
+    query = f"""
+        SELECT 
+            * 
+        FROM 
+            trace_metadata_width
+        WHERE
+            distance = {distance}
+            AND environment_id = {environment_id}
+            AND device = {device}
+            AND trace_process_id = {trace_process_id}
+        ;
+    """
+    data = pd.read_sql_query(query, con2)
+    con2.close()
+
+    data.fillna("None", inplace=True)
+    data = data[data["test_dataset_id"] == test_dataset_id]
+    data = data[data["training_dataset_id"] == training_dataset_id]
+    data["dyn_range"] = data["max_val"] - data["min_val"]
+    mean_rms = np.sqrt(np.sum(data["rms_val"] ** 2) / (len(data["rms_val"])))
+    ax1.plot(data["trace_index"], data["rms_val"])
+    ax1.axhline(mean_rms, color=NORD_LIGHT_ORANGE)
+    ax1.set_ylim(mean_rms*0.8, mean_rms*1.2)
+    ax1.set_ylabel(f"$A_{{{'RMS'}}}, D_{{{device}}}$")
+    # ax1.set_xlabel("$Recorded traces_{{{'index'}}}$")
+    ax1.set_xlabel("")
+    # plt.title(
+    #     f"Device: {device}, Distance: {distance}\nMean $A_{{{'RMS'}}}$: {round(mean_rms, 4)}"
+    # )
+    if save_path:
+        path = os.path.join(
+            save_path,
+            f"figures/{trace_process_id}/trace_width_device_{device}_training_{training_dataset_id}_test_{test_dataset_id}_env_{environment_id}_dist_{distance}.{file_format}"
         )
         plt.savefig(path)
     if show:

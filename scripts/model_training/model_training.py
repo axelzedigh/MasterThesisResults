@@ -40,8 +40,8 @@ if __name__ == "__main__":
 
         balance_dataset = True
         additive_noise_method_ids = [None]
-        denoising_method_ids = [None]
-        trace_process_ids = [3]
+        denoising_method_ids = [1, 2]
+        trace_process_ids = [9, 8]
 
         for training_dataset_id in training_dataset_ids:
             for additive_noise_method_id in additive_noise_method_ids:
