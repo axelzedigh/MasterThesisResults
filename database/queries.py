@@ -214,7 +214,13 @@ QUERY_LIST_INITIALIZE_DB = [
     "INSERT INTO denoising_methods VALUES (2,'Moving Average Filter', 'N', "
     "5, NULL, NULL); ",
     "INSERT INTO denoising_methods VALUES (3,'Wiener Filter', 'Noise Power', "
-    "2e-7, NULL, NULL); ",
+    "NULL, NULL, NULL); ",
+    "INSERT INTO denoising_methods VALUES (4,'Wiener Filter', 'Noise Power', "
+    "0.2, NULL, NULL); ",
+    "INSERT INTO denoising_methods VALUES (5,'Moving Average Filter', 'N', "
+    "11, NULL, NULL); ",
+    "INSERT INTO denoising_methods VALUES (6,'Wiener Filter', 'Noise Power', "
+    "0.02, NULL, NULL); ",
 
     "INSERT INTO trace_processes VALUES (1, 'Raw (all__.npy');",
     "INSERT INTO trace_processes VALUES (2, 'Randomized order (traces.npy)');",
