@@ -7,7 +7,7 @@ from matplotlib import pyplot as plt, ticker
 
 from configs.variables import NORD_LIGHT_MPL_STYLE_PATH, \
     NORD_LIGHT_MPL_STYLE_2_PATH, REPORT_DIR, NORD_LIGHT_RED, NORD_LIGHT_YELLOW, \
-    NORD_LIGHT_4_CUSTOM_LINES
+    NORD_LIGHT_5_CUSTOM_LINES
 from utils.db_utils import get_training_model_file_path
 from utils.plot_utils import set_size
 
@@ -107,7 +107,7 @@ def plot_history_log__overview_trace_process(
 
     # MPL styling
     plt.style.use(NORD_LIGHT_MPL_STYLE_2_PATH)
-    custom_lines = NORD_LIGHT_4_CUSTOM_LINES
+    custom_lines = NORD_LIGHT_5_CUSTOM_LINES
     plt.rcParams.update({
         "ytick.labelsize": "xx-small",
         "xtick.labelsize": "xx-small",
