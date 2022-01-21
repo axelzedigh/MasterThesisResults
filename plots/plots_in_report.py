@@ -13,7 +13,7 @@ from utils.plot_utils import df_to_latex__additive
 if __name__ == "__main__":
     # Additive noise example
     # additive_noise_example_plot()
-    plot_recorded_noise(file_format="pgf", show=True)
+    # plot_recorded_noise(file_format="pgf", show=False)
     # plot_training_diff_psd(
     #     training_dataset_id=3,
     #     additive_noise_method_id=None,

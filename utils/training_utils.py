@@ -457,7 +457,7 @@ def denoising_of_trace_set(
     elif denoising_method_id == 3:
         range_start = 130
         range_end = 240
-        filtered_set, _, __ = wiener_filter_trace_set(trace_set, 2e-2)
+        filtered_set, _, __ = wiener_filter_trace_set(trace_set, None) #2e-2)
         return filtered_set, range_start, range_end, example_not_denoised_trace
     elif denoising_method_id == 4:
         range_start = 130
@@ -469,6 +469,11 @@ def denoising_of_trace_set(
             test_trace_set=trace_set,
             training_dataset_id=training_dataset_id,
         )
+        return filtered_set, range_start, range_end, example_not_denoised_trace
+    elif denoising_method_id == 6:
+        range_start = 130
+        range_end = 240
+        filtered_set, _, __ = wiener_filter_trace_set(trace_set, 0.02)
         return filtered_set, range_start, range_end, example_not_denoised_trace
     else:
         raise f"Denoising method id {denoising_method_id} is not correct."

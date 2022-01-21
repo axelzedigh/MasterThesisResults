@@ -9,7 +9,7 @@ from matplotlib import pyplot as plt
 from matplotlib.gridspec import GridSpec
 
 from configs.variables import NORD_LIGHT_MPL_STYLE_PATH, \
-    NORD_LIGHT_4_CUSTOM_LINES, NORD_LIGHT_LIGHT_BLUE, REPORT_DIR, \
+    NORD_LIGHT_5_CUSTOM_LINES, NORD_LIGHT_LIGHT_BLUE, REPORT_DIR, \
     NORD_LIGHT_MPL_STYLE_2_PATH, NORD_LIGHT_YELLOW, NORD_LIGHT_RED
 from utils.db_utils import get_db_absolute_path, get_test_trace_path, \
     get_training_model_file_path
@@ -44,7 +44,7 @@ def plot_additive_noise_comparison_all(
     # MPL styling
     sns.set(rc={"figure.figsize": (15, 7)})
     plt.style.use(NORD_LIGHT_MPL_STYLE_PATH)
-    custom_lines = NORD_LIGHT_4_CUSTOM_LINES
+    custom_lines = NORD_LIGHT_5_CUSTOM_LINES
 
     query = f"""
     select

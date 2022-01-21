@@ -8,7 +8,7 @@ from matplotlib import pyplot as plt, ticker
 from matplotlib.gridspec import GridSpec
 
 from configs.variables import NORD_LIGHT_MPL_STYLE_PATH, \
-    NORD_LIGHT_4_CUSTOM_LINES, NORD_LIGHT_RED, NORD_LIGHT_ORANGE, \
+    NORD_LIGHT_5_CUSTOM_LINES, NORD_LIGHT_RED, NORD_LIGHT_ORANGE, \
     NORD_LIGHT_BLUE, NORD_LIGHT_LIGHT_BLUE, REPORT_DIR, \
     NORD_LIGHT_MPL_STYLE_2_PATH
 from utils.db_utils import get_db_absolute_path
@@ -32,7 +32,7 @@ def plot_trace_metadata_depth__one(test_dataset_id, distance, device,
 
     # MPL styling
     plt.style.use(NORD_LIGHT_MPL_STYLE_PATH)
-    custom_lines = NORD_LIGHT_4_CUSTOM_LINES
+    custom_lines = NORD_LIGHT_5_CUSTOM_LINES
 
     query = f"""
     select

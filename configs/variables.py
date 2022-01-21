@@ -47,12 +47,16 @@ NORD_LIGHT_MPL_STYLE_2_PATH = os.path.join(
 NORD_DARK_MPL_STYLE_PATH = os.path.join(
     PROJECT_DIR, "configs/matplotlib_styles", "nord-dark.mplstyle"
 )
-NORD_LIGHT_4_CUSTOM_LINES = [Line2D([0], [0], color='#5e81ac', lw=4),
-                             Line2D([0], [0], color='#88c0d0', lw=4),
-                             Line2D([0], [0], color='#bf616a', lw=4),
-                             Line2D([0], [0], color='#d08770', lw=4)]
 NORD_LIGHT_BLUE = '#5e81ac'
 NORD_LIGHT_LIGHT_BLUE = '#88c0d0'
 NORD_LIGHT_RED = '#bf616a'
 NORD_LIGHT_ORANGE = '#d08770'
 NORD_LIGHT_YELLOW = '#ebcb8b'
+
+NORD_LIGHT_5_CUSTOM_LINES = [
+    Line2D([0], [0], color='#5e81ac', lw=4),
+    Line2D([0], [0], color='#88c0d0', lw=4),
+    Line2D([0], [0], color='#bf616a', lw=4),
+    Line2D([0], [0], color='#d08770', lw=4),
+    Line2D([0], [0], color=NORD_LIGHT_YELLOW, lw=4)
+]

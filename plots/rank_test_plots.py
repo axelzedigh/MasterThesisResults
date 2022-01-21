@@ -8,7 +8,7 @@ from matplotlib import pyplot as plt
 from matplotlib.gridspec import GridSpec
 
 from configs.variables import NORD_LIGHT_MPL_STYLE_PATH, \
-    NORD_LIGHT_4_CUSTOM_LINES, NORD_LIGHT_MPL_STYLE_2_PATH, REPORT_DIR, \
+    NORD_LIGHT_5_CUSTOM_LINES, NORD_LIGHT_MPL_STYLE_2_PATH, REPORT_DIR, \
     NORD_LIGHT_BLUE, NORD_LIGHT_RED, NORD_LIGHT_LIGHT_BLUE
 from utils.db_utils import get_db_absolute_path
 from utils.plot_utils import set_size
@@ -37,7 +37,7 @@ def plot_best_additive_noise_methods(
 
     # MPL styling
     plt.style.use(NORD_LIGHT_MPL_STYLE_2_PATH)
-    custom_lines = NORD_LIGHT_4_CUSTOM_LINES
+    custom_lines = NORD_LIGHT_5_CUSTOM_LINES
     w, h = set_size(subplots=(2, 1))
     fig, axs = plt.subplots(2, 1, figsize=(w, h))
 
@@ -203,6 +203,7 @@ def plot_best_additive_noise_methods_2(
         training_dataset_id: Optional[int] = None,
 ) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """
+
     :param training_dataset:
     :param trace_process_id: The parameter 1 value.
     :param gaussian_value:  The parameter 1 value.
@@ -224,7 +225,7 @@ def plot_best_additive_noise_methods_2(
 
     # MPL styling
     plt.style.use(NORD_LIGHT_MPL_STYLE_2_PATH)
-    custom_lines = NORD_LIGHT_4_CUSTOM_LINES
+    custom_lines = NORD_LIGHT_5_CUSTOM_LINES
     w, h = set_size(subplots=(row_size, col_size), fraction=1)
     fig = plt.figure(constrained_layout=True, figsize=(w, h))
     gs = GridSpec(1, 7, figure=fig)
@@ -297,6 +298,7 @@ def plot_best_additive_noise_methods_2(
     full_rank_test__wang = pd.read_sql_query(query1, con)
     full_rank_test__zedigh = pd.read_sql_query(query2, con)
     con.close()
+
     full_rank_test__wang.fillna("None", inplace=True)
     full_rank_test__wang.rename(columns={
         "additive_noise_method_parameter_1_value": "Additive parameter 1"},
@@ -730,7 +732,7 @@ def plot_all_of_an_additive_noise__report__2(
 
     # MPL styling
     plt.style.use(NORD_LIGHT_MPL_STYLE_2_PATH)
-    custom_lines = NORD_LIGHT_4_CUSTOM_LINES
+    custom_lines = NORD_LIGHT_5_CUSTOM_LINES
     w, h = set_size(subplots=(row_size, col_size), fraction=1)
     fig = plt.figure(constrained_layout=True, figsize=(w, h))
     gs = GridSpec(1, 7, figure=fig)
@@ -805,6 +807,7 @@ def plot_all_of_an_additive_noise__report__2(
             additive_noise_method_parameter_1_value
             ;
     """
+
     database = get_db_absolute_path("main.db")
     con = lite.connect(database)
     full_rank_test__wang = pd.read_sql_query(query_wang, con)
@@ -818,6 +821,7 @@ def plot_all_of_an_additive_noise__report__2(
         "additive_noise_method_parameter_1_value": "Additive parameter 1"},
         inplace=True)
     con.close()
+
     sns1 = sns.barplot(
         x=full_rank_test__wang["device"],
         y=full_rank_test__wang["termination_point"],
@@ -945,7 +949,7 @@ def plot_all_of_an_additive_noise__report__zedigh_distances(
 
     # MPL styling
     plt.style.use(NORD_LIGHT_MPL_STYLE_2_PATH)
-    custom_lines = NORD_LIGHT_4_CUSTOM_LINES
+    custom_lines = NORD_LIGHT_5_CUSTOM_LINES
     w, h = set_size(subplots=(row_size, col_size), fraction=1)
     fig = plt.figure(constrained_layout=True, figsize=(w, h))
     if big_hall:
@@ -1293,74 +1297,138 @@ def plot_all_of_a_denoising_method__report(
 
 
 def plot_all_of_denoising(
-        training_dataset: str = 'Wang_2021 - Cable, 5 devices, 200k traces',
-        denoising_method: str = "Moving Average Filter",
+        training_model: str = 'cnn_110',
+        training_dataset: str = 'Wang_2021 - Cable, 5 devices, 500k traces',
+        parameter_1_value_1: float = 0.01,
+        parameter_1_value_2: float = 0.03,
+        parameter_1_value_3: float = 0.04,
+        parameter_1_value_4: float = 0.05,
         trace_process_id: int = 3,
-        epoch: int = 65,
+        epoch_none: int = 12,
+        epoch_1: int = 12,
+        epoch_2: int = 12,
+        epoch_3: int = 12,
+        epoch_4: int = 12,
         distance: float = 15,
-        save: bool = False
+        environment: str = "office_corridor",
+        save_path: Optional[str] = REPORT_DIR,
+        file_format: str = "pgf",
+        show: bool = False,
+        y_bottom: int = 0,
+        y_top: int = 1200,
+        row_size: float = 2,
+        col_size: float = 2,
+        x_label: bool = True,
+        y_label_subtext: Optional[str] = None,
+        labels: Optional[List] = None,
+        training_dataset_id: Optional[int] = None,
 ) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """
+
+    :param training_model:
     :param training_dataset:
-    :param denoising_method:
+    :param parameter_1_value_1:
+    :param parameter_1_value_2:
+    :param parameter_1_value_3:
+    :param parameter_1_value_4:
     :param trace_process_id:
-    :param epoch:
+    :param epoch_none:
+    :param epoch_1:
+    :param epoch_2:
+    :param epoch_3:
+    :param epoch_4:
     :param distance:
-    :param save:
+    :param environment:
+    :param save_path:
+    :param file_format:
+    :param show:
+    :param y_bottom:
+    :param y_top:
+    :param row_size:
+    :param col_size:
+    :param x_label:
+    :param y_label_subtext:
+    :param labels:
+    :param training_dataset_id:
+    :return:
     """
 
     # MPL styling
-    sns.set(rc={"figure.figsize": (15, 7)})
-    plt.style.use(NORD_LIGHT_MPL_STYLE_PATH)
-    fig, axs = plt.subplots(1, 2)
+    plt.style.use(NORD_LIGHT_MPL_STYLE_2_PATH)
+    custom_lines = NORD_LIGHT_5_CUSTOM_LINES
+    w, h = set_size(subplots=(row_size, col_size), fraction=1)
+    fig = plt.figure(constrained_layout=True, figsize=(w, h))
+    gs = GridSpec(1, 7, figure=fig)
+    ax1 = fig.add_subplot(gs[0:, 0:5])
+    ax2 = fig.add_subplot(gs[0:, 5:7])
 
     query_wang = f"""
-    select
-        device, 
-        epoch, 
-        denoising_method,
-        denoising_method_parameter_1, 
-        denoising_method_parameter_1_value, 
-        denoising_method_parameter_2, 
-        denoising_method_parameter_2_value, 
-        termination_point
-    from
-        full_rank_test
-    where
-        test_dataset = 'Wang_2021'
-        AND training_dataset = '{training_dataset}'
-        AND epoch = {epoch}
-        AND distance = {distance}
-        AND additive_noise_method IS NULL
-        AND (denoising_method IS NULL 
-        OR denoising_method = '{denoising_method}')
-    order by 
-        denoising_method_parameter_1_value;
+        select
+            environment,
+            device,
+            epoch,
+            denoising_method,
+            denoising_method_parameter_1,
+            denoising_method_parameter_1_value,
+            denoising_method_parameter_2,
+            denoising_method_parameter_2_value,
+            termination_point
+        from
+            full_rank_test
+        where
+            trace_process_id = {trace_process_id}
+            AND training_model = '{training_model}'
+            AND training_dataset = '{training_dataset}'
+            AND test_dataset = 'Wang_2021'
+            AND environment = '{environment}'
+            AND distance = {distance}
+            AND additive_noise_method IS NULL
+            AND (
+                (denoising_method IS NULL AND epoch = {epoch_none})
+                OR (denoising_method_parameter_1_value = {parameter_1_value_1} AND epoch = {epoch_1})
+                OR (denoising_method_parameter_1_value = {parameter_1_value_2} AND epoch = {epoch_2})
+                OR (denoising_method_parameter_1_value = {parameter_1_value_3} AND epoch = {epoch_3})
+                OR (denoising_method_parameter_1_value = {parameter_1_value_4} AND epoch = {epoch_4})
+            )
+        order by
+            denoising_method_parameter_1_value
+            ;
     """
 
     query_zedigh = f"""
-    select
-        device, 
-        epoch, 
-        denoising_method,
-        denoising_method_parameter_1, 
-        denoising_method_parameter_1_value, 
-        denoising_method_parameter_2, 
-        denoising_method_parameter_2_value, 
-        termination_point
-    from
-        full_rank_test
-    where
-        test_dataset = 'Zedigh_2021'
-        AND training_dataset = '{training_dataset}'
-        AND epoch = {epoch}
-        AND distance = {distance}
-        AND additive_noise_method IS NULL
-        AND (denoising_method IS NULL 
-        OR denoising_method = '{denoising_method}')
-    order by 
-        denoising_method_parameter_1_value;
+        select
+            environment,
+            device,
+            epoch,
+            denoising_method,
+            denoising_method_parameter_1,
+            denoising_method_parameter_1_value,
+            denoising_method_parameter_2,
+            denoising_method_parameter_2_value,
+            termination_point
+        from
+            full_rank_test
+        where
+            trace_process_id = {trace_process_id}
+            AND training_model = '{training_model}'
+            AND training_dataset = '{training_dataset}'
+            AND test_dataset = 'Zedigh_2021'
+            AND environment = '{environment}'
+            AND distance = {distance}
+            AND device != 9
+            AND additive_noise_method IS NULL
+            AND (
+                (denoising_method IS NULL AND epoch = {epoch_none})
+                OR (denoising_method_parameter_1_value = {parameter_1_value_1} AND epoch = {epoch_1})
+                OR (denoising_method_parameter_1_value = {parameter_1_value_2} AND epoch = {epoch_2})
+                OR (denoising_method_parameter_1_value = {parameter_1_value_3} AND epoch = {epoch_3})
+                OR (denoising_method_parameter_1_value = {parameter_1_value_4} AND epoch = {epoch_4})
+            )
+        order by
+            denoising_method_parameter_1_value
+            ;
     """
+
     database = get_db_absolute_path("main.db")
     con = lite.connect(database)
     full_rank_test__wang = pd.read_sql_query(query_wang, con)
@@ -1374,38 +1442,75 @@ def plot_all_of_denoising(
         "denoising_method_parameter_1_value": "Denoising parameter 1"},
         inplace=True)
     con.close()
-    ylim_bottom = 0
-    ylim_top = 1600
-    sns.barplot(
+
+    sns1 = sns.barplot(
         x=full_rank_test__wang["device"],
         y=full_rank_test__wang["termination_point"],
         hue=full_rank_test__wang["Denoising parameter 1"],
-        ax=axs[0]
+        ax=ax1
     )
-    sns.barplot(
-        x=full_rank_test__zedigh["device"],
-        y=full_rank_test__zedigh["termination_point"],
-        hue=full_rank_test__zedigh["Denoising parameter 1"],
-        ax=axs[1]
-    )
-    plt.suptitle(
-        f"{denoising_method.capitalize()}, {distance}m, trace process {trace_process_id}",
-        fontsize=18,
-        y=0.95
-    )
-    axs[0].set_ylim(ylim_bottom, ylim_top)
-    axs[0].set_ylabel("Termination point")
-    axs[0].set_xlabel("Device")
-    axs[0].text(x=-0.2, y=(ylim_top - 100), s="Wang 2021", fontsize=16)
-    axs[1].set_ylim(ylim_bottom, ylim_top)
-    axs[1].set_ylabel("Termination point")
-    axs[1].set_xlabel("Device")
-    axs[1].text(x=-0.2, y=(ylim_top - 100), s="Zedigh 2021", fontsize=16)
-    plt.tight_layout()
-    if save:
-        plt.savefig(
-            f"../docs/figs/{denoising_method.replace(' ', '_')}_comparison.png")
-    plt.show()
+    ax1.set_ylim(y_bottom, y_top)
+    if y_label_subtext is not None:
+        ax1.set_ylabel(f"{y_label_subtext}\nTermination point")
+    else:
+        ax1.set_ylabel("Termination point")
+    if x_label:
+        ax1.set_xlabel("Device\n(Wang 2021)")
+    else:
+        ax1.set_xlabel("")
+    if labels:
+        ax1.legend(
+            handles=custom_lines,
+            labels=labels,
+            bbox_to_anchor=(0., 1.3, 1, 0),
+            loc="lower left",
+            mode="expand",
+            ncol=4,
+            fontsize="xx-small"
+        )
+    else:
+        ax1.legend(
+            # handles=custom_lines,
+            # labels=labels,
+            bbox_to_anchor=(0., 1, 1.4, 0),
+            loc="lower left",
+            mode="expand",
+            ncol=5
+        )
+
+    try:
+        sns2 = sns.barplot(
+            x=full_rank_test__zedigh["device"],
+            y=full_rank_test__zedigh["termination_point"],
+            hue=full_rank_test__zedigh["Denoising parameter 1"],
+            ax=ax2
+        )
+        sns2.set(ylabel=None, yticklabels=[])
+        sns2.tick_params(left=False)
+        ax2.set_ylim(y_bottom, y_top)
+        if x_label:
+            ax2.set_xlabel("Device\n(Zedigh 2021)")
+        else:
+            ax2.set_xlabel("")
+        ax2.legend([], [], frameon=False)
+    except:
+        pass
+    # plt.tight_layout()
+
+    if save_path:
+        if training_dataset_id:
+            path = os.path.join(
+                save_path,
+                f"figures/{trace_process_id}/denoising_comparison__diff_epochs__{training_dataset_id}.{file_format}"
+            )
+        else:
+            path = os.path.join(
+                save_path,
+                f"figures/{trace_process_id}/denoising_comparison__diff_epochs.{file_format}"
+            )
+        plt.savefig(path)
+    if show:
+        plt.show()
     return full_rank_test__wang, full_rank_test__zedigh
 
 
