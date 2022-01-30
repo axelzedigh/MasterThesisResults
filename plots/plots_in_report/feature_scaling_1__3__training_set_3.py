@@ -68,10 +68,10 @@ if __name__ == '__main__':
         x_label=False,
         y_label_subtext="Gaussian",
         labels=[
-            f"None $e_{{{epoch_none}}}$",
-            f"0.03 $e_{{{17}}}$",
-            f"0.04 $e_{{{13}}}$",
-            f"0.05 $e_{{{15}}}$",
+            f"None $N_{{{epoch_none}}}$",
+            f"0.03 $N_{{{17}}}$",
+            f"0.04 $N_{{{13}}}$",
+            f"0.05 $N_{{{15}}}$",
         ],
     )
 
@@ -95,9 +95,9 @@ if __name__ == '__main__':
         x_label=False,
         y_label_subtext="Recorded",
         labels=[
-            f"None $e_{{{epoch_none}}}$",
-            f"25 $e_{{{5}}}$",
-            f"50 $e_{{{18}}}$",
+            f"None $N_{{{epoch_none}}}$",
+            f"25 $N_{{{5}}}$",
+            f"50 $N_{{{18}}}$",
         ],
     )
 
@@ -121,8 +121,8 @@ if __name__ == '__main__':
         x_label=False,
         y_label_subtext="Rayleigh",
         labels=[
-            f"None $e_{{{epoch_none}}}$",
-            f"0.0276 $e_{{{17}}}$",
+            f"None $N_{{{epoch_none}}}$",
+            f"0.0276 $N_{{{17}}}$",
         ],
     )
 
@@ -149,22 +149,22 @@ if __name__ == '__main__':
 
     df_to_latex__additive(
         wang,
-        zedigh,
+        zedigh=None,
         trace_process_id=trace_process_id,
         file_name=f"best_additive__set_{3}",
         label=f"tbl:best_additive_{trace_process_id}_per_additive",
         table_type="per_additive_method",
     )
 
-    df_to_latex__additive(
-        wang,
-        zedigh,
-        trace_process_id=trace_process_id,
-        file_name=f"best_additive__set_{3}",
-        label=f"tbl:best_additive_{trace_process_id}_per_device",
-        table_type="per_device",
-    )
-
+    # df_to_latex__additive(
+    #     wang,
+    #     zedigh,
+    #     trace_process_id=trace_process_id,
+    #     file_name=f"best_additive__set_{3}",
+    #     label=f"tbl:best_additive_{trace_process_id}_per_device",
+    #     table_type="per_device",
+    # )
+    #
     # plot_histogram_overview(
     #     training_model_id=1,
     #     training_dataset_id=training_dataset_id,

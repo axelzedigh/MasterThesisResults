@@ -6,7 +6,7 @@ import numpy as np
 from tqdm import tqdm
 
 from scripts.RankTestScriptToDatabase import termination_point_test_setup, \
-    termination_point_test__rank_test
+    termination_point_test__rank_test, termination_point_test__rank_test__2000
 from utils.db_utils import insert_data_to_db
 from utils.denoising_utils import moving_average_filter_n3, \
     moving_average_filter_n5, wiener_filter_trace_set, moving_average_filter_n11
@@ -76,7 +76,7 @@ def termination_point_test_and_insert_to_db(
     )
 
     for _ in tqdm_iterator:
-        termination_point = termination_point_test__rank_test(
+        termination_point = termination_point_test__rank_test__2000(
             testing_traces=t,
             predictions=p,
             key_interest=k,
@@ -168,7 +168,7 @@ if __name__ == "__main__":
         database = "main.db"
         # database = "tmp_1.db"
         runs = 2
-        # runs = 100
+        # runs = 12
         test_dataset_ids = [1]
         training_dataset_ids = [3]
         environment_ids = [1]
@@ -177,11 +177,11 @@ if __name__ == "__main__":
         devices = [10]
         training_model_id = 1
         epochs = [x for x in range(2, 20)]
-        # epochs = [16]
+        # epochs = [12]
+        # additive_noise_method_ids = [None]
         additive_noise_method_ids = [None]
-        # additive_noise_method_ids = [5]
-        denoising_method_ids = [None]
-        trace_process_ids = [3]
+        denoising_method_ids = [2]
+        trace_process_ids = [8]
         plot = False
 
         for test_dataset_id in test_dataset_ids:
@@ -214,23 +214,17 @@ if __name__ == "__main__":
         # database = "tmp_1.db"
         # runs = 2
         runs = 100
-        test_dataset_ids = [2]
+        test_dataset_ids = [1]
         training_dataset_ids = [3]
         environment_ids = [1]
         distances = [15]
-        devices = [8, 10]
+        devices = [6, 7, 8, 9, 10]
         training_model_id = 1
-        denoising_method_ids = [None]
-        trace_process_ids = [3]
+        denoising_method_ids = [2]
+        trace_process_ids = [8]
         plot = False
         additive_epochs = [
-            # (6, 5),
-            # (7, 18),
-            # (3, 17),
-            # (4, 13),
-            (5, 15),
-            (11, 17),
-            (None, 10),
+            (None, 16),
         ]
 
         for test_dataset_id in test_dataset_ids:

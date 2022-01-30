@@ -71,6 +71,7 @@ def df_to_latex__additive(
             "Additive parameter 1": "Parameter Value",
         }
     )
+    wang = wang.replace({"Collected": "Recorded"})
 
     if table_type == "per_device":
         wang = wang.groupby(["Noise method", "Device"]) \
@@ -132,74 +133,78 @@ def df_to_latex__additive(
     file.close()
 
     # Zedigh
-    zedigh = zedigh.rename(
-        columns={
-            "termination_point": "Termination point",
-            "additive_noise_method": "Noise method",
-            "device": "Device",
-            "epoch": "Epoch",
-            "Additive parameter 1": "Parameter Value",
-        }
-    )
-    if table_type == "per_device":
-        zedigh = zedigh.groupby(["Noise method", "Device"]) \
-            .agg(
-            # .head(100).reset_index(drop=True).agg(
-            {'Termination point': ['mean', 'std', 'count', interval_lower, interval_upper]})
+    try:
         zedigh = zedigh.rename(
             columns={
-                "mean": "Mean",
-                "std": "$\sigma$",
-                "count": "Count",
-                "interval_lower": "$CI_{-}$",
-                "interval_upper": "$CI_{+}$",
+                "termination_point": "Termination point",
+                "additive_noise_method": "Noise method",
+                "device": "Device",
+                "epoch": "Epoch",
+                "Additive parameter 1": "Parameter Value",
             }
         )
-        latex = zedigh.to_latex(
-            # header=["M", "D", "M"],
-            # columns=["Noise method", "Device", "mean", "std", "count"],
-            sparsify=True,
-            float_format="%.0f",
-            label=label + "_zedigh",
-            escape=False,
-            caption=f"Table for Zedigh 2021 dataset - {header}",
-            position="H",
-        )
-    elif table_type == "per_additive_method":
-        g = zedigh.groupby(["Noise method", "Device"])
-        zedigh = g.apply(lambda x: x.sample(g.size().min())).reset_index(
-            drop=True)
-        zedigh = zedigh.groupby(["Noise method", "Epoch", "Parameter Value"]).agg(
-            {'Termination point': ['mean', 'std', 'count', interval_lower,
-                                   interval_upper]})
-        zedigh = zedigh.rename(
-            columns={
-                "mean": "Mean",
-                "std": "$\sigma$",
-                "count": "Count",
-                "interval_lower": "$CI_{-}$",
-                "interval_upper": "$CI_{+}$",
-            }
-        )
-        zedigh = zedigh.reset_index()
-        latex = zedigh.to_latex(
-            # header=["M", "D", "M"],
-            sparsify=True,
-            float_format="%.0f",
-            label=label + "_wang",
-            escape=False,
-            caption=f"Table for Zedigh 2021 dataset - {header}",
-            position="H",
-        )
+        zedigh = zedigh.replace({"Collected": "Recorded"})
+        if table_type == "per_device":
+            zedigh = zedigh.groupby(["Noise method", "Device"]) \
+                .agg(
+                # .head(100).reset_index(drop=True).agg(
+                {'Termination point': ['mean', 'std', 'count', interval_lower, interval_upper]})
+            zedigh = zedigh.rename(
+                columns={
+                    "mean": "Mean",
+                    "std": "$\sigma$",
+                    "count": "Count",
+                    "interval_lower": "$CI_{-}$",
+                    "interval_upper": "$CI_{+}$",
+                }
+            )
+            latex = zedigh.to_latex(
+                # header=["M", "D", "M"],
+                # columns=["Noise method", "Device", "mean", "std", "count"],
+                sparsify=True,
+                float_format="%.0f",
+                label=label + "_zedigh",
+                escape=False,
+                caption=f"Table for Zedigh 2021 dataset - {header}",
+                position="H",
+            )
+        elif table_type == "per_additive_method":
+            g = zedigh.groupby(["Noise method", "Device"])
+            zedigh = g.apply(lambda x: x.sample(g.size().min())).reset_index(
+                drop=True)
+            zedigh = zedigh.groupby(["Noise method", "Epoch", "Parameter Value"]).agg(
+                {'Termination point': ['mean', 'std', 'count', interval_lower,
+                                       interval_upper]})
+            zedigh = zedigh.rename(
+                columns={
+                    "mean": "Mean",
+                    "std": "$\sigma$",
+                    "count": "Count",
+                    "interval_lower": "$CI_{-}$",
+                    "interval_upper": "$CI_{+}$",
+                }
+            )
+            zedigh = zedigh.reset_index()
+            latex = zedigh.to_latex(
+                # header=["M", "D", "M"],
+                sparsify=True,
+                float_format="%.0f",
+                label=label + "_zedigh",
+                escape=False,
+                caption=f"Table for Zedigh 2021 dataset - {header}",
+                position="H",
+            )
 
-    file_path = os.path.join(
-        REPORT_DIR,
-        f"tables/{trace_process_id}",
-        file_name + f"_{table_type}_zedigh.tex",
-        )
-    file = open(file_path, "w")
-    file.write(latex)
-    file.close()
+        file_path = os.path.join(
+            REPORT_DIR,
+            f"tables/{trace_process_id}",
+            file_name + f"_{table_type}_zedigh.tex",
+            )
+        file = open(file_path, "w")
+        file.write(latex)
+        file.close()
+    except:
+        pass
 
 
 def df_to_latex__denoising(
@@ -221,6 +226,7 @@ def df_to_latex__denoising(
             "Denoising parameter 1": "Parameter Value",
         }
     )
+    wang = wang.replace({"Collected": "Recorded"})
 
     if table_type == "per_device":
         wang = wang.groupby(["Denoising method", "Device"]) \
@@ -291,6 +297,7 @@ def df_to_latex__denoising(
             "Denoising parameter 1": "Parameter Value",
         }
     )
+    zedigh = zedigh.replace({"Collected": "Recorded"})
     if table_type == "per_device":
         zedigh = zedigh.groupby(["Noise method", "Device"]) \
             .agg(

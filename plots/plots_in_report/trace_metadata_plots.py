@@ -433,131 +433,131 @@ if __name__ == '__main__':
     # )
 
 
-    # # # 15m, office corridor, Wang2021
-    # plot_trace_width__rms(
-    #     test_dataset_id=1,
-    #     training_dataset_id="None",
-    #     distance=15,
-    #     device=9,
-    #     environment_id=1,
-    #     trace_process_id=1,
-    #     # show=True,
-    # )
-    # plot_trace_width__rms(
-    #     test_dataset_id=1,
-    #     training_dataset_id="None",
-    #     distance=15,
-    #     device=7,
-    #     environment_id=1,
-    #     trace_process_id=1,
-    #     # show=True,
-    # )
-    # plot_trace_width__rms(
-    #     test_dataset_id=1,
-    #     training_dataset_id="None",
-    #     distance=15,
-    #     device=6,
-    #     environment_id=1,
-    #     trace_process_id=1,
-    #     # show=True,
-    # )
-    # plot_trace_width__rms(
-    #     test_dataset_id=1,
-    #     training_dataset_id="None",
-    #     distance=15,
-    #     device=8,
-    #     environment_id=1,
-    #     trace_process_id=1,
-    #     # show=True,
-    # )
-    # plot_trace_width__rms(
-    #     test_dataset_id=1,
-    #     training_dataset_id="None",
-    #     distance=15,
-    #     device=10,
-    #     environment_id=1,
-    #     trace_process_id=1,
-    #     # show=True,
-    # )
+    # # 15m, office corridor, Wang2021
+    plot_trace_width__rms(
+        test_dataset_id=1,
+        training_dataset_id="None",
+        distance=15,
+        device=9,
+        environment_id=1,
+        trace_process_id=1,
+        # show=True,
+    )
+    plot_trace_width__rms(
+        test_dataset_id=1,
+        training_dataset_id="None",
+        distance=15,
+        device=7,
+        environment_id=1,
+        trace_process_id=1,
+        # show=True,
+    )
+    plot_trace_width__rms(
+        test_dataset_id=1,
+        training_dataset_id="None",
+        distance=15,
+        device=6,
+        environment_id=1,
+        trace_process_id=1,
+        # show=True,
+    )
+    plot_trace_width__rms(
+        test_dataset_id=1,
+        training_dataset_id="None",
+        distance=15,
+        device=8,
+        environment_id=1,
+        trace_process_id=1,
+        # show=True,
+    )
+    plot_trace_width__rms(
+        test_dataset_id=1,
+        training_dataset_id="None",
+        distance=15,
+        device=10,
+        environment_id=1,
+        trace_process_id=1,
+        # show=True,
+    )
 
-    # # 15m, office corridor, Zedigh2021
-    # plot_trace_width__rms(
-    #     test_dataset_id=2,
-    #     training_dataset_id="None",
-    #     distance=15,
-    #     device=8,
-    #     environment_id=1,
-    #     trace_process_id=1,
-    #     # show=True,
-    # )
-    # plot_trace_width__rms(
-    #     test_dataset_id=2,
-    #     training_dataset_id="None",
-    #     distance=15,
-    #     device=10,
-    #     environment_id=1,
-    #     trace_process_id=1,
-    #     # show=True,
-    # )
+    # 15m, office corridor, Zedigh2021
+    plot_trace_width__rms(
+        test_dataset_id=2,
+        training_dataset_id="None",
+        distance=15,
+        device=8,
+        environment_id=1,
+        trace_process_id=1,
+        # show=True,
+    )
+    plot_trace_width__rms(
+        test_dataset_id=2,
+        training_dataset_id="None",
+        distance=15,
+        device=10,
+        environment_id=1,
+        trace_process_id=1,
+        # show=True,
+    )
 
-    # # 10m, office corridor, Zedigh2021
-    # plot_trace_width__rms(
-    #     test_dataset_id=2,
-    #     training_dataset_id="None",
-    #     distance=10,
-    #     device=8,
-    #     environment_id=1,
-    #     trace_process_id=1,
-    #     # show=True,
-    # )
-    # plot_trace_width__rms(
-    #     test_dataset_id=2,
-    #     training_dataset_id="None",
-    #     distance=10,
-    #     device=10,
-    #     environment_id=1,
-    #     trace_process_id=1,
-    #     # show=True,
-    # )
+    # 10m, office corridor, Zedigh2021
+    plot_trace_width__rms(
+        test_dataset_id=2,
+        training_dataset_id="None",
+        distance=10,
+        device=8,
+        environment_id=1,
+        trace_process_id=1,
+        # show=True,
+    )
+    plot_trace_width__rms(
+        test_dataset_id=2,
+        training_dataset_id="None",
+        distance=10,
+        device=10,
+        environment_id=1,
+        trace_process_id=1,
+        # show=True,
+    )
 
-    # # 5m, office corridor, Zedigh2021
-    # plot_trace_width__rms(
-    #     test_dataset_id=2,
-    #     training_dataset_id="None",
-    #     distance=5,
-    #     device=8,
-    #     environment_id=1,
-    #     trace_process_id=1,
-    #     # show=True,
-    # )
-    # plot_trace_width__rms(
-    #     test_dataset_id=2,
-    #     training_dataset_id="None",
-    #     distance=5,
-    #     device=10,
-    #     environment_id=1,
-    #     trace_process_id=1,
-    #     # show=True,
-    # )
+    # 5m, office corridor, Zedigh2021
+    plot_trace_width__rms(
+        test_dataset_id=2,
+        training_dataset_id="None",
+        distance=5,
+        device=8,
+        environment_id=1,
+        trace_process_id=1,
+        # show=True,
+    )
+    plot_trace_width__rms(
+        test_dataset_id=2,
+        training_dataset_id="None",
+        distance=5,
+        device=10,
+        environment_id=1,
+        trace_process_id=1,
+        # show=True,
+    )
 
-    # # 5m, big hall, Zedigh2021
-    # plot_trace_width__rms(
-    #     test_dataset_id=2,
-    #     training_dataset_id="None",
-    #     distance=5,
-    #     device=8,
-    #     environment_id=2,
-    #     trace_process_id=1,
-    #     # show=True,
-    # )
-    # plot_trace_width__rms(
-    #     test_dataset_id=2,
-    #     training_dataset_id="None",
-    #     distance=5,
-    #     device=10,
-    #     environment_id=2,
-    #     trace_process_id=1,
-    #     # show=True,
-    # )
+    # 5m, big hall, Zedigh2021
+    plot_trace_width__rms(
+        test_dataset_id=2,
+        training_dataset_id="None",
+        distance=5,
+        device=8,
+        environment_id=2,
+        trace_process_id=1,
+        # show=True,
+    )
+    plot_trace_width__rms(
+        test_dataset_id=2,
+        training_dataset_id="None",
+        distance=5,
+        device=10,
+        environment_id=2,
+        trace_process_id=1,
+        # show=True,
+    )
     pass
 

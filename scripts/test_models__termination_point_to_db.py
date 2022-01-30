@@ -172,18 +172,18 @@ if __name__ == "__main__":
         # database = "tmp_1.db"
         runs = 2
         # runs = 12
-        test_dataset_ids = [2]
+        test_dataset_ids = [1]
         training_dataset_ids = [3]
         environment_ids = [1]
         distances = [15]
         # devices = [6, 7, 8, 9, 10]
         devices = [10]
         training_model_id = 1
-        epochs = [x for x in range(10, 20)]
+        epochs = [x for x in range(2, 20)]
         # epochs = [12]
         # additive_noise_method_ids = [None]
-        additive_noise_method_ids = [8]
-        denoising_method_ids = [None]
+        additive_noise_method_ids = [None]
+        denoising_method_ids = [1]
         trace_process_ids = [9]
         plot = False
 
@@ -217,24 +217,17 @@ if __name__ == "__main__":
         # database = "tmp_1.db"
         # runs = 2
         runs = 100
-        test_dataset_ids = [2]
+        test_dataset_ids = [1]
         training_dataset_ids = [3]
         environment_ids = [1]
-        distances = [5, 10]
-        devices = [8, 10]
+        distances = [15]
+        devices = [6, 7, 8, 9, 10]
         training_model_id = 1
         denoising_method_ids = [None]
-        trace_process_ids = [9]
+        trace_process_ids = [3]
         plot = False
         additive_epochs = [
-            (None, 6),
-            (4, 11),
-            (6, 6),
-            (11, 15),
-            (3, 13),
-            (5, 12),
-            (10, 16),
-            (7, 4),
+            (6, 5),
         ]
 
         for test_dataset_id in test_dataset_ids:

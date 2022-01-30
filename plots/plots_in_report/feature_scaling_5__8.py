@@ -5,9 +5,9 @@ from plots.history_log_plots import plot_history_log__overview_trace_process
 from plots.rank_test_plots import plot_best_additive_noise_methods_2, \
     plot_epoch_comparison_report, plot_all_of_an_additive_noise__report, \
     plot_all_of_a_denoising_method__report, \
-    plot_all_of_an_additive_noise__report__2
+    plot_all_of_an_additive_noise__report__2, plot_all_of_denoising
 from plots.trace_plots import plot_example_normalized_training_trace_1_row
-from utils.plot_utils import df_to_latex__additive
+from utils.plot_utils import df_to_latex__additive, df_to_latex__denoising
 
 if __name__ == '__main__':
     # Feature scaling 5 - Standardization over Sbox range
@@ -17,21 +17,21 @@ if __name__ == '__main__':
     #     file_format="pgf", show=False, denoising_method_id=None
     # )
 
-    plot_epoch_comparison_report(
-        training_model_id=1,
-        training_dataset_id=3,
-        test_dataset_id=1,
-        trace_process_id=trace_process_id,
-        environment_id=1,
-        distance=15,
-        device=10,
-        additive_noise_method_id=5,
-        save_path=REPORT_DIR,
-        file_format="pgf",
-        # show=True,
-        y_bottom=100,
-        y_top=400,
-    )
+    # plot_epoch_comparison_report(
+    #     training_model_id=1,
+    #     training_dataset_id=3,
+    #     test_dataset_id=1,
+    #     trace_process_id=trace_process_id,
+    #     environment_id=1,
+    #     distance=15,
+    #     device=10,
+    #     additive_noise_method_id=5,
+    #     save_path=REPORT_DIR,
+    #     file_format="pgf",
+    #     # show=True,
+    #     y_bottom=100,
+    #     y_top=400,
+    # )
 
     epoch_none = 16
     plot_all_of_an_additive_noise__report__2(
@@ -52,10 +52,10 @@ if __name__ == '__main__':
         x_label=False,
         y_label_subtext="Gaussian",
         labels=[
-            f"None $e_{{{epoch_none}}}$",
-            f"0.03 $e_{{{10}}}$",
-            f"0.04 $e_{{{5}}}$",
-            f"0.05 $e_{{{17}}}$",
+            f"None $N_{{{epoch_none}}}$",
+            f"0.03 $N_{{{10}}}$",
+            f"0.04 $N_{{{5}}}$",
+            f"0.05 $N_{{{17}}}$",
         ],
     )
 
@@ -77,9 +77,9 @@ if __name__ == '__main__':
         x_label=False,
         y_label_subtext="Recorded",
         labels=[
-            f"None $e_{{{epoch_none}}}$",
-            f"25 $e_{{{9}}}$",
-            f"50 $e_{{{8}}}$",
+            f"None $N_{{{epoch_none}}}$",
+            f"25 $N_{{{9}}}$",
+            f"50 $N_{{{8}}}$",
         ],
     )
 
@@ -101,9 +101,9 @@ if __name__ == '__main__':
         x_label=False,
         y_label_subtext="Rayleigh",
         labels=[
-            f"None $e_{{{epoch_none}}}$",
-            f"0.0138 $e_{{{6}}}$",
-            f"0.0276 $e_{{{15}}}$",
+            f"None $N_{{{epoch_none}}}$",
+            f"0.0138 $N_{{{6}}}$",
+            f"0.0276 $N_{{{15}}}$",
         ],
     )
 
@@ -158,3 +158,36 @@ if __name__ == '__main__':
     #     file_format="pgf",
     #     # show=True,
     # )
+
+    # Denoising
+    wang, zedigh = plot_all_of_denoising(
+        trace_process_id=trace_process_id,
+        parameter_1_value_1=3,
+        parameter_1_value_2=5,
+        parameter_1_value_3=0,
+        parameter_1_value_4=0,
+        epoch_none=epoch_none,
+        epoch_1=16,
+        epoch_2=16,
+        epoch_3=0,
+        epoch_4=0,
+        # show=True,
+        y_top=3000,
+        row_size=1,
+        x_label=True,
+        y_label_subtext="Denoising",
+        labels=[
+            f"- $N_{{{epoch_none}}}$",
+            "$M_3, N_{16}$",
+            "$M_5, N_{16}$",
+        ],
+    )
+
+    df_to_latex__denoising(
+        wang,
+        zedigh,
+        trace_process_id=trace_process_id,
+        file_name=f"denoising",
+        label=f"tbl:denoising__per_denoising",
+        table_type="per_denoising",
+    )

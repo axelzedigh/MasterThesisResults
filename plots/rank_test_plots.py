@@ -308,10 +308,10 @@ def plot_best_additive_noise_methods_2(
         "additive_noise_method_parameter_1_value": "Additive parameter 1"},
         inplace=True)
     labels = [
-        f"None: $e_{{{epoch_none}}}$",
-        f"Re: {collected_value} $e_{{{epoch_collected}}}$",
-        f"G: {gaussian_value} $e_{{{epoch_gaussian}}}$",
-        f"Ra: {rayleigh_value} $e_{{{epoch_rayleigh}}}$",
+        f"None: $N_{{{epoch_none}}}$",
+        f"Re: {collected_value} $N_{{{epoch_collected}}}$",
+        f"G: {gaussian_value} $N_{{{epoch_gaussian}}}$",
+        f"Ra: {rayleigh_value} $N_{{{epoch_rayleigh}}}$",
     ]
     sns.barplot(
         x=full_rank_test__wang["device"],

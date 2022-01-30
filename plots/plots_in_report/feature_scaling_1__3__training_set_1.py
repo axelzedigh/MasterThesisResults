@@ -30,22 +30,22 @@ if __name__ == '__main__':
     #     file_format="pgf", show=False, denoising_method_id=None
     # )
 
-    plot_epoch_comparison_report(
-        training_model_id=1,
-        training_dataset_id=training_dataset_id,
-        test_dataset_id=test_dataset_id,
-        trace_process_id=trace_process_id,
-        environment_id=environment_id,
-        distance=distance,
-        device=device,
-        additive_noise_method_id=additive_noise_method,
-        save_path=REPORT_DIR,
-        file_format="pgf",
-        # show=True
-        y_bottom=100,
-        y_top=400,
-    )
-
+    # plot_epoch_comparison_report(
+    #     training_model_id=1,
+    #     training_dataset_id=training_dataset_id,
+    #     test_dataset_id=test_dataset_id,
+    #     trace_process_id=trace_process_id,
+    #     environment_id=environment_id,
+    #     distance=distance,
+    #     device=device,
+    #     additive_noise_method_id=additive_noise_method,
+    #     save_path=REPORT_DIR,
+    #     file_format="pgf",
+    #     # show=True
+    #     y_bottom=100,
+    #     y_top=400,
+    # )
+    #
     epoch_none = 65
     plot_all_of_an_additive_noise__report__2(
         training_dataset='Wang_2021 - Cable, 5 devices, 200k traces',
@@ -66,11 +66,11 @@ if __name__ == '__main__':
         x_label=False,
         y_label_subtext="Gaussian",
         labels=[
-            f"None $e_{{{epoch_none}}}$",
-            f"0.01 $e_{{{65}}}$",
-            f"0.03 $e_{{{65}}}$",
-            f"0.04 $e_{{{65}}}$",
-            f"0.05 $e_{{{65}}}$",
+            f"None $N_{{{epoch_none}}}$",
+            f"0.01 $N_{{{65}}}$",
+            f"0.03 $N_{{{65}}}$",
+            f"0.04 $N_{{{65}}}$",
+            f"0.05 $N_{{{65}}}$",
         ],
     )
 
@@ -93,11 +93,11 @@ if __name__ == '__main__':
         x_label=False,
         y_label_subtext="Recorded",
         labels=[
-            f"None $e_{{{epoch_none}}}$",
-            f"25 $e_{{{65}}}$",
-            f"50 $e_{{{65}}}$",
-            f"75 $e_{{{65}}}$",
-            f"100 $e_{{{65}}}$",
+            f"None $N_{{{epoch_none}}}$",
+            f"25 $N_{{{65}}}$",
+            f"50 $N_{{{65}}}$",
+            f"75 $N_{{{65}}}$",
+            f"100 $N_{{{65}}}$",
         ],
     )
 
@@ -121,8 +121,8 @@ if __name__ == '__main__':
         y_label_subtext="Rayleigh",
         labels=[
             f"None $e_{{{epoch_none}}}$",
-            f"0.0138 $e_{{{65}}}$",
-            f"0.0276 $e_{{{65}}}$",
+            f"0.0138 $N_{{{65}}}$",
+            f"0.0276 $N_{{{65}}}$",
         ],
     )
 

@@ -49,10 +49,10 @@ if __name__ == '__main__':
         x_label=False,
         y_label_subtext="Gaussian",
         labels=[
-                   f"None $e_{{{epoch_none}}}$",
-                   f"0.03 $e_{{{12}}}$",
-                   f"0.04 $e_{{{12}}}$",
-                   f"0.05 $e_{{{13}}}$",
+                   f"None $N_{{{epoch_none}}}$",
+                   f"0.03 $N_{{{12}}}$",
+                   f"0.04 $N_{{{12}}}$",
+                   f"0.05 $N_{{{13}}}$",
                ],
     )
 
@@ -74,9 +74,9 @@ if __name__ == '__main__':
         x_label=False,
         y_label_subtext="Recorded",
         labels=[
-            f"None $e_{{{epoch_none}}}$",
-            f"25 $e_{{{12}}}$",
-            f"50 $e_{{{7}}}$",
+            f"None $N_{{{epoch_none}}}$",
+            f"25 $N_{{{12}}}$",
+            f"50 $N_{{{7}}}$",
         ],
     )
 
@@ -98,9 +98,9 @@ if __name__ == '__main__':
         x_label=False,
         y_label_subtext="Rayleigh",
         labels=[
-            f"None $e_{{{epoch_none}}}$",
-            f"0.0138 $e_{{{12}}}$",
-            f"0.0276 $e_{{{7}}}$",
+            f"None $N_{{{epoch_none}}}$",
+            f"0.0138 $N_{{{12}}}$",
+            f"0.0276 $N_{{{7}}}$",
         ],
     )
 

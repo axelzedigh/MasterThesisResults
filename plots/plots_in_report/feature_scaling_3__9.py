@@ -6,14 +6,14 @@ from plots.rank_test_plots import plot_best_additive_noise_methods_2, \
     plot_epoch_comparison_report, plot_all_of_an_additive_noise__report, \
     plot_all_of_a_denoising_method__report, \
     plot_all_of_an_additive_noise__report__2, \
-    plot_all_of_an_additive_noise__report__zedigh_distances
+    plot_all_of_an_additive_noise__report__zedigh_distances, \
+    plot_all_of_denoising
 from plots.trace_plots import plot_example_normalized_training_trace_1_row
-from utils.plot_utils import df_to_latex__additive
-
+from utils.plot_utils import df_to_latex__additive, df_to_latex__denoising
 
 if __name__ == '__main__':
 
-    # Feature scaling 3 - MaxMin(-1, 1) over Sbox
+    # Feature scaling 3 - MaxMin(-1, 1) over whole trace
     # Trace process id 9
     trace_process_id = 9
     # plot_example_normalized_training_trace_1_row(
@@ -51,18 +51,18 @@ if __name__ == '__main__':
     #     epoch_3=11,
     #     epoch_4=12,
     #     # show=True,
-    #     y_top=1000,
+    #     y_top=1200,
     #     row_size=1,
     #     x_label=False,
     #     y_label_subtext="Gaussian",
     #     labels=[
-    #         f"None $e_{{{epoch_none}}}$",
-    #         f"0.03 $e_{{{13}}}$",
-    #         f"0.04 $e_{{{11}}}$",
-    #         f"0.05 $e_{{{12}}}$",
+    #         f"None $N_{{{epoch_none}}}$",
+    #         f"0.03 $N_{{{13}}}$",
+    #         f"0.04 $N_{{{11}}}$",
+    #         f"0.05 $N_{{{12}}}$",
     #     ],
     # )
-
+    #
     # plot_all_of_an_additive_noise__report__2(
     #     trace_process_id=trace_process_id,
     #     additive_noise_method='Collected',
@@ -76,17 +76,17 @@ if __name__ == '__main__':
     #     epoch_3=0,
     #     epoch_4=0,
     #     # show=True,
-    #     y_top=1000,
+    #     y_top=1200,
     #     row_size=1,
     #     x_label=False,
     #     y_label_subtext="Recorded",
     #     labels=[
-    #         f"None $e_{{{epoch_none}}}$",
-    #         f"25 $e_{{{6}}}$",
-    #         f"50 $e_{{{4}}}$",
+    #         f"None $N_{{{epoch_none}}}$",
+    #         f"25 $N_{{{6}}}$",
+    #         f"50 $N_{{{4}}}$",
     #     ],
     # )
-
+    #
     # plot_all_of_an_additive_noise__report__2(
     #     trace_process_id=trace_process_id,
     #     additive_noise_method='Rayleigh',
@@ -100,17 +100,17 @@ if __name__ == '__main__':
     #     epoch_3=0,
     #     epoch_4=0,
     #     # show=True,
-    #     y_top=1000,
+    #     y_top=1200,
     #     row_size=1,
     #     x_label=False,
     #     y_label_subtext="Rayleigh",
     #     labels=[
-    #         f"None $e_{{{epoch_none}}}$",
-    #         f"0.0138 $e_{{{16}}}$",
-    #         f"0.0276 $e_{{{15}}}$",
+    #         f"None $N_{{{epoch_none}}}$",
+    #         f"0.0138 $N_{{{16}}}$",
+    #         f"0.0276 $N_{{{15}}}$",
     #     ],
     # )
-
+    #
     # wang, zedigh = plot_best_additive_noise_methods_2(
     #     training_dataset='Wang_2021 - Cable, 5 devices, 500k traces',
     #     trace_process_id=trace_process_id,
@@ -124,20 +124,21 @@ if __name__ == '__main__':
     #     epoch_collected=6,
     #     epoch_rayleigh=15,
     #     # show=True,
-    #     y_top=1000,
+    #     y_top=1200,
     #     row_size=1,
     #     x_label=True,
     #     y_label_subtext="Best Additive Noise",
-    #     custom_labels=True
+    #     custom_labels=True,
     # )
-
+    #
     # df_to_latex__additive(
-    #     wang,
-    #     zedigh,
+    #     wang=wang,
+    #     zedigh=zedigh,
     #     trace_process_id=trace_process_id,
     #     file_name=f"best_additive",
     #     label=f"tbl:best_additive_{trace_process_id}_per_additive",
     #     table_type="per_additive_method",
+    #     header="MaxMin (-1, 1) over whole trace",
     # )
 
     # df_to_latex__additive(
@@ -147,6 +148,21 @@ if __name__ == '__main__':
     #     file_name=f"best_additive",
     #     label=f"tbl:best_additive__per_device",
     #     table_type="per_device",
+    # )
+
+    # # Stats
+    # hypothesis_test_1(
+    #     trace_process_id=trace_process_id,
+    #     gaussian_value=0.04,
+    #     collected_value=25,
+    #     rayleigh_value=0.0276,
+    #     epoch_none=epoch_none,
+    #     epoch_gaussian=11,
+    #     epoch_collected=6,
+    #     epoch_rayleigh=15,
+    #     # histogram=True
+    #     file_name=f"stats_{trace_process_id}_",
+    #     label=f"tbl:stats_{trace_process_id}_",
     # )
 
     # plot_histogram_overview(
@@ -212,27 +228,64 @@ if __name__ == '__main__':
     #     ],
     # )
 
-    plot_all_of_an_additive_noise__report__zedigh_distances(
+    # plot_all_of_an_additive_noise__report__zedigh_distances(
+    #     trace_process_id=trace_process_id,
+    #     additive_noise_method='Rayleigh',
+    #     parameter_1_value_1=0.0138,
+    #     parameter_1_value_2=0.0276,
+    #     parameter_1_value_3=0,
+    #     parameter_1_value_4=0,
+    #     epoch_none=epoch_none,
+    #     epoch_1=16,  # Or 7
+    #     epoch_2=15,  # Or 8
+    #     epoch_3=0,
+    #     epoch_4=0,
+    #     # show=True,
+    #     y_top=1500,
+    #     row_size=1,
+    #     x_label=True,
+    #     y_label_subtext="Rayleigh",
+    #     labels=[
+    #         f"None $e_{{{epoch_none}}}$",
+    #         f"0.0138 $e_{{{16}}}$",
+    #         f"0.0276 $e_{{{15}}}$",
+    #     ],
+    #     big_hall=True
+    # )
+
+    # Denoising
+    wang, zedigh = plot_all_of_denoising(
         trace_process_id=trace_process_id,
-        additive_noise_method='Rayleigh',
-        parameter_1_value_1=0.0138,
-        parameter_1_value_2=0.0276,
-        parameter_1_value_3=0,
-        parameter_1_value_4=0,
+        parameter_1_value_1=3,
+        parameter_1_value_2=5,
+        parameter_1_value_3=0.02,
+        parameter_1_value_4=0.2,
         epoch_none=epoch_none,
-        epoch_1=16,  # Or 7
-        epoch_2=15,  # Or 8
-        epoch_3=0,
-        epoch_4=0,
+        epoch_1=19,
+        epoch_2=4,
+        epoch_3=13,
+        epoch_4=11,
         # show=True,
-        y_top=1500,
+        y_top=3000,
         row_size=1,
-        x_label=True,
-        y_label_subtext="Rayleigh",
+        x_label=False,
+        y_label_subtext="Denoising",
         labels=[
-            f"None $e_{{{epoch_none}}}$",
-            f"0.0138 $e_{{{16}}}$",
-            f"0.0276 $e_{{{15}}}$",
+            f"- $N_{{{epoch_none}}}$",
+            "$M_3, N_{19}$",
+            "$M_5, N_{4}$",
+            "$W_{0.02}, N_{13}$",
+            "$W_{0.2}, N_{11}$",
         ],
-        big_hall=True
     )
+
+    df_to_latex__denoising(
+        wang,
+        zedigh,
+        trace_process_id=trace_process_id,
+        file_name=f"denoising",
+        label=f"tbl:denoising__per_denoising",
+        table_type="per_denoising",
+    )
+
+

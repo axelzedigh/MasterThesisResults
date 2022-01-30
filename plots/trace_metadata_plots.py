@@ -1067,7 +1067,7 @@ def plot_trace_width__rms(
     """
     # MPL styling
     plt.style.use(NORD_LIGHT_MPL_STYLE_2_PATH)
-    w, h = set_size(subplots=(0.5, 1), fraction=1)
+    w, h = set_size(subplots=(0.4, 1), fraction=1)
     fig = plt.figure(figsize=(w, h), constrained_layout=True)
     ax1 = fig.gca()
     # ax2 = plt.subplot(1, 2, 2)

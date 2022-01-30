@@ -49,9 +49,9 @@ if __name__ == '__main__':
     #     x_label=False,
     #     y_label_subtext="Gaussian",
     #     labels=[
-    #         f"None $e_{{{epoch_none}}}$",
-    #         f"0.03 $e_{{{0}}}$",
-    #         f"0.04 $e_{{{0}}}$",
+    #         f"None $N_{{{epoch_none}}}$",
+    #         f"0.03 $N_{{{0}}}$",
+    #         f"0.04 $N_{{{0}}}$",
     #     ],
     # )
 
@@ -73,11 +73,11 @@ if __name__ == '__main__':
     #     x_label=False,
     #     y_label_subtext="Recorded",
     #     labels=[
-    #         f"None $e_{{{epoch_none}}}$",
-    #         f"25 $e_{{{20}}}$",
-    #         f"50 $e_{{{7}}}$",
-    #         f"75 $e_{{{12}}}$",
-    #         f"100 $e_{{{19}}}$",
+    #         f"None $N_{{{epoch_none}}}$",
+    #         f"25 $N_{{{20}}}$",
+    #         f"50 $N_{{{7}}}$",
+    #         f"75 $N_{{{12}}}$",
+    #         f"100 $N_{{{19}}}$",
     #     ],
     # )
 
@@ -99,7 +99,7 @@ if __name__ == '__main__':
         x_label=False,
         y_label_subtext="Rayleigh",
         labels=[
-            f"0.0138 $e_{{{17}}}$",
+            f"0.0138 $N_{{{17}}}$",
         ],
     )
 
@@ -141,16 +141,16 @@ if __name__ == '__main__':
         table_type="per_device",
     )
 
-    plot_histogram_overview(
-        training_model_id=1,
-        training_dataset_id=3,
-        test_dataset_id=1,
-        environment_id=1,
-        trace_process_id=3,
-        device=6,
-        distance=15,
-        epoch=65,
-        save_path=REPORT_DIR,
-        file_format="pgf",
-        # show=True,
-    )
+    # plot_histogram_overview(
+    #     training_model_id=1,
+    #     training_dataset_id=3,
+    #     test_dataset_id=1,
+    #     environment_id=1,
+    #     trace_process_id=3,
+    #     device=6,
+    #     distance=15,
+    #     epoch=65,
+    #     save_path=REPORT_DIR,
+    #     file_format="pgf",
+    #     # show=True,
+    # )

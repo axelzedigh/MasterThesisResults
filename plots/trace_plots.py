@@ -614,7 +614,7 @@ def plot_example_normalized_training_trace_1_row(
     plt.rcParams.update({
         "lines.linewidth": 1,
     })
-    w, h = set_size(subplots=(0.5, 1), fraction=1)
+    w, h = set_size(subplots=(0.45, 1), fraction=1)
     fig, ax1 = plt.subplots(1, 1, figsize=(w, h))
 
     # Get training traces path.

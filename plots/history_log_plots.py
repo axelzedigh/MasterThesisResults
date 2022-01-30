@@ -122,7 +122,7 @@ def plot_history_log__overview_trace_process(
     ]
 
     # Create 4 x 4 grid
-    w, h = set_size(subplots=(nrows, 2), fraction=1)
+    w, h = set_size(subplots=(nrows*0.85, 2), fraction=1)
     fig = plt.figure(figsize=(w, h))
     fig.subplots_adjust(hspace=0.2, wspace=0.2)
     additive_noise_method_ids = ["None", 1, 3, 4, 5, 6, 7, 8, 9, 10, 11]
@@ -300,8 +300,10 @@ def plot_history_log__overview_trace_process(
                 ax1.set_title("$MAF_3$")
             elif denoising_method == 2:
                 ax1.set_title("$MAF_5$")
-            elif denoising_method == 3:
-                ax1.set_title("Wiener Filter")
+            elif denoising_method == 4:
+                ax1.set_title("Wiener Filter $P_{0.2}$")
+            elif denoising_method == 6:
+                ax1.set_title("Wiener Filter $P_{0.02}$")
 
             ax1.xaxis.set_major_locator(ticker.MaxNLocator(integer=True, nbins=5))
             ax1.set_ylim(0, 2.5)
